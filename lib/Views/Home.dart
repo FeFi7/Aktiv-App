@@ -39,46 +39,37 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => ClickerProvider()),
-        ],
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
             ),
-            body: Center(
-              child: _widgetOptions.elementAt(_selectedIndex),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Kalender',
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.calendar_today),
-                  label: 'Kalender',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.confirmation_num),
-                  label: 'Tickets',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              selectedItemColor: Colors.blue[800],
-              onTap: _onItemTapped,
+            BottomNavigationBarItem(
+              icon: Icon(Icons.confirmation_num),
+              label: 'Tickets',
             ),
-            floatingActionButton: Consumer<ClickerProvider>(
-              builder: (context, value, child) {
-                return FloatingActionButton(
-                  onPressed:
-                      Provider.of<ClickerProvider>(context, listen: false)
-                          .incrementCounter,
-                  tooltip: 'Increment',
-                  child: Icon(Icons.add),
-                );
-              },
-            )));
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.blue[800],
+          onTap: _onItemTapped,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: Provider.of<ClickerProvider>(context, listen: false)
+              .incrementCounter,
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        ));
   }
 }
