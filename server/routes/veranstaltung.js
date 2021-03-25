@@ -6,7 +6,7 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
-router.get('/*', function(req, res) {
+router.get('/*', async function(req, res) {
   res.send('API für Veranstaltungen');
 });
 

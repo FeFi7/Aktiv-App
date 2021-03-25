@@ -8,7 +8,7 @@ const port = 3000
 app.use(compression())
 
 app.use('/api/veranstaltung', routerVeranstaltungen)
-app.get('/api/*', (req, res) => res.send('Hello Aktiv App API!'))
-app.get('/', (req, res) => res.send('Hello Aktiv App!'))
+app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
+app.get('/',async (req, res) => res.send('Hello Aktiv App!'))
 
 app.listen(port, () => console.log('Example app listening on port '+ port +'!'))
