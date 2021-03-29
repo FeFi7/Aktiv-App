@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+    nodeserver:
+        restart: unless-stopped
+        build:
+            context: ./nodeJS
+        volumes: 
+            - /home/uploads/images/:/uploads/images
+        ports:
+            - "3000:3000"
+        depends_on: 
+            - db
+    nginx:
+        restart: unless-stopped
+        build:
+            context: ./nginx
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes: 
+            - /data/certs:/etc/nginx/certs
+            - ./logs:/var/log/nginx
+    db: 
+        image: mysql:8.0
+        restart: unless-stopped
+        environment: 
+            MYSQL_DATABASE: 'db'
+            MYSQL_USER: 'user'
+            MYSQL_PASSWORD: 'user1'
+            MYSQL_ROOT_PASSWORD: 'root1'
+        ports:
+            - '3306:3306'
+        expose:
+            - '3306'
+        volumes:
+            - db-config:/etc/mysql
+            - db-data:/var/lib/mysql
+            - ./db/backup/files/:/data_backup/data
+volumes: 
+    db-config:
+    db-data:
