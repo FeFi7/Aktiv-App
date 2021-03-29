@@ -1,8 +1,0 @@
-172.18.0.1 - - [29/Mar/2021:13:00:27 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:00:34 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:27 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:28 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:30 +0000] "GET / HTTP/1.1" 404 153 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:31 +0000] "GET / HTTP/1.1" 404 153 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:34 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"
-172.18.0.1 - - [29/Mar/2021:13:14:36 +0000] "GET /api/ HTTP/1.1" 304 0 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:87.0) Gecko/20100101 Firefox/87.0" "-"

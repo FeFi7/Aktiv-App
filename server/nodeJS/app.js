@@ -1,6 +1,6 @@
 const express = require('express')
 const compression = require('compression')
-const routerVeranstaltungen = require('./routes/veranstaltung')
+const routerVeranstaltungen = require('./routes/veranstaltungRoute')
 
 const app = express()
 const port = 3000
