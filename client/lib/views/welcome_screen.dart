@@ -71,7 +71,9 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return HomePage();
+                        return HomePage(
+                          title: "AktivApp",
+                        );
                       },
                     ),
                   );

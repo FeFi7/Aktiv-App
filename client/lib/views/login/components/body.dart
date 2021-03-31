@@ -5,6 +5,7 @@ import 'package:aktiv_app_flutter/Views/Registrieren/registrieren_screen.dart';
 import 'package:aktiv_app_flutter/Views/color_palette.dart';
 import 'package:aktiv_app_flutter/components/account_vorhanden_check.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
+import 'package:aktiv_app_flutter/main.dart';
 import 'package:flutter/material.dart';
 
 import '../../Home.dart';
@@ -57,7 +58,9 @@ class Body extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return HomePage();
+                        return HomePage(
+                          title: "AktivApp",
+                        );
                       },
                     ),
                   );

@@ -48,8 +48,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          //title: Text(widget.title, style: TextStyle(fontSize: 25)),
-          title: Text("AktivApp", style: TextStyle(fontSize: 25)),
+          title: Text(widget.title, style: TextStyle(fontSize: 25)),
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
