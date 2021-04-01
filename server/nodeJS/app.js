@@ -7,7 +7,7 @@ const port = 3000
 
 app.use(compression())
 
-app.use('/api/veranstaltung', routerVeranstaltungen)
+app.use('/api/veranstaltungen', routerVeranstaltungen)
 app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
 app.get('/',async (req, res) => res.send('Hello Aktiv App!'))
 
