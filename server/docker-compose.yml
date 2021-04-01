@@ -4,8 +4,6 @@ services:
         restart: unless-stopped
         build:
             context: ./nodeJS
-        volumes: 
-            - /home/uploads/images/:/uploads/images
         ports:
             - "3000:3000"
         depends_on: 
@@ -18,6 +16,7 @@ services:
             - "80:80"
             - "443:443"
         volumes: 
+            - /home/uploads/pics/:/uploads/images
             - /data/certs:/etc/nginx/certs
             - ./logs:/var/log/nginx
     db: 
