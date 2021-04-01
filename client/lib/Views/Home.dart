@@ -63,7 +63,8 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today_rounded),
               label: 'Kalender',
-            ),BottomNavigationBarItem(
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.add),
               label: 'Erstellen',
             ),

@@ -23,7 +23,7 @@ extension ColorPaletteExtension on ColorPalette {
       case ColorPalette.endeavour:
         return const Color(0xff0066b3);
       case ColorPalette.congress_blue:
-        return const Color(0xff0066b3);
+        return const Color(0xff00487d);
       case ColorPalette.french_pass:
         return const Color(0xffbfe4ff);
       case ColorPalette.malibu:

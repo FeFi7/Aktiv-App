@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Provider/ClickerProvider.dart';
-import 'Views/Home.dart';
+import 'Views/welcome_screen.dart';
 
 void main() {
   runApp(AktivApp());
@@ -12,15 +12,17 @@ class AktivApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => ClickerProvider()),
-        ],
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: HomePage(title: 'Aktiv App Test'),
-        ));
+      providers: [
+        ChangeNotifierProvider(create: (_) => ClickerProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: WelcomeScreen(),
+      ),
+    );
   }
 }

@@ -38,14 +38,14 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
           Column(
             children: <Widget>[
               Container(
-                width: 210,
+                width: 170,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text('Veranstaltung!', style: TextStyle(fontSize: 20)),
                 ),
               ),
               Container(
-                  width: 230,
+                  width: 190,
                   padding: const EdgeInsets.all(10.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
