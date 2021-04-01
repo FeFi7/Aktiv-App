@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'Clicker.dart';
+import 'color_palette.dart';
+import 'event_preview_box.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -20,13 +22,18 @@ class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
+    EventPreviewBox(),
     Clicker(),
     Text(
-      'Mein Kalender',
+      'Erstellen',
       style: optionStyle,
     ),
     Text(
-      'Ticket Marketplace',
+      'Favoriten',
+      style: optionStyle,
+    ),
+    Text(
+      'Profil',
       style: optionStyle,
     ),
   ];
@@ -41,28 +48,38 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(widget.title, style: TextStyle(fontSize: 25)),
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: BottomNavigationBar(
+          iconSize: 40,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(Icons.location_on_rounded),
+              label: 'Umgebung',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
+              icon: Icon(Icons.calendar_today_rounded),
               label: 'Kalender',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.confirmation_num),
-              label: 'Tickets',
+              icon: Icon(Icons.add),
+              label: 'Erstellen',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border_rounded),
+              label: 'Vermerkt',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profil',
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.blue[800],
+          selectedItemColor: ColorPalette.endeavour.rgb,
+          unselectedItemColor: ColorPalette.french_pass.rgb,
           onTap: _onItemTapped,
         ),
         floatingActionButton: FloatingActionButton(
