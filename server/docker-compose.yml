@@ -16,9 +16,11 @@ services:
             - "80:80"
             - "443:443"
         volumes: 
-            - /home/uploads/pics/:/uploads/images
+            #- /home/uploads/pics/:/uploads/images
+            - /data/uploads/:/uploads/images
             - /data/certs:/etc/nginx/certs
-            - ./logs:/var/log/nginx
+            - /data/logs/:/var/log/nginx
+            #- ./logs:/var/log/nginx
     db: 
         image: mysql:8.0
         restart: unless-stopped
@@ -34,7 +36,8 @@ services:
         volumes:
             - db-config:/etc/mysql
             - db-data:/var/lib/mysql
-            - ./db/backup/files/:/data_backup/data
+            - /data/db/backup/:/data_backup/data
+            #- ./db/backup/files/:/data_backup/data
 volumes: 
     db-config:
     db-data:
