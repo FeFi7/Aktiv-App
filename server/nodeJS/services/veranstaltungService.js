@@ -1,5 +1,5 @@
-let Veranstaltung = require("../models/Veranstaltung").Veranstaltung
-
+let Veranstaltung = require("../models/Veranstaltung").Veranstaltung 
+let conn = require('../db').getConnection();
 
 function getVeranstaltungById(veranstaltungId){
 
@@ -10,6 +10,15 @@ function getVeranstaltungById(veranstaltungId){
 }
 
 function getVeranstaltungen(){
+    conn.execute("SELECT * FROM PLZ", function(err, rows, fields) {
+        if(err){
+            console.log(err);
+        }
+        else{
+            console.log(rows.length + " rows gefunden")
+        }
+        
+     })
 
     // Testdatensatz da DB noch nicht vorhanden
     return [new Veranstaltung(1, "Testveranstaltung", "Testbeschreibung", "Tel: 0125125123",
