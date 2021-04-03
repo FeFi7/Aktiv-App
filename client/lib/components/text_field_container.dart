@@ -1,4 +1,4 @@
-import 'package:aktiv_app_flutter/Views/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:flutter/material.dart';
 
 class TextFieldContainer extends StatelessWidget {

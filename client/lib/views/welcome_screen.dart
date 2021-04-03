@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:flutter/material.dart';
 import 'Home.dart';
-import 'color_palette.dart';
+import 'defaults/color_palette.dart';
 import 'Login/login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -71,9 +71,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return HomePage(
-                          title: "AktivApp",
-                        );
+                        return HomePage();
                       },
                     ),
                   );

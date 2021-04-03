@@ -2,7 +2,7 @@ import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_password_field.dart';
 import 'package:aktiv_app_flutter/Views/Login/login_screen.dart';
 import 'package:aktiv_app_flutter/Views/Registrieren/components/background.dart';
-import 'package:aktiv_app_flutter/Views/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/account_vorhanden_check.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';

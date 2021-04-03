@@ -1,15 +1,13 @@
 import 'package:aktiv_app_flutter/Provider/ClickerProvider.dart';
+import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'Clicker.dart';
-import 'color_palette.dart';
-import 'event_preview_box.dart';
+import 'defaults/color_palette.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  HomePage({Key key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -22,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    EventPreviewBox(),
+    EnvironmentView(),
     Clicker(),
     Text(
       'Erstellen',
@@ -47,46 +45,48 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title, style: TextStyle(fontSize: 25)),
-        ),
-        body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          iconSize: 40,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.location_on_rounded),
-              label: 'Umgebung',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today_rounded),
-              label: 'Kalender',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add),
-              label: 'Erstellen',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border_rounded),
-              label: 'Vermerkt',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profil',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: ColorPalette.endeavour.rgb,
-          unselectedItemColor: ColorPalette.french_pass.rgb,
-          onTap: _onItemTapped,
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: Provider.of<ClickerProvider>(context, listen: false)
-              .incrementCounter,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ));
+      appBar: AppBar(
+        backgroundColor: ColorPalette.endeavour.rgb,
+        title: Text('Aktiv App', style: TextStyle(fontSize: 25)),
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        iconSize: 40,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on_rounded),
+            label: 'Umgebung',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today_rounded),
+            label: 'Kalender',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Erstellen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_border_rounded),
+            label: 'Favoriten',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: ColorPalette.endeavour.rgb,
+        unselectedItemColor: ColorPalette.french_pass.rgb,
+        onTap: _onItemTapped,
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: Provider.of<ClickerProvider>(context, listen: false)
+      //       .incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // )
+    );
   }
 }
