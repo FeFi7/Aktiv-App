@@ -1,12 +1,36 @@
 version: "3.8"
 services:
-    nodeserver:
+    node1:
         restart: unless-stopped
         build:
             context: ./nodeJS
         ports:
             - "3000:3000"
         depends_on: 
+            - db
+    node2:
+        restart: unless-stopped
+        build:
+            context: ./nodeJS
+        ports:
+            - "3001:3000"
+        depends_on: 
+            - db
+    node3: 
+        restart: unless-stopped
+        build: 
+            context: ./nodeJS
+        ports: 
+            - "3002:3000"
+        depends_on:
+            - db
+    node4:
+        restart: unless-stopped
+        build:
+            context: ./nodeJS
+        ports:
+            - "3003:3000"
+        depends_on:
             - db
     nginx:
         restart: unless-stopped
@@ -21,6 +45,11 @@ services:
             - /data/certs:/etc/nginx/certs
             - /data/logs/:/var/log/nginx
             #- ./logs:/var/log/nginx
+        depends_on:
+            - node1
+            - node2
+            - node3
+            - node4
     db: 
         image: mysql:8.0
         restart: unless-stopped
