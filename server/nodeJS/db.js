@@ -14,7 +14,7 @@ pool.on('connection', function (connection) {
     console.log(pool._allConnections.length + " aktuell offener connections");
 });
 
-const  getConnection = () => pool;
+const getConnection = () => pool.promise();
 
 
 module.exports = {

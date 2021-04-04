@@ -14,14 +14,14 @@ router.get('/:veranstaltungId', async function(req, res) {
   if(! /^\d+$/.test(req.params.veranstaltungId)){
     res.sendStatus(400);
     res.send("Id keine Zahl")
-}
+  }
 
   if(veranstaltungService.getVeranstaltungById(req.params.veranstaltungId) === null){
     res.sendStatus(404);
     res.send("Veranstaltung nicht vorhanden")
   }
   
-  res.json(veranstaltungService.getVeranstaltungById(req.params.veranstaltungId));
+  res.json(await veranstaltungService.getVeranstaltungById(req.params.veranstaltungId));
 });
 
 // [PUT] update einzelne Veranstaltung
@@ -64,8 +64,10 @@ router.get('/*', async function(req, res) {
       page = req.query.page
     }
   }
+
+  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit) 
   
-  res.json(veranstaltungService.getVeranstaltungen())
+  res.send(veranstaltungen)
 });
 
 // [POST] Erstelle eine Veranstaltung

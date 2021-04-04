@@ -1,35 +1,23 @@
 let Veranstaltung = require("../models/Veranstaltung").Veranstaltung 
 let conn = require('../db').getConnection();
 
-function getVeranstaltungById(veranstaltungId){
+async function getVeranstaltungById(veranstaltungId){
+    const query = `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, i.name AS institutionName, i.beschreibung AS institutBeschreibung  FROM Veranstaltung v
+    INNER JOIN Institution i ON v.institutionId = i.id
+    WHERE v.id = ?
+    LIMIT 10`
 
-    // Testdatensatz da DB noch nicht vorhanden
-    return new Veranstaltung(1, "Testveranstaltung", "Testbeschreibung", "Tel: 0125125123",
-    "2021-28-03 14:20", "2021-28-03 15:25", "Am Musterweg 4 gleichen hinter der Hütte", 
-    "2021-05-03 14:00", 2.2111114, 2.244442);
+    const result = (await conn.query(query, [veranstaltungId]))[0];
+    return result;
 }
 
-function getVeranstaltungen(){
-    conn.execute("SELECT * FROM PLZ", function(err, rows, fields) {
-        if(err){
-            console.log(err);
-        }
-        else{
-            console.log(rows.length + " rows gefunden")
-        }
-        
-     })
+async function getVeranstaltungen(limit = 25){
+    const query = `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, i.name AS institutionName, i.beschreibung AS institutBeschreibung FROM Veranstaltung v
+    INNER JOIN Institution i ON v.institutionId = i.id
+    LIMIT ?`
 
-    // Testdatensatz da DB noch nicht vorhanden
-    return [new Veranstaltung(1, "Testveranstaltung", "Testbeschreibung", "Tel: 0125125123",
-    "2021-28-03 14:20", "2021-28-03 15:25", "Am Musterweg 4 gleichen hinter der Hütte", 
-    "2021-05-03 14:00", 2.2111114, 2.244442),
-    new Veranstaltung(2, "Testveranstaltung2", "Testbeschreibung2", "Tel: 0125125123",
-    "2021-28-03 14:20", "2021-28-03 15:25", "Am Musterweg 4 gleichen hinter der Hütte", 
-    "2021-05-03 14:00", 2.2111114, 2.244442),
-    new Veranstaltung(3, "Testveranstaltung3", "Testbeschreibung3", "Tel: 0125125123",
-    "2021-28-03 14:20", "2021-28-03 15:25", "Am Musterweg 4 gleichen hinter der Hütte", 
-    "2021-05-03 14:00", 2.2111114, 2.244442)];
+    const result = (await conn.query(query, [limit]))[0];
+    return result;
 }
 
 
