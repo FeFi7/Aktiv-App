@@ -25,10 +25,10 @@ class RoundedPasswordField extends StatelessWidget {
             icon,
             color: ColorPalette.torea_bay.rgb,
           ),
-          suffixIcon: Icon(
-            Icons.visibility,
-            color: ColorPalette.torea_bay.rgb,
-          ),
+          // suffixIcon: Icon(
+          //   Icons.visibility,
+          //   color: ColorPalette.torea_bay.rgb,
+          // ),
           border: InputBorder.none,
         ),
       ),

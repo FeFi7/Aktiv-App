@@ -43,9 +43,9 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 width: 100,
                 child: Container(
                   margin: const EdgeInsets.all(2.0),
-                  
                   child: CircleAvatar(
-                    backgroundImage: AssetImage("assets/images/lq_logo_klein.png"), //Bild muss noch dynamisch werden
+                    backgroundImage: AssetImage(
+                        "assets/images/lq_logo_klein.png"), //Bild muss noch dynamisch werden
                   ),
                 ),
               ),
@@ -96,21 +96,23 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    IconButton(icon: Icon(
-                      widget.liked
-                          ? Icons.favorite_rounded
-                          : Icons.favorite_border,
-                      color: widget.liked
-                          ? ColorPalette.orange.rgb
-                          : ColorPalette.black.rgb,
-                      size: 32,
-                    ), onPressed: () {
-                      /** Hier noch mit Backend verbinden, 
+                    IconButton(
+                        icon: Icon(
+                          widget.liked
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border,
+                          color: widget.liked
+                              ? ColorPalette.orange.rgb
+                              : ColorPalette.black.rgb,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          /** Hier noch mit Backend verbinden, 
                        * dass die Veranstaltung geliked wurde */
-                      setState(() {
-                        widget.liked = !widget.liked;
-                      });
-                    }),
+                          setState(() {
+                            widget.liked = !widget.liked;
+                          });
+                        }),
                     Icon(
                       Icons.chevron_right_rounded,
                       size: 48,

@@ -1,11 +1,10 @@
 import 'package:aktiv_app_flutter/Views/Login/components/background.dart';
-import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
+import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_password_field.dart';
 import 'package:aktiv_app_flutter/Views/Registrieren/registrieren_screen.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/account_vorhanden_check.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
-import 'package:aktiv_app_flutter/main.dart';
 import 'package:flutter/material.dart';
 
 import '../../Home.dart';
@@ -24,25 +23,13 @@ class Body extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              AppBar(
-                centerTitle: true,
-                title: Text(
-                  "LOGIN",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: ColorPalette.white.rgb,
-                  ),
-                ),
-                backgroundColor: ColorPalette.malibu.rgb,
-              ),
               SizedBox(height: size.height * 0.03), //Abstand über dem Bild
               CircleAvatar(
                 radius: 150,
                 backgroundImage: AssetImage("assets/images/logo.png"),
               ),
               SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
-              RoundedInputField(
+              RoundedInputEmailField(
                 hintText: "Email Adresse",
                 onChanged: (value) {},
               ),

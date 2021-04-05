@@ -1,7 +1,5 @@
-import 'package:aktiv_app_flutter/Provider/ClickerProvider.dart';
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'Clicker.dart';
 import 'defaults/color_palette.dart';
