@@ -40,11 +40,9 @@ services:
             - "80:80"
             - "443:443"
         volumes: 
-            #- /home/uploads/pics/:/uploads/images
-            - /data/uploads/:/uploads/images
+            - /data/uploads/:/uploads
             - /data/certs:/etc/nginx/certs
             - /data/logs/:/var/log/nginx
-            #- ./logs:/var/log/nginx
         depends_on:
             - node1
             - node2
