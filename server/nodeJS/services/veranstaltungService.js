@@ -7,7 +7,7 @@ async function getVeranstaltungById(veranstaltungId){
     WHERE v.id = ?
     LIMIT 10`
 
-    const result = (await conn.query(query, [veranstaltungId]))[0];
+    const result =  (await conn.query(query, [limit]).catch(error => {console.log(error); return null;}))[0]
     return result;
 }
 
@@ -16,13 +16,25 @@ async function getVeranstaltungen(limit = 25){
     INNER JOIN Institution i ON v.institutionId = i.id
     LIMIT ?`
 
-    const result = (await conn.query(query, [limit]))[0];
+    const result = (await conn.query(query, [limit]).catch(error => {console.log(error); return null;}))[0]
     return result;
+}
+
+async function createVeranstaltung(titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt ){
+    const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt)
+    VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), ?, ?, ?)`
+
+    const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt];
+
+    const result = (await conn.query(query, params).catch(error => {console.log(error); return null;}))[0]
+    return result;
+
 }
 
 
 
 module.exports = {
     getVeranstaltungById: getVeranstaltungById,
-    getVeranstaltungen: getVeranstaltungen
+    getVeranstaltungen: getVeranstaltungen,
+    createVeranstaltung: createVeranstaltung
 }

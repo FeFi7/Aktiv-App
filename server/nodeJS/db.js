@@ -16,7 +16,6 @@ pool.on('connection', function (connection) {
 
 const getConnection = () => pool.promise();
 
-
 module.exports = {
     getConnection: getConnection
 }
