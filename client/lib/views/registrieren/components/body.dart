@@ -14,6 +14,8 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   int currentStep = 0; //startIndex für Stepper
   bool complete = false; //Registrierung abgeschlossen?
+  static TextEditingController password = TextEditingController();
+  static TextEditingController confirmPassword = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -110,11 +112,15 @@ class _BodyState extends State<Body> {
           ),
           RoundedPasswordField(
             hintText: "Passwort",
-            onChanged: (value) {},
+            onChanged: (value) {
+              password.text = value;
+            },
           ),
           RoundedPasswordField(
             hintText: "Passwort wiederholen",
-            onChanged: (value) {},
+            onChanged: (value) {
+              confirmPassword.text = value;
+            },
           ),
         ],
       ),

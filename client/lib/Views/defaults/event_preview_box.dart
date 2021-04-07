@@ -18,6 +18,7 @@ class EventPreviewBox extends StatefulWidget {
 class _EventPreviewBoxState extends State<EventPreviewBox> {
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return FractionallySizedBox(
       widthFactor: 1,
       // heightFactor: 0.2,
@@ -50,7 +51,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 ),
               ),
               Container(
-                width: 200,
+                width: size.width * 0.4,
                 padding: const EdgeInsets.all(7.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
