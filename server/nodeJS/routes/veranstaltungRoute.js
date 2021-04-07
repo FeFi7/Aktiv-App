@@ -1,6 +1,7 @@
 var veranstaltungService = require("../services/veranstaltungService");
 var express = require("express");
 var router = express.Router();
+const passport = require('passport');
 
 router.use(function timeLog(req, res, next) {
   console.log(req.headers.host + " Time: ", new Date().toISOString());

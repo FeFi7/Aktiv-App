@@ -17,8 +17,8 @@ async function registerUser(mail, passwort, plz, rolleId) {
   }
 
   // passwort hashen mit salt
-  const salt = await bcrypt.genSalt(10);
-  const passwortHashed = await bcrypt.hash(passwort, salt);
+  //const salt = await bcrypt.genSalt(10);
+  const passwortHashed = await bcrypt.hash(passwort, 10);
 
   const queryPlz = `INSERT INTO PLZ(PLZ.plz) VALUES(?) ON DUPLICATE KEY UPDATE PLZ.plz = PLZ.plz;`;
   const queryUser = `INSERT INTO User(mail, passwort, rolleId, plzId) VALUES(?,?,?, (SELECT id FROM PLZ WHERE PLZ.plz = ?))`;
@@ -41,14 +41,40 @@ async function registerUser(mail, passwort, plz, rolleId) {
 async function userExists(mail) {
   const query = `SELECT u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
-  const result = (
+  const results = (
     await conn.query(query, [mail]).catch((error) => {
       console.log(error);
       return null;
     })
   )[0];
 
-  return result;
+  return results;
+}
+
+async function userExists(mail, passwort) {
+  const query = `SELECT u.mail, u.passwort, u.erstellt_ts FROM User u WHERE u.mail = ?`;
+
+  const results = (
+    await conn.query(query, [mail]).catch((error) => {
+      console.log(error);
+      return null;
+    })
+  )[0];
+
+  if(results.length > 0){
+    const validPasswort = await bcrypt.compare(passwort, results[0].passwort);
+
+    if(validPasswort){
+      return results[0];
+    }
+    else{
+      return {error: "Passwort nicht korrekt"}
+    }
+  }
+  else{
+    return {error: "User nicht vorhanden"}
+  }
+
 }
 
 module.exports = {

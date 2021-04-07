@@ -7,7 +7,7 @@ async function getVeranstaltungById(veranstaltungId){
     WHERE v.id = ?
     LIMIT 10`
 
-    const result =  (await conn.query(query, [limit]).catch(error => {console.log(error); return null;}))[0]
+    const result =  (await conn.query(query, [veranstaltungId]).catch(error => {console.log(error); return null;}))[0]
     return result;
 }
 
