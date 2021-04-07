@@ -12,20 +12,20 @@ router.get("/:veranstaltungId", async function (req, res) {
   const veranstaltungId = req.params.veranstaltungId;
   // ist query eine Zahl?
   if (!/^\d+$/.test(veranstaltungId)) {
-    res.status(400).send("Id keine Zahl");
+    return res.status(400).send("Id keine Zahl");
   }
 
   const veranstaltung = await veranstaltungService.getVeranstaltungById(
     req.params.veranstaltungId
   );
   if (veranstaltung) {
-    res.json(
+    return res.json(
       await veranstaltungService.getVeranstaltungById(
         req.params.veranstaltungId
       )
     );
   } else {
-    res.status(404).send("Veranstaltung nicht vorhanden");
+    return res.status(404).send("Veranstaltung nicht vorhanden");
   }
 });
 
@@ -34,11 +34,11 @@ router.put("/:veranstaltungId", async function (req, res) {
   const veranstaltungId = req.params.veranstaltungId;
   // ist query eine Zahl?
   if (!/^\d+$/.test(veranstaltungId)) {
-    res.status(400).send("Id keine Zahl");
+    return res.status(400).send("Id keine Zahl");
   }
 
   if (veranstaltungService.getVeranstaltungById(veranstaltungId) === null) {
-    res.status(404).send("Veranstaltung nicht vorhanden");
+    return res.status(404).send("Veranstaltung nicht vorhanden");
   }
 
   res.json(veranstaltungService.getVeranstaltungById(veranstaltungId));
@@ -46,7 +46,7 @@ router.put("/:veranstaltungId", async function (req, res) {
 
 // [DELETE] lösche einzelne Veranstaltung
 router.delete("/:veranstaltungId", async function (req, res) {
-  res.json(
+  return res.json(
     veranstaltungService.getVeranstaltungById(req.params.veranstaltungId)
   );
 });
@@ -70,7 +70,7 @@ router.get("/*", async function (req, res) {
 
   const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit);
 
-  res.send(veranstaltungen);
+  return res.send(veranstaltungen);
 });
 
 // [POST] Erstelle eine Veranstaltung
@@ -89,68 +89,54 @@ router.post("/*", async function (req, res) {
 
   //-------------------------Überprüfung Parameter---------------------------
   if (!titel) {
-    res.status(400).send("titel benötigt");
-    return;
+    return res.status(400).send({ error: "titel benötigt" });
   }
   if (!beschreibung) {
-    res.status(400).send("beschreibung benötigt");
-    return;
+    return res.status(400).send({ error: "beschreibung benötigt" });
   }
   if (!kontakt) {
-    res.status(400).send("kontakt benötigt");
-    return;
+    return res.status(400).send({ error: "kontakt benötigt" });
   }
   if (!beginn_ts) {
-    res.status(400).send("beginn_ts benötigt");
-    return;
+    return res.status(400).send({ error: "beginn_ts benötigt" });
   }
   if (!ende_ts) {
-    res.status(400).send("ende_ts benötigt");
-    return;
+    return res.status(400).send({ error: "ende_ts benötigt" });
   }
   if (!ortBeschreibung) {
-    res.status(400).send("ortBeschreibung benötigt");
-    return;
+    return res.status(400).send({ error: "ortBeschreibung benötigt" });
   }
   if (latitude) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(latitude)) {
-      res.status(400).send("latitude muss numerisch sein");
-      return;
+      return res.status(400).send({ error: "latitude muss numerisch sein" });
     }
   } else {
-    res.status(400).send("latitude benötigt");
-    return;
+    return res.status(400).send({ error: "latitude benötigt" });
   }
   if (longitude) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(longitude)) {
-      res.status(400).send("longitude muss numerisch sein");
-      return;
+      return res.status(400).send({ error: "longitude muss numerisch sein" });
     }
   } else {
-    res.status(400).send("longitude benötigt");
-    return;
+    return res.status(400).send({ error: "longitude benötigt"});
   }
   if (institutionId) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(institutionId)) {
-      res.status(400).send("institutionId muss numerisch sein");
-      return;
+      return res.status(400).send({ error: "institutionId muss numerisch sein" });
     }
   } else {
-    res.status(400).send("institutionId benötigt");
-    return;
+    return res.status(400).send({ error: "institutionId benötigt"});
   }
   if (userId) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(userId)) {
-      res.status(400).send("userId muss numerisch sein");
-      return;
+      return res.status(400).send({ error: "userId muss numerisch sein"});
     }
   } else {
-    res.status(400).send("userId benötigt");
-    return;
+    return res.status(400).send({ error: "userId benötigt" });
   }
   if (!istGenehmigt) {
     istGenehmigt = 0;

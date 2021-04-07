@@ -7,85 +7,59 @@ router.use(function timeLog(req, res, next) {
   next();
 });
 
+// [POST] register User
+router.post("/signup", async function(req, res){
+  let body = req.body;
+
+  if(!body.mail){
+    return res.status(400).send({error: "Mail nicht vorhanden"});
+  }
+  if(!body.passwort){
+    return res.status(400).send({error: "Passwort nicht vorhanden"});
+  }
+  if(!body.plz){
+    return res.status(400).send({error: "Plz nicht vorhanden"});
+  }
+  if(!body.rolle){
+    body.rolle = 1;
+  }
+  else{
+      // ist numerisch?
+      if (!/^-?\d+\.?\d*$/.test(body.rolle)) {
+        body.rolle = 1;
+      }
+  }
+
+  const result = await userService.registerUser(body.mail, body.passwort, body.plz, body.rolle);
+
+  if(result.error){
+    return res.status(400).send(result);
+  }
+  else{
+    return res.send(result);
+  }
+})
+
+
 // [GET] bekomme einzelne user
-router.get('/:userId', async function(req, res) {
-  let userId = req.params.userId;
-  // ist query eine Zahl?
-  if(! /^\d+$/.test(req.params.userId)){
-    res.sendStatus(400);
-    res.send("Id keine Zahl")
-}
+router.get('/', async function(req, res) {
+  let query = req.query;
 
-  if(userService.getuserById(req.params.userId) === null){
-    res.sendStatus(404);
-    res.send("user nicht vorhanden")
+  if(!query.mail){
+    return res.status(400).send({error: "Mail nicht vorhanden"});
   }
+  const result = await userService.userExists(query.mail);
+
+  if(result.length > 0){
+    return res.json({istVorhanden: true, user: result[0]});
+  }
+  else{
+    return res.json({istVorhanden: false});
+  }
+
   
-  res.json(userService.getuserById(req.params.userId));
 });
 
-// [PUT] update einzelne user
-router.put('/:userId', async function(req, res) {
 
-  let userId = req.params.userId;
-  // ist query eine Zahl?
-  if(! /^\d+$/.test(req.params.userId)){
-    res.sendStatus(400);
-    res.send("Id keine Zahl")
-  }
-
-  if(userService.getuserById(req.params.userId) === null){
-    res.sendStatus(404);
-    res.send("user nicht vorhanden")
-  }
-  
-  res.json(userService.getuserById(req.params.userId));
-});
-
-// [DELETE] lösche einzelne user
-router.delete('/:userId', async function(req, res) {
-
-  res.json(userService.getuserById(req.params.userId));
-});
-
-// [GET] bekomme alle user
-router.get('/*', async function(req, res) {
-  let limit = 25
-  let page = 1
-
-  if(typeof req.query.limit !== 'undefined'){
-    // ist query eine Zahl?
-    if(/^\d+$/.test(req.query.limit) && req.query.limit < 100){
-        limit = req.query.limit
-    }
-  }
-  if(typeof req.query.page !== 'undefined'){
-    if(/^\d+$/.test(req.query.page)){
-      page = req.query.page
-    }
-  }
-  
-  res.json(userService.getuseren())
-});
-
-// [POST] Erstelle eine user
-router.post('/*', async function(req, res) {
-  let limit = 25
-  let page = 1
-
-  if(typeof req.query.limit !== 'undefined'){
-    // ist query eine Zahl?
-    if(/^\d+$/.test(req.query.limit) && req.query.limit < 100){
-        limit = req.query.limit
-    }
-  }
-  if(typeof req.query.page !== 'undefined'){
-    if(/^\d+$/.test(req.query.page)){
-      page = req.query.page
-    }
-  }
-  
-  res.json(userService.getuseren())
-});
 
 module.exports = router;
