@@ -1,7 +1,7 @@
+import 'package:aktiv_app_flutter/views/welcome_screen/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Provider/ClickerProvider.dart';
-import 'Views/welcome_screen.dart';
 
 void main() {
   runApp(AktivApp());
