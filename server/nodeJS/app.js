@@ -11,8 +11,10 @@ const port = 3000
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
-
-app.use(compression())
+app.use(function timeLog(req, res, next) {
+    console.log( req.headers.host + ' Time: ', new Date().toISOString());
+    next();
+  });
 
 require('./auth/auth')
 
@@ -22,7 +24,7 @@ app.use('/api/user', passport.authenticate('jwt', { session: false }), secureRou
 app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
 app.get('/',async (req, res) =>  res.send('Hello Aktiv App!'))
 
-
+app.use(compression())
 
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

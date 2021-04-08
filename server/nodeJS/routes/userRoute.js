@@ -8,10 +8,7 @@ const config = require('config')
 const jwtConfig = config.get('Customer.jwtConfig');
 const SECRET_TOKEN = jwtConfig.secret;
 
-router.use(function timeLog(req, res, next) {
-  console.log( req.headers.host + ' Time: ', new Date().toISOString());
-  next();
-});
+
 
 // [POST] register User
 router.post("/signup", async function(req, res){
@@ -70,7 +67,6 @@ router.post('/login',async (req, res, next) => {
     passport.authenticate(
       'login',
       async (err, user, info) => {
-        console.log(user)
         try {
           if (err || !user) {
             return res.status(401).json({error: info.message})
