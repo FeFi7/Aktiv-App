@@ -21,13 +21,11 @@ app.use(function timeLog(req, res, next) {
 require('./auth/auth')
 
 app.use('/api/veranstaltungen', routerVeranstaltungen)
-app.use('/api/user', routerUser)
 app.use('/api/fileupload', routerFileUpload)
-app.use('/api/user', passport.authenticate('jwt', { session: false }), secureRoute);
+app.use('/api/user', routerUser)
+app.use('/api/auth', passport.authenticate('jwt', { session: false }), secureRoute);
 app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
 app.get('/',async (req, res) =>  res.send('Hello Aktiv App!'))
-
-
 
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

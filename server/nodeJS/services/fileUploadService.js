@@ -1,17 +1,60 @@
 let conn = require("../db").getConnection();
+const multer = require("multer");
 
-async function createFile(pfad, typ){
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (file.mimetype == "image/jpeg") {
+      cb(null, "D:\\");//"/uploads/images");
+    } else if (file.mimetype == "image/png") {
+      cb(null, "/uploads/images");
+    } else if (file.mimetype == "application/pdf") {
+      cb(null, "/uploads/flyer");
+    } else {
+      console.log(file.mimetype);
+      cb({ error: "File types allowed .jpeg, .jpg .png and .pdf!" });
+    }
+  },
+  filename: function (req, file, cb) {
+    var datetimestamp = Date.now();
+    var name =
+      datetimestamp +
+      "-" +
+      file.originalname.toLowerCase().split(" ").join("-");
+    cb(null, name);
+  },
+});
 
-    const query = `INSERT INTO File (pfad, typ) VALUES( ?, ?)`
+var upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+});
 
-    const params = [pfad, typ];
+async function createFileInDb(pfad, typ) {
+  const queryInsert = `INSERT INTO File (pfad, typ) VALUES( ?, ?)`;
+  const querySelect = `SELECT * FROM File f WHERE f.id = ?`;
 
-    const result = (await conn.query(query, params).catch(error => {console.log(error); return null;}))[0]
+  const params = [pfad, typ];
 
-    return result; 
+  const resultInsert = (
+    await conn.query(queryInsert, params).catch((error) => {
+      console.log(error);
+      return {error: "Fehler in der Db aufgetreten"};
+    })
+  )[0];
+
+  const resultSelectInserted = (
+    await conn.query(querySelect, resultInsert.insertId).catch((error) => {
+      console.log(error);
+      return {error: "Fehler in der Db aufgetreten"};
+    })
+  )[0];
+
+  return resultSelectInserted;
 }
-
 
 module.exports = {
-    createFile: createFile
-}
+  createFileInDb: createFileInDb,
+  upload: upload,
+};
