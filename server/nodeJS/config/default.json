@@ -1,0 +1,13 @@
+{
+    "Customer": {
+      "dbConfig": {
+        "host": "h2931685.stratoserver.net",
+        "user": "nodeUser",
+        "password": "epNpU5bT6fB8vn6A",
+        "database": "aktivapp"
+      },
+      "jwtConfig":{
+          "secret": "epNpU5bT6fB8vn6A"
+      }
+    }
+  }

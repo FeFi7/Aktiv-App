@@ -12,14 +12,14 @@ class EnvironmentView extends StatelessWidget {
     List<Widget> widgetList = <Widget>[
       PreviewListHeading('Bald'),
       EventPreviewBox(1, 'Erste Beispiel Veranstaltung',
-          'Sehr kurze Beschreibung', 'Beginnt in 57 Minuten', true),
+          'Sehr kurze Beschreibung', 'Beginnt in 57 Minuten', false),
       EventPreviewBox(
           1,
           'Zweite viel tollere Beispiel Veranstaltung',
           'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
           'Beginnt in 3 Stunden',
           false),
-      PreviewListDots(),
+      PreviewListDots(EventPreviewList(<Widget>[]), 'Bald'),
       PreviewListHeading('In der Nähe'),
       EventPreviewBox(1, 'Erste Beispiel Veranstaltung',
           'Sehr kurze Beschreibung', 'Am 15.04 nur 3km entfernt', false),
@@ -29,7 +29,7 @@ class EnvironmentView extends StatelessWidget {
           'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
           'Am 20.04 nur 7km entfernt',
           false),
-      PreviewListDots()
+      PreviewListDots(EventPreviewList(<Widget>[]), 'In der Nähe')
     ];
 
     // widgetList.add();

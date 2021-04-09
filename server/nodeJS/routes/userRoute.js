@@ -1,11 +1,14 @@
 var userService = require("../services/userService")
 var express = require('express');
 var router = express.Router();
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
 
-router.use(function timeLog(req, res, next) {
-  console.log( req.headers.host + ' Time: ', new Date().toISOString());
-  next();
-});
+const config = require('config')
+const jwtConfig = config.get('Customer.jwtConfig');
+const SECRET_TOKEN = jwtConfig.secret;
+
+
 
 // [POST] register User
 router.post("/signup", async function(req, res){
@@ -56,10 +59,38 @@ router.get('/', async function(req, res) {
   else{
     return res.json({istVorhanden: false});
   }
-
-  
 });
 
+
+// [POST] login User
+router.post('/login',async (req, res, next) => {
+    passport.authenticate(
+      'login',
+      async (err, user, info) => {
+        try {
+          if (err || !user) {
+            return res.status(401).json({error: info.message})
+          }
+
+          req.login(
+            user,
+            { session: false },
+            async (error) => {
+              if (error) return next(error);
+
+              const body = { _id: user.id, email: user.mail };
+              const token = jwt.sign({ user: body }, SECRET_TOKEN);
+
+              return res.json({ token });
+            }
+          );
+        } catch (error) {
+          return next(error);
+        }
+      }
+    )(req, res, next);
+  }
+);
 
 
 module.exports = router;

@@ -2,11 +2,6 @@ var institutionService = require("../services/institutionService")
 var express = require('express');
 var router = express.Router();
 
-router.use(function timeLog(req, res, next) {
-  console.log( req.headers.host + ' Time: ', new Date().toISOString());
-  next();
-});
-
 // [GET] bekomme einzelne institution
 router.get('/:institutionId', async function(req, res) {
   let institutionId = req.params.institutionId;

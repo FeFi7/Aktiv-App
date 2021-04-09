@@ -1,10 +1,13 @@
 var mysql = require('mysql2');
 
+const config = require('config')
+const dbConfig = config.get('Customer.dbConfig');
+
 const pool = mysql.createPool({
-    host: 'h2931685.stratoserver.net',
-    user: 'nodeUser',
-    password: 'epNpU5bT6fB8vn6A',
-    database: 'aktivapp',
+    host: dbConfig.host,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    database: dbConfig.database,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0

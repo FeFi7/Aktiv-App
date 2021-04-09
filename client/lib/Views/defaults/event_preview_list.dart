@@ -1,4 +1,5 @@
 import 'package:aktiv_app_flutter/Views/Home.dart';
+import 'package:provider/provider.dart';
 
 import 'color_palette.dart';
 import 'event_preview_box.dart';
@@ -17,7 +18,14 @@ class EventPreviewList extends StatefulWidget {
   }
 
   void addListExtensionDots() {
-    widgetList.insert(0, PreviewListDots());
+    // hier muss nioch dynamisch fest gelegt werden wohin die leiten sollen
+    widgetList.insert(
+        0,
+        PreviewListDots(
+            EventPreviewList(<Widget>[
+              EventPreviewBox(0, 'titel', 'description', 'additive', false)
+            ]),
+            ''));
   }
 }
 
@@ -46,6 +54,12 @@ class _EventPreviewListState extends State<EventPreviewList> {
 }
 
 class PreviewListDots extends StatefulWidget {
+  
+  final Widget extendedList;
+  final String extendedListTitle;
+
+  PreviewListDots(this.extendedList, this.extendedListTitle);
+
   @override
   _PreviewListDotsState createState() => _PreviewListDotsState();
 }
@@ -61,16 +75,10 @@ class _PreviewListDotsState extends State<PreviewListDots> {
             size: 64,
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return HomePage(); /* Hier muss sich noch was ausgedacht werdem
-                  wie man auf eine weitere Liste verweist, die aber immer noch
-                  im Untermenü Umgebung auftaucht & nicht ein ganz neues Widget ist */
-                },
-              ),
-            );
+            Provider.of<BodyProvider>(context, listen: false)
+                .setBody(widget.extendedList);
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .setTitle(widget.extendedListTitle);
           }),
     );
   }

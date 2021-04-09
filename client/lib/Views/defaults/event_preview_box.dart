@@ -1,5 +1,9 @@
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../Home.dart';
 
 class EventPreviewBox extends StatefulWidget {
   final int id;
@@ -11,6 +15,8 @@ class EventPreviewBox extends StatefulWidget {
   EventPreviewBox(
       this.id, this.titel, this.description, this.additive, this.liked);
 
+  /// wär besser wenn liked nicht übergeben wird, sondern sich die info via id holt. Änderung folgt...
+
   @override
   _EventPreviewBoxState createState() => _EventPreviewBoxState();
 }
@@ -19,6 +25,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return FractionallySizedBox(
       widthFactor: 1,
       // heightFactor: 0.2,
@@ -29,7 +36,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
           // border: Border.all(
           //   color: Color(0xFF00487d),
           //   width: 3,
-          // ), Finde es ohne
+          // ), Finde es ohne besser
           borderRadius:
               BorderRadius.all(Radius.circular(10.0)), // rundung der border
           color: ColorPalette.french_pass.rgb,
@@ -51,7 +58,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 ),
               ),
               Container(
-                width: size.width * 0.4,
+                width: size.width * 0.45,
                 padding: const EdgeInsets.all(7.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,7 +73,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ))),
-                    Container(
+                    SizedBox(
                         child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -108,16 +115,34 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                           size: 32,
                         ),
                         onPressed: () {
-                          /** Hier noch mit Backend verbinden, 
-                       * dass die Veranstaltung geliked wurde */
                           setState(() {
                             widget.liked = !widget.liked;
+                            if (widget.liked) {
+                              Provider.of<FavoritesProvider>(context,
+                                      listen: false)
+                                  .addFavorite(widget);
+                            } else {
+                              Provider.of<FavoritesProvider>(context,
+                                      listen: false)
+                                  .removeFavorite(widget);
+                            }
                           });
                         }),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 48,
-                    ),
+                    IconButton(
+                        icon: Icon(
+                          Icons.chevron_right_rounded,
+                          size: 48,
+                        ),
+                        onPressed: () {
+                          /// Hier muss ein noch Event Vorschau Objekt erstellt werden
+                          /// dass aus einer in dieser Klasse gespeicherten Event
+                          /// Instance, so dass
+                          Provider.of<BodyProvider>(context, listen: false)
+                              .setBody(Container());
+                          Provider.of<AppBarTitleProvider>(context,
+                                  listen: false)
+                              .setTitle('Übersicht');
+                        }),
                   ],
                 ),
               ),
