@@ -9,6 +9,7 @@ const passport = require('passport');
 const app = express()
 const port = 3000
 
+app.use(compression())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(function timeLog(req, res, next) {
@@ -24,7 +25,7 @@ app.use('/api/user', passport.authenticate('jwt', { session: false }), secureRou
 app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
 app.get('/',async (req, res) =>  res.send('Hello Aktiv App!'))
 
-app.use(compression())
+
 
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

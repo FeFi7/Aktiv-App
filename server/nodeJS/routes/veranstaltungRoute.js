@@ -49,22 +49,42 @@ router.delete("/:veranstaltungId", async function (req, res) {
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
-  const limit = 25;
-  const page = 1;
+  let page = 1;
+  const query = req.query;
+  let bis = query.bis;
+  let istGenehmigt = query.istGenehmigt;
+  let limit = query.limit;
+  
 
-  if (req.query.limit) {
+  if (limit) {
     // ist query eine Zahl?
-    if (/^\d+$/.test(req.query.limit) && req.query.limit < 100) {
-      limit = req.query.limit;
+    if (!(/^\d+$/.test(req.query.limit) && req.query.limit < 100)) {
+      limit = 25;
     }
+  }
+  else{
+    limit = 25;
   }
   if (req.query.page) {
     if (/^\d+$/.test(req.query.page)) {
       page = req.query.page;
     }
   }
+  if (!istGenehmigt) {
+    istGenehmigt = 1;
+  }
+  if (!bis){
+    const dt = new Date();
+        bis = `${
+            dt.getFullYear().toString().padStart(4, '0')}-${
+            (dt.getMonth()+2).toString().padStart(2, '0')}-${
+            dt.getDate().toString().padStart(2, '0')} ${
+            dt.getHours().toString().padStart(2, '0')}:${
+            dt.getMinutes().toString().padStart(2, '0')}:${
+            dt.getSeconds().toString().padStart(2, '0')}`
+  }
 
-  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit);
+  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis);
 
   return res.send(veranstaltungen);
 });
