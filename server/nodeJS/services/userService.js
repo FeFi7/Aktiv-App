@@ -51,6 +51,51 @@ async function userExists(mail) {
   return results;
 }
 
+async function saveRefreshToken(token) {
+  const query = `INSERT INTO JwtRefreshToken(token) VALUES(?)`;
+
+  const results = (
+    await conn.query(query, [token]).catch((_error) => {
+      console.log(_error);
+      return {error: _error};
+    })
+  )[0];
+
+  return results;
+}
+
+async function deleteRefreshToken(token) {
+  const query = `DELETE FROM JwtRefreshToken j WHERE j.token = ?`;
+
+  const results = (
+    await conn.query(query, [token]).catch((_error) => {
+      console.log(_error);
+      return {error: _error};
+    })
+  )[0];
+
+  return results;
+}
+
+async function existRefreshToken(token) {
+  const query = `SELECT * FROM JwtRefreshToken j WHERE j.token = ?`;
+
+  const results = (
+    await conn.query(query, [token]).catch((_error) => {
+      console.log(_error);
+      return false;
+    })
+  )[0];
+
+  if(results.length > 0){
+    return true;
+  }
+  else{
+    return false;
+  }
+
+}
+
 async function userExists(mail, passwort) {
   const query = `SELECT u.mail, u.passwort, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
@@ -82,4 +127,7 @@ module.exports = {
   getUser: getUser,
   registerUser: registerUser,
   userExists: userExists,
+  saveRefreshToken: saveRefreshToken,
+  existRefreshToken: existRefreshToken,
+  deleteRefreshToken: deleteRefreshToken
 };
