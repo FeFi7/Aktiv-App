@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 enum ColorPalette {
   black,
+  light_grey,
+  grey,
+  dark_grey,
   white,
   torea_bay,
   endeavour,
@@ -16,6 +19,12 @@ extension ColorPaletteExtension on ColorPalette {
     switch (this) {
       case ColorPalette.black:
         return const Color(0xff000000);
+        case ColorPalette.light_grey:
+        return const Color(0xffDDDDDD);
+        case ColorPalette.grey:
+        return const Color(0xffAAAAAA);
+        case ColorPalette.dark_grey:
+        return const Color(0xff555555);
       case ColorPalette.white:
         return const Color(0xffffffff);
       case ColorPalette.torea_bay:

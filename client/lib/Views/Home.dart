@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
 import 'package:aktiv_app_flutter/Views/profile/profile_screen.dart';
@@ -24,7 +25,7 @@ class _HomePageState extends State<HomePage> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     EnvironmentView(),
-    Clicker(),
+    CalendarView(),
     Text(
       'Erstellen',
       style: optionStyle,
