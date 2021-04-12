@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
+import 'package:aktiv_app_flutter/Views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,10 +30,7 @@ class _HomePageState extends State<HomePage> {
       style: optionStyle,
     ),
     FavoritesView(),
-    Text(
-      'Profil',
-      style: optionStyle,
-    ),
+    ProfileScreen(),
   ];
 
   static const List<String> _widgetTitles = <String>[
@@ -40,7 +38,7 @@ class _HomePageState extends State<HomePage> {
     'Kalender',
     'Erstellen',
     'Favoriten',
-    'Account',
+    'Profil',
   ];
 
   static Widget body = Consumer<BodyProvider>(builder: (context, value, child) {
@@ -83,10 +81,10 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 48),
           onPressed: () {
             Provider.of<BodyProvider>(context, listen: false)
-              .previousBody(context);
-              Provider.of<AppBarTitleProvider>(context, listen: false)
-              .previousTitle(context);
-              },
+                .previousBody(context);
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .previousTitle(context);
+          },
         ),
       ),
       body: Center(
