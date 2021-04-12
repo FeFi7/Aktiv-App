@@ -1,4 +1,5 @@
 var userService = require("../services/userService");
+const fileUploadService = require('../services/fileUploadService')
 var express = require("express");
 var router = express.Router();
 const passport = require("passport");
@@ -72,7 +73,7 @@ router.post("/login", async (req, res, next) => {
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error);
 
-        const body = { _id: user.id, email: user.mail };
+        const body = { _id: user.id, mail: user.mail };
         const accessToken = jwt.sign({ user: body }, SECRET_TOKEN, {
           expiresIn: "3000m",
         });
@@ -119,6 +120,60 @@ router.post("/token", async function (req, res) {
       accessToken,
     });
   });
+});
+
+// [POST] Hinterlege Bild für Profil
+router.post('/:userId/profilbild',  fileUploadService.upload.single('file'), async function(req, res){
+  const userId = req.params.userId;
+  if (!/^\d+$/.test(userId)) {
+    return res.status(400).send("Id keine Zahl");
+  }
+  try {
+    if (req.file == undefined) {
+      return res.status(400).send({ error: "Kein datei gefunden" });
+    }
+    
+    const result = await fileUploadService.createFileInDb(req.file.filename, req.file.mimetype);
+    await userService.saveProfilbildIdToUser(userId, result.id)
+
+    if(result.error){
+      return res.status(400).send(result)
+    }
+    else{
+      return res.status(200).send(result)
+    }
+  } catch (err) {
+    console.log(err);
+
+    if (err.code == "LIMIT_FILE_SIZE") {
+      return res.status(500).send({
+        message: "Datei muss kleiner als 5MB sein",
+      });
+    }
+
+    res.status(500).send({
+      error: `${err}`,
+    });
+  } 
+});
+
+// [GET] Bekomme Informationen zu User
+router.get('/:userId', passport.authenticate('jwt', { session: false }), async function(req, res){
+  const userId = req.params.userId;
+  if (!/^\d+$/.test(userId)) {
+    return res.status(400).send("Id keine Zahl");
+  }
+
+  const result = await userService.getUserInfo(userId, req.user.mail);
+
+  if(result.error){
+    res.status(400).json(result);
+  }
+  else{
+    res.status(200).json(result);
+  }
+
+
 });
 
 module.exports = router;

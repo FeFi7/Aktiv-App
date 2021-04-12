@@ -51,8 +51,10 @@ async function createFileInDb(pfad, typ) {
     })
   )[0];
 
-  return resultSelectInserted;
+  return resultSelectInserted[0];
 }
+
+
 
 module.exports = {
   createFileInDb: createFileInDb,

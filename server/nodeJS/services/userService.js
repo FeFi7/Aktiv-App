@@ -38,6 +38,32 @@ async function registerUser(mail, passwort, plz, rolleId) {
   return result;
 }
 
+async function logLogintoDB(mail) {
+  const query = `UPDATE User u SET u.lastLogin_ts = NOW() WHERE u.mail = ?`;
+
+  const results = (
+    await conn.query(query, [mail]).catch((error) => {
+      console.log(error);
+      return null;
+    })
+  )[0];
+
+  return results;
+}
+
+async function saveProfilbildIdToUser(userId, pofilbildId) {
+  const query = `UPDATE User u SET u.pofilbildId = ? WHERE u.id = ?`;
+
+  const results = (
+    await conn.query(query, [pofilbildId, userId]).catch((error) => {
+      console.log(error);
+      return null;
+    })
+  )[0];
+
+  return results;
+}
+
 async function userExists(mail) {
   const query = `SELECT u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
@@ -49,6 +75,46 @@ async function userExists(mail) {
   )[0];
 
   return results;
+}
+
+async function getUserInfo(id, mail) {
+  let results;
+  if(mail){
+    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild FROM User u
+    INNER JOIN Rolle r ON u.rolleId = r.id
+    INNER JOIN PLZ p ON u.plzId = p.id
+    LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
+    WHERE u.id = ? and u.mail = ? limit 1`;
+
+    results = (
+      await conn.query(query, [id, mail]).catch((error) => {
+        console.log(error);
+        return {error: "Fehler bei Db"};
+      })
+    )[0];
+  }
+  else{
+    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild FROM User u
+    INNER JOIN Rolle r ON u.rolleId = r.id
+    INNER JOIN PLZ p ON u.plzId = p.id
+    LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
+    WHERE u.id = ? limit 1`;
+
+    results = (
+      await conn.query(query, [id]).catch((error) => {
+        console.log(error);
+        return {error: "Fehler bei Db"};
+      })
+    )[0];
+  }
+  
+  if(results.length > 0){
+    return results[0];
+  }
+  else{
+    return {error: "User nicht vorhanden"};
+  }
+  
 }
 
 async function saveRefreshToken(token) {
@@ -129,5 +195,8 @@ module.exports = {
   userExists: userExists,
   saveRefreshToken: saveRefreshToken,
   existRefreshToken: existRefreshToken,
-  deleteRefreshToken: deleteRefreshToken
+  deleteRefreshToken: deleteRefreshToken,
+  logLogintoDB: logLogintoDB,
+  saveProfilbildIdToUser: saveProfilbildIdToUser,
+  getUserInfo: getUserInfo
 };

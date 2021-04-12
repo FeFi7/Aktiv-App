@@ -22,6 +22,8 @@ passport.use(
           if (user.error) {
             return done(null, false, { message: user.error });
           }
+
+          await userService.logLogintoDB(mail)
   
           return done(null, user, { message: 'Erfolgreich eingeloggt' });
         } catch (error) {
