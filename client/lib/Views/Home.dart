@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
+import 'package:aktiv_app_flutter/Views/veranstaltung/anlegen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,10 +25,7 @@ class _HomePageState extends State<HomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     EnvironmentView(),
     Clicker(),
-    Text(
-      'Erstellen',
-      style: optionStyle,
-    ),
+    VeranstaltungAnlegenView(),
     FavoritesView(),
     Text(
       'Profil',
