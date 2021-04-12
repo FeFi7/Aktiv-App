@@ -32,13 +32,14 @@ class EventPreviewList extends StatefulWidget {
 class _EventPreviewListState extends State<EventPreviewList> {
   _EventPreviewListState();
 
-  void addEventPreview(EventPreviewBox previewBox) {
-    setState(() {});
-  }
+  // void addEventPreview(EventPreviewBox previewBox) {
+  //   setState(() {
+  //   });
+  // }
 
-  void addListExtensionDots() {
-    setState(() {});
-  }
+  // void addListExtensionDots(EventPreviewList list) {
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +55,6 @@ class _EventPreviewListState extends State<EventPreviewList> {
 }
 
 class PreviewListDots extends StatefulWidget {
-  
   final Widget extendedList;
   final String extendedListTitle;
 
