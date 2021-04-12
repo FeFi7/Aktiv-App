@@ -8,7 +8,6 @@ import 'package:aktiv_app_flutter/Views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Clicker.dart';
 import 'defaults/color_palette.dart';
 
 class HomePage extends StatefulWidget {
