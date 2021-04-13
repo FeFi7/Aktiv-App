@@ -1,5 +1,5 @@
 var userService = require("../services/userService");
-const fileUploadService = require('../services/fileUploadService')
+const fileUploadService = require("../services/fileUploadService");
 var express = require("express");
 var router = express.Router();
 const passport = require("passport");
@@ -75,7 +75,7 @@ router.post("/login", async (req, res, next) => {
 
         const body = { _id: user.id, mail: user.mail };
         const accessToken = jwt.sign({ user: body }, SECRET_TOKEN, {
-          expiresIn: "3000m",
+          expiresIn: "30m",
         });
         const refreshToken = jwt.sign({ user: body }, SECRET_TOKEN_REFRESH);
 
@@ -123,57 +123,90 @@ router.post("/token", async function (req, res) {
 });
 
 // [POST] Hinterlege Bild für Profil
-router.post('/:userId/profilbild',  fileUploadService.upload.single('file'), async function(req, res){
-  const userId = req.params.userId;
-  if (!/^\d+$/.test(userId)) {
-    return res.status(400).send("Id keine Zahl");
-  }
-  try {
-    if (req.file == undefined) {
-      return res.status(400).send({ error: "Kein datei gefunden" });
+router.post(
+  "/:userId/profilbild",
+  fileUploadService.upload.single("file"),
+  async function (req, res) {
+    const userId = req.params.userId;
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
     }
-    
-    const result = await fileUploadService.createFileInDb(req.file.filename, req.file.mimetype);
-    await userService.saveProfilbildIdToUser(userId, result.id)
+    try {
+      if (req.file == undefined) {
+        return res.status(400).send({ error: "Kein datei gefunden" });
+      }
 
-    if(result.error){
-      return res.status(400).send(result)
-    }
-    else{
-      return res.status(200).send(result)
-    }
-  } catch (err) {
-    console.log(err);
+      const result = await fileUploadService.createFileInDb(
+        req.file.filename,
+        req.file.mimetype
+      );
+      await userService.saveProfilbildIdToUser(userId, result.id);
 
-    if (err.code == "LIMIT_FILE_SIZE") {
-      return res.status(500).send({
-        message: "Datei muss kleiner als 5MB sein",
+      if (result.error) {
+        return res.status(400).send(result);
+      } else {
+        return res.status(200).send(result);
+      }
+    } catch (err) {
+      console.log(err);
+
+      if (err.code == "LIMIT_FILE_SIZE") {
+        return res.status(500).send({
+          message: "Datei muss kleiner als 5MB sein",
+        });
+      }
+
+      res.status(500).send({
+        error: `${err}`,
       });
     }
-
-    res.status(500).send({
-      error: `${err}`,
-    });
-  } 
-});
+  }
+);
 
 // [GET] Bekomme Informationen zu User
-router.get('/:userId', passport.authenticate('jwt', { session: false }), async function(req, res){
-  const userId = req.params.userId;
-  if (!/^\d+$/.test(userId)) {
-    return res.status(400).send("Id keine Zahl");
+router.get(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    const userId = req.params.userId;
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+    console.log("mail: " + req.user.mail);
+    const result = await userService.getUserInfo(userId, req.user.mail);
+    if (result.error) {
+      res.status(400).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   }
+);
 
-  const result = await userService.getUserInfo(userId, req.user.mail);
+// [PUT] UPdate Informationen zu User
+router.put(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    const userId = req.params.userId;
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+    let body = req.body;
+    const result = await userService.updateUserInformation(
+      userId,
+      req.user.mail,
+      body.vorname,
+      body.nachname,
+      body.plz,
+      body.tel
+    );
 
-  if(result.error){
-    res.status(400).json(result);
+    if (result.error) {
+      res.status(400).json(result);
+    } else {
+      res.status(200).json(result);
+    }
   }
-  else{
-    res.status(200).json(result);
-  }
-
-
-});
+);
 
 module.exports = router;
