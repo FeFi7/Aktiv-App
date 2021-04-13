@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   static const List<String> _widgetTitles = <String>[
-    'Umgebung',
+    'Suche',
     'Kalender',
     'Erstellen',
     'Favoriten',
@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> {
         iconSize: 40,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.location_on_rounded),
-            label: 'Umgebung',
+            icon: Icon(Icons.search_rounded),
+            label: 'Suchen',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today_rounded),

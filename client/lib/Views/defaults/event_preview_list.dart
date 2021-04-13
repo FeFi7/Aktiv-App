@@ -68,6 +68,7 @@ class _PreviewListDotsState extends State<PreviewListDots> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(bottom: 25),
       child: IconButton(
           icon: Icon(
             Icons.more_horiz,

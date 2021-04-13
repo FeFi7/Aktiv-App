@@ -41,6 +41,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
               BorderRadius.all(Radius.circular(10.0)), // rundung der border
           color: ColorPalette.french_pass.rgb,
         ),
+        height: size.height * 0.2,
         child: SizedBox(
           height: 128,
           child: Row(

@@ -17,31 +17,32 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   Widget build(BuildContext context) {
     return Container(
+        padding: const EdgeInsets.all(10.0),
         child: TableCalendar(
-      firstDay: DateTime.now(),
-      focusedDay: _focusedDay,
-      lastDay: DateTime(_focusedDay.year + 10),
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarFormat: _calendarFormat,
-      headerStyle: HeaderStyle(
-        formatButtonVisible: false,
-      ),
-      calendarBuilders: calendarBuilder(),
-      selectedDayPredicate: (day) {
-        return isSameDay(_selectedDay, day);
-      },
-      onDaySelected: (selectedDay, focusedDay) {
-        if (!isSameDay(_selectedDay, selectedDay)) {
-          setState(() {
-            _selectedDay = selectedDay;
+          firstDay: DateTime.now(),
+          focusedDay: _focusedDay,
+          lastDay: DateTime(_focusedDay.year + 10),
+          startingDayOfWeek: StartingDayOfWeek.monday,
+          calendarFormat: _calendarFormat,
+          headerStyle: HeaderStyle(
+            formatButtonVisible: false,
+          ),
+          calendarBuilders: calendarBuilder(),
+          selectedDayPredicate: (day) {
+            return isSameDay(_selectedDay, day);
+          },
+          onDaySelected: (selectedDay, focusedDay) {
+            if (!isSameDay(_selectedDay, selectedDay)) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            }
+          },
+          onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
-          });
-        }
-      },
-      onPageChanged: (focusedDay) {
-        _focusedDay = focusedDay;
-      },
-    ));
+          },
+        ));
   }
 
   // Farbschema des Kalenders festlegen
@@ -81,7 +82,6 @@ class CalendarDay extends StatelessWidget {
       height: 45,
       width: 45,
       decoration: new BoxDecoration(
-        
           color: backgroundColor,
           borderRadius: new BorderRadius.circular(40.0)),
       child: Center(
