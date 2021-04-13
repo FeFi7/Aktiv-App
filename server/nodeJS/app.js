@@ -6,9 +6,12 @@ const routerUser = require('./routes/userRoute')
 const routerFileUpload = require('./routes/fileUploadRoute')
 const secureRoute = require('./routes/secureRoute')
 const passport = require('passport');
+const cors = require('cors');
 
 const app = express()
 const port = 3000
+
+app.use(cors())
 
 app.use(compression())
 app.use(express.urlencoded({ extended: false }))
