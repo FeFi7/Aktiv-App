@@ -1,13 +1,13 @@
 import 'dart:collection';
-
 import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
+import 'package:aktiv_app_flutter/Views/veranstaltung/anlegen.dart';
 import 'package:aktiv_app_flutter/Views/profile/profile_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Clicker.dart';
 import 'defaults/color_palette.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,10 +26,7 @@ class _HomePageState extends State<HomePage> {
   static const List<Widget> _widgetOptions = <Widget>[
     EnvironmentView(),
     CalendarView(),
-    Text(
-      'Erstellen',
-      style: optionStyle,
-    ),
+    VeranstaltungAnlegenView(),
     FavoritesView(),
     ProfileScreen(),
   ];
