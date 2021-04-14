@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
-import 'package:aktiv_app_flutter/Views/login/login_screen.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/background.dart';
+import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -182,7 +182,7 @@ class _BodyState extends State<Body> {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return LoginScreen();
+                          return WelcomeScreen();
                         },
                       ),
                     );

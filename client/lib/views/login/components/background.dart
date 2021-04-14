@@ -12,7 +12,17 @@ class Background extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      decoration: BoxDecoration(color: ColorPalette.torea_bay.rgb),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            ColorPalette.endeavour.rgb,
+            ColorPalette.torea_bay.rgb,
+            ColorPalette.torea_bay.rgb
+          ],
+        ),
+      ),
       width: double.infinity,
       height: size.height,
       child: Stack(

@@ -3,23 +3,26 @@ import 'dart:convert';
 
 const SERVER_IP = "85.214.166.230";
 
-Future<String> attemptLogIn(String mail, String passwort) async {
+Future<http.Response> attemptLogIn(String mail, String passwort) async {
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
-  final response = await http.post(Uri.http(SERVER_IP, 'api/user/login'),
-      headers: <String, String>{
-        'Content-Type': "application/x-www-form-urlencoded"
-      },
-      body: body,
-      encoding: Encoding.getByName("utf-8"));
+  if (mail.isNotEmpty && passwort.isNotEmpty) {
+    final response = await http.post(Uri.http(SERVER_IP, 'api/user/login'),
+        headers: <String, String>{
+          'Content-Type': "application/x-www-form-urlencoded"
+        },
+        body: body,
+        encoding: Encoding.getByName("utf-8"));
 
-  if (response.statusCode == 200) {
-    print("Login erfolgreich");
-  } else {
-    print(response.statusCode);
-  }
+    if (response.statusCode == 200) {
+      print("Login erfolgreich");
+    } else {
+      print(response.statusCode);
+    }
 
-  return response.body;
+    return response;
+  } else
+    return null;
 }
 
 Future<String> attemptSignUpWithPLZ(

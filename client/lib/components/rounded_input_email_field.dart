@@ -18,8 +18,9 @@ class RoundedInputEmailField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: Form(
-        autovalidateMode: AutovalidateMode.always,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: TextFormField(
+          keyboardType: TextInputType.emailAddress,
           validator: (value) => EmailValidator.validate(value)
               ? null
               : "Bitte gültige Email eingeben",
