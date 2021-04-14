@@ -64,6 +64,9 @@ class _BodyState extends State<Body> {
                   var accessToken = parsedJson['accessToken'];
                   var refreshToken = parsedJson['refreshToken'];
 
+                  print(accessToken);
+                  print(refreshToken);
+
                   if (jwt != null) {
                     storage.write("accessToken", accessToken);
                     storage.write("refreshToken", refreshToken);

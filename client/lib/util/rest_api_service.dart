@@ -101,6 +101,12 @@ Future<String> attemptGetUser(String mail) async {
   return response.body;
 }
 
+Future<int> attemptFileUpload() async {}
+
+Future<String> attemptCreateVeranstaltung() async {}
+
+Future<String> attemptGetAllVeranstaltungen() async {}
+
 Future<int> testapi() async {
   final response = await http.get(Uri.http('85.214.166.230', 'api/'));
   if (response.statusCode == 200) {
