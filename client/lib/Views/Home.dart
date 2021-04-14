@@ -21,9 +21,9 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex =
       0; // Index des ausgewählten Item's der BottomNavigationBar
 
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  // static const TextStyle optionStyle =
+  //     TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static final List<Widget> _widgetOptions = <Widget>[
     EnvironmentView(),
     CalendarView(),
     VeranstaltungAnlegenView(),
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   static const List<String> _widgetTitles = <String>[
-    'Suche',
+    'Entdecken',
     'Kalender',
     'Erstellen',
     'Favoriten',

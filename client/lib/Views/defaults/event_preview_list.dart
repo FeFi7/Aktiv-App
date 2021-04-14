@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +20,7 @@ class EventPreviewList extends StatefulWidget {
   }
 
   void addListExtensionDots() {
-    // hier muss nioch dynamisch fest gelegt werden wohin die leiten sollen
+    // hier muss noch dynamisch fest gelegt werden wohin die leiten sollen
     widgetList.insert(
         0,
         PreviewListDots(
@@ -26,6 +28,10 @@ class EventPreviewList extends StatefulWidget {
               EventPreviewBox(0, 'titel', 'description', 'additive', false)
             ]),
             ''));
+  }
+
+  void clear() {
+    widgetList.clear();
   }
 }
 
@@ -41,10 +47,33 @@ class _EventPreviewListState extends State<EventPreviewList> {
   //   setState(() {});
   // }
 
+  ScrollController _controller;
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      setState(() {
+        // TODO: Möglichkeit coden, damit Event dynamisch hinzugefügt werden...
+        log("reach the bottom");
+
+      });
+      
+    }
+  }
+
+  @override
+  void initState() {
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView.builder(
+        // shrinkWrap: true, 
+          controller: _controller,
           padding: const EdgeInsets.all(8),
           itemCount: widget.widgetList.length,
           itemBuilder: (BuildContext context, int index) {

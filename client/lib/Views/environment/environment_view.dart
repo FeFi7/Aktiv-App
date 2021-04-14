@@ -58,7 +58,7 @@ class _EnvironmentViewState extends State<EnvironmentView> {
 
 // widgetList.add();
 
-      EventPreviewList list = EventPreviewList(<Widget>[]);
+      // EventPreviewList list = EventPreviewList(<Widget>[]);
 
       return EventPreviewList(widgetList);
 // widgetList.add();
@@ -153,44 +153,9 @@ class _EnvironmentViewState extends State<EnvironmentView> {
       // crossAxisSpacing: 10,
       // crossAxisCount: 1,
       onItemFound: (Post post, int index) {
-        // return Container(
-        //   color: Colors.lightBlue,
-        //   child: ListTile(
-        //     title: Text(post.title),
-        //     isThreeLine: true,
-        //     subtitle: Text(post.body),
-        //     onTap: () {
-        //       Navigator.of(context).push(
-        //           MaterialPageRoute(builder: (context) => Detail()));
-        //     },
-        //   ),
-        // );
-
-        /// TODO: Muss noch ge
-        return SizedBox(
-            // height: 10,
-            child: EventPreviewBox(
-                index, post.title, post.body, 'noch kein ', false));
+        return EventPreviewBox(
+            index, post.title, post.body, 'noch kein ', false);
       },
     ));
   }
 }
-
-// class Detail extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: SafeArea(
-//         child: Column(
-//           children: <Widget>[
-//             IconButton(
-//               icon: Icon(Icons.arrow_back),
-//               onPressed: () => Navigator.of(context).pop(),
-//             ),
-//             Text("Detail"),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

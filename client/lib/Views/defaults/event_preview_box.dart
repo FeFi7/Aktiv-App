@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../Home.dart';
 
+// ignore: must_be_immutable
 class EventPreviewBox extends StatefulWidget {
   final int id;
   final String titel;
@@ -12,10 +13,13 @@ class EventPreviewBox extends StatefulWidget {
   final String additive;
   bool liked;
 
+
+  // TODO: Überprüfe ob Box höhe wirklich einheitlich ist 
+
+  // TODO: Ob die veranstaltung geliked ist, sollte nicht übergeben werden,
+  // sondern aus einer singleton Klasse durch die id entnommen werdem 
   EventPreviewBox(
       this.id, this.titel, this.description, this.additive, this.liked);
-
-  /// wär besser wenn liked nicht übergeben wird, sondern sich die info via id holt. Änderung folgt...
 
   @override
   _EventPreviewBoxState createState() => _EventPreviewBoxState();
@@ -28,17 +32,12 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
 
     return FractionallySizedBox(
       widthFactor: 1,
-      // heightFactor: 0.2,
       child: Container(
         margin: const EdgeInsets.all(10.0),
         padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
-          // border: Border.all(
-          //   color: Color(0xFF00487d),
-          //   width: 3,
-          // ), Finde es ohne besser
           borderRadius:
-              BorderRadius.all(Radius.circular(10.0)), // rundung der border
+              BorderRadius.all(Radius.circular(10.0)), 
           color: ColorPalette.french_pass.rgb,
         ),
         height: size.height * 0.2,
@@ -53,8 +52,9 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 child: Container(
                   margin: const EdgeInsets.all(2.0),
                   child: CircleAvatar(
+                    // TODO: Bild der Preview Box muss noch dynamisch werden
                     backgroundImage: AssetImage(
-                        "assets/images/lq_logo_klein.png"), //Bild muss noch dynamisch werden
+                        "assets/images/lq_logo_klein.png"),
                   ),
                 ),
               ),
@@ -82,7 +82,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                         style: TextStyle(fontSize: 12),
                         maxLines: 4,
                         overflow: TextOverflow
-                            .ellipsis, //Mach ... bei zu langem Texts
+                            .ellipsis, //Macht ... bei zu langem Texts
                       ),
                     )),
                     Container(
@@ -135,9 +135,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                           size: 48,
                         ),
                         onPressed: () {
-                          /// Hier muss ein noch Event Vorschau Objekt erstellt werden
-                          /// dass aus einer in dieser Klasse gespeicherten Event
-                          /// Instance, so dass
+                          /// TODO: Verweise auf detail anischt der Veransanstaltung
                           Provider.of<BodyProvider>(context, listen: false)
                               .setBody(Container());
                           Provider.of<AppBarTitleProvider>(context,

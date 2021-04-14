@@ -1,4 +1,3 @@
-import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:provider/provider.dart';

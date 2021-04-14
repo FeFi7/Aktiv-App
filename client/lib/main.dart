@@ -26,11 +26,12 @@ class AktivApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ClickerProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => AppBarTitleProvider()),
-        ChangeNotifierProvider(create: (_) => BodyProvider())
+        
+        ChangeNotifierProvider(create: (_) => BodyProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'wir:hier',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
