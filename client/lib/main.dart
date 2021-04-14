@@ -11,8 +11,7 @@ import 'package:flutter/foundation.dart';
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(details);
-    if (kReleaseMode)
-      exit(1);
+    if (kReleaseMode) exit(1);
   };
   runApp(AktivApp());
 }
