@@ -27,8 +27,7 @@ async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis){
     LEFT JOIN Institution i ON v.institutionId = i.id
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?
     LIMIT ?`
-
-    let results = (await conn.query(query, [istGenehmigt, bis, limit]).catch(error => {console.log(error); return null;}))
+    let results = (await conn.query(query, [Number(istGenehmigt), bis, Number(limit)]).catch(error => {console.log(error); return null;}))
 
     if(results){
         const result = results[0];
