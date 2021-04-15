@@ -18,12 +18,13 @@ passport.use(
     async (mail, passwort, done) => {
       try {
         const user = await userService.userExists(mail, passwort);
-
+        console.log(user)
         if (user.error) {
-          return done(user.error, false, { message: user.error });
+          return done(null, false, { message: user.error });
         }
-        const _user = { mail: user[0].mail, erstellt_ts: user[0].erstellt_ts };
-        await userService.logLogintoDB(mail);
+        const _user = {id: user.id, mail: user.mail, erstellt_ts: user.erstellt_ts };
+        await userService.logLogintoDB(mail).catch((error) => console.log(error));
+        
         return done(null, _user, { message: "Erfolgreich eingeloggt" });
       } catch (error) {
         return done(error);

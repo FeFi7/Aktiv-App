@@ -11,26 +11,19 @@ async function getUser() {
   return [{}, {}];
 }
 
-async function registerUser(mail, passwort, plz, rolleId) {
-  if ((await userExists(mail)).length > 0) {
+async function registerUser(mail, passwort, rolleId) {
+  if ((await mailExists(mail)).length > 0) {
     return { error: "User schon vorhanden" };
   }
 
   // passwort hashen mit salt
-  //const salt = await bcrypt.genSalt(10);
   const passwortHashed = await bcrypt.hash(passwort, 10);
 
-  const queryPlz = `INSERT INTO PLZ(PLZ.plz) VALUES(?) ON DUPLICATE KEY UPDATE PLZ.plz = PLZ.plz;`;
-  const queryUser = `INSERT INTO User(mail, passwort, rolleId, plzId) VALUES(?,?,?, (SELECT id FROM PLZ WHERE PLZ.plz = ?))`;
-
-  await conn.query(queryPlz, [plz]).catch((_error) => {
-    console.log(_error);
-    return { error: _error };
-  });
+  const queryUser = `INSERT INTO User(mail, passwort, rolleId) VALUES(?,?,?)`;
 
   const result = (
     await conn
-      .query(queryUser, [mail, passwortHashed, rolleId, plz])
+      .query(queryUser, [mail, passwortHashed, rolleId])
       .catch((_error) => {
         console.log(_error);
         return { error: _error };
@@ -147,8 +140,7 @@ async function existRefreshToken(token) {
 }
 
 async function userExists(mail, passwort) {
-  const query = `SELECT u.mail, u.passwort, u.erstellt_ts FROM User u WHERE u.mail = ?`;
-
+  const query = `SELECT u.id, u.mail, u.passwort, u.erstellt_ts FROM User u WHERE u.mail = ?`;
   const results = (
     await conn.query(query, [mail]).catch((error) => {
       console.log(error);
@@ -158,9 +150,9 @@ async function userExists(mail, passwort) {
 
   if (results.length > 0) {
     const validPasswort = await bcrypt.compare(passwort, results[0].passwort);
-
+    console.log("Passwort valide: " + validPasswort)
     if (validPasswort) {
-      return results[0][0];
+      return results[0];
     } else {
       return { error: "Passwort nicht korrekt" };
     }
@@ -169,7 +161,7 @@ async function userExists(mail, passwort) {
   }
 }
 
-async function userExists(mail) {
+async function mailExists(mail) {
   const query = `SELECT u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
   const results = (

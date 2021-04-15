@@ -20,9 +20,6 @@ router.post("/signup", async function (req, res) {
   if (!body.passwort) {
     return res.status(400).send({ error: "Passwort nicht vorhanden" });
   }
-  if (!body.plz) {
-    return res.status(400).send({ error: "Plz nicht vorhanden" });
-  }
   if (!body.rolle) {
     body.rolle = 1;
   } else {
@@ -35,7 +32,6 @@ router.post("/signup", async function (req, res) {
   const result = await userService.registerUser(
     body.mail,
     body.passwort,
-    body.plz,
     body.rolle
   );
 
