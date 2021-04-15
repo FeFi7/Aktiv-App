@@ -63,7 +63,7 @@ class _EnvironmentViewState extends State<EnvironmentView> {
 
     /// TODO: Soll noch zu List<EventPreviewBox> geändert werden
     Future<List<Post>> _getALlPosts(String text) async {
-      await Future.delayed(Duration(seconds: text.length == 4 ? 10 : 1));
+      // await Future.delayed(Duration(seconds: text.length == 4 ? 10 : 1));
       if (isReplay) return [Post("Replaying !", "Replaying body")];
       // if (text.length == 5) throw Error();
       // if (text.length == 6) return [];

@@ -2,6 +2,7 @@ import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
+import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -34,6 +35,9 @@ class _CalendarViewState extends State<CalendarView> {
 
     // Muss zu beginn ausgeführt werden um die Veransatltungen erstmals zu laden
     // Können anfangs einfach nur die veransatltung von diesem Monat sein
+
+    
+
     _groupEvents([
       Veranstaltung.create(
           'Heutige bsp Veranstaltung',
@@ -115,7 +119,7 @@ class _CalendarViewState extends State<CalendarView> {
                   }
                 }
 
-                /// TODO: Die verwendeten Events austauschen (Zwischen Persnlich und allgemein wechslen)
+                /// TODO: Die verwendeten Events austauschen (Zwischen Persönlich und allgemein wechseln)
 
               });
             },

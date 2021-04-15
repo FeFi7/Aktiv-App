@@ -2,7 +2,7 @@ import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'Provider/ClickerProvider.dart';
+import 'Provider/body_provider.dart';
 import 'Views/welcome_screen.dart';
 
 import 'dart:io';
@@ -22,7 +22,6 @@ class AktivApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ClickerProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => AppBarTitleProvider()),
         
