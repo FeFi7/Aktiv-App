@@ -33,6 +33,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
     return FractionallySizedBox(
       widthFactor: 1,
       child: Container(
+        
         margin: const EdgeInsets.all(10.0),
         padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(

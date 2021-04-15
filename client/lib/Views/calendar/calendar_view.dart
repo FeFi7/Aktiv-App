@@ -23,6 +23,8 @@ class _CalendarViewState extends State<CalendarView> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay;
 
+  final List<bool> isSelected = [true, false];
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +91,41 @@ class _CalendarViewState extends State<CalendarView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Container(
+          margin: const EdgeInsets.all(10.0),
+          child: ToggleButtons(
+            children: [
+              Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Allgemein')),
+              Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Persönlich')),
+            ],
+            isSelected: isSelected,
+            onPressed: (int index) {
+              setState(() {
+                for (int buttonIndex = 0;
+                    buttonIndex < isSelected.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    isSelected[buttonIndex] = true;
+                  } else {
+                    isSelected[buttonIndex] = false;
+                  }
+                }
+
+                /// TODO: Die verwendeten Events austauschen (Zwischen Persnlich und allgemein wechslen)
+
+              });
+            },
+            borderRadius: BorderRadius.circular(30),
+            borderWidth: 1,
+            selectedColor: ColorPalette.white.rgb,
+            fillColor: ColorPalette.endeavour.rgb,
+            disabledBorderColor: ColorPalette.french_pass.rgb,
+          ),
+        ),
         Container(
             padding: const EdgeInsets.all(10.0),
             child: TableCalendar(
@@ -161,11 +198,8 @@ class _CalendarViewState extends State<CalendarView> {
         return CalendarDay(date.day.toString(), ColorPalette.light_grey.rgb);
       },
       singleMarkerBuilder: (context, date, _) {
-        // TODO: Wenn favorisierte veranstaltung an dem Tag, dynamisch au true setzen
-        bool fav = false;
-
         return SingleMarkerDay(
-            fav ? ColorPalette.orange.rgb : ColorPalette.malibu.rgb);
+            isSelected[1] ? ColorPalette.orange.rgb : ColorPalette.malibu.rgb);
       },
     );
   }

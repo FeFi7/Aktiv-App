@@ -25,6 +25,8 @@ class EnvironmentView extends StatefulWidget {
   _EnvironmentViewState createState() => _EnvironmentViewState();
 }
 
+final List<bool> isSelected = [true, false, false];
+
 class _EnvironmentViewState extends State<EnvironmentView> {
   @override
   Widget build(BuildContext context) {
@@ -56,17 +58,7 @@ class _EnvironmentViewState extends State<EnvironmentView> {
         PreviewListDots(EventPreviewList(<Widget>[]), 'In der Nähe')
       ];
 
-// widgetList.add();
-
-      // EventPreviewList list = EventPreviewList(<Widget>[]);
-
       return EventPreviewList(widgetList);
-// widgetList.add();
-
-// list.addEventPreview(EventPreviewBox(1, 'Zusatz Veranstaaltung', 'Beschriebung', 'Zusatz Infos'));
-// list.addExtenionListDots(EventPreviewList());
-//
-//
     }
 
     /// TODO: Soll noch zu List<EventPreviewBox> geändert werden
@@ -85,15 +77,12 @@ class _EnvironmentViewState extends State<EnvironmentView> {
       return posts;
     }
 
-    // margin: const EdgeInsets.all(10.0),
-    // padding: const EdgeInsets.all(10.0),
-
     return Container(
         child: SearchBar<Post>(
       // searchBarPadding: EdgeInsets.symmetric(horizontal: 50),
       // headerPadding: EdgeInsets.all(50),
       searchBarPadding: EdgeInsets.only(left: 15, right: 15, top: 15),
-    
+
       ///symmetric(horizontal: 10), ///EdgeInsets.all(15),
       listPadding: EdgeInsets.symmetric(horizontal: 10),
       textStyle: TextStyle(
@@ -119,31 +108,43 @@ class _EnvironmentViewState extends State<EnvironmentView> {
           child: Center(child: Text("Zurück"))),
       emptyWidget: Text("empty"),
       indexedScaledTileBuilder: (int index) => ScaledTile.count(1, 0.475),
-      // header: Row(
-      //   children: <Widget>[
-      //     RaisedButton(
-      //       child: Text("sort"),
-      //       onPressed: () {
-      //         _searchBarController.sortList((Post a, Post b) {
-      //           return a.body.compareTo(b.body);
-      //         });
-      //       },
-      //     ),
-      //     RaisedButton(
-      //       child: Text("Desort"),
-      //       onPressed: () {
-      //         _searchBarController.removeSort();
-      //       },
-      //     ),
-      //     RaisedButton(
-      //       child: Text("Replay"),
-      //       onPressed: () {
-      //         isReplay = !isReplay;
-      //         _searchBarController.replayLastSearch();
-      //       },
-      //     ),
-      //   ],
-      // ),
+      header: Center(
+        child: Container(
+          margin: const EdgeInsets.all(2.0),
+          child: ToggleButtons(
+            children: [
+              Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Allgemein')),
+              Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Datum')),
+              Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Zeitraum')),
+            ],
+            isSelected: isSelected,
+            onPressed: (int index) {
+              setState(() {
+                for (int buttonIndex = 0;
+                    buttonIndex < isSelected.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    isSelected[buttonIndex] = true;
+                  } else {
+                    isSelected[buttonIndex] = false;
+                  }
+                }
+              });
+            },
+            borderRadius: BorderRadius.circular(30),
+            borderWidth: 1,
+            selectedColor: ColorPalette.white.rgb,
+            fillColor: ColorPalette.endeavour.rgb,
+            disabledBorderColor: ColorPalette.french_pass.rgb,
+          ),
+        ),
+      ),
       onCancelled: () {
         print("Cancelled triggered");
         FocusScope.of(context).requestFocus(new FocusNode());
