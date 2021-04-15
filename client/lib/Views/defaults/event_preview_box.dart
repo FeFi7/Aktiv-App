@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:flutter/material.dart';
