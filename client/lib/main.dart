@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class AktivApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => AppBarTitleProvider()),
-        
+        ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => BodyProvider()),
       ],
       child: MaterialApp(
