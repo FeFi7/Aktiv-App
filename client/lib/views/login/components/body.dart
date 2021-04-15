@@ -96,6 +96,14 @@ class _BodyState extends State<Body> {
                               },
                             ),
                           );
+                        } else if (jwt.statusCode == 401) {
+                          Fluttertoast.showToast(
+                              msg: "Unauthorisierter Benutzer",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: ColorPalette.orange.rgb,
+                              textColor: ColorPalette.white.rgb);
                         } else {
                           Fluttertoast.showToast(
                               msg: "Ungültige Anmeldedaten",

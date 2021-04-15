@@ -28,34 +28,47 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                       content: SingleChildScrollView(
                         child: ListBody(
                           children: <Widget>[
-                            RichText(
-                              text: TextSpan(
-                                text:
-                                    "Vielen Dank für die vervollständigung Ihrer angaben. \nSie haben nun die Möglichkeit, Veranstaltungen anzulegen.",
-                                style: TextStyle(color: ColorPalette.white.rgb),
-                              ),
-                            ),
+                            Text(
+                                "Vielen Dank für die Vervollständigung Ihrer angaben.\n Sie haben nun die Möglichkeit, Veranstaltungen anzulegen."),
                           ],
                         ),
                       ),
                       actions: <Widget>[
                         TextButton(
                             onPressed: () {
-                              complete = false;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return ProfileScreen();
-                                  },
-                                ),
-                              );
+                              setState(() => complete = false);
                             },
                             child: Text("Weiterleiten"))
                       ],
                     ),
                   )
                 : Stepper(
+                    controlsBuilder: (BuildContext context,
+                        {VoidCallback onStepContinue,
+                        VoidCallback onStepCancel}) {
+                      return Row(
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: onStepContinue,
+                            child: const Text(
+                              'Weiter',
+                              style: TextStyle(
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: onStepCancel,
+                            child: const Text(
+                              'Zurück',
+                              style: TextStyle(
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                     steps: steps,
                     currentStep: currentStep,
                     onStepContinue: nextStep,

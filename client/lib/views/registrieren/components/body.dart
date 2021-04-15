@@ -91,7 +91,7 @@ class _BodyState extends State<Body> {
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                         TextSpan(
-                          text: "AGBs",
+                          text: "AGBs ",
                           style: TextStyle(color: ColorPalette.white.rgb),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
@@ -106,7 +106,26 @@ class _BodyState extends State<Body> {
                             },
                         ),
                         TextSpan(
-                          text: " gelesen und akzeptiert",
+                          text: "und",
+                          style: TextStyle(color: ColorPalette.malibu.rgb),
+                        ),
+                        TextSpan(
+                          text: " Datenschutzerklärung ",
+                          style: TextStyle(color: ColorPalette.white.rgb),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              final url =
+                                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/";
+
+                              await launch(
+                                url,
+                                forceSafariVC: false,
+                                forceWebView: false,
+                              );
+                            },
+                        ),
+                        TextSpan(
+                          text: " \ngelesen und akzeptiere.",
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                       ]),
@@ -147,7 +166,15 @@ class _BodyState extends State<Body> {
                         var jwt =
                             await attemptSignUpWithPLZ(mail, password, "89075");
 
-                        if (jwt.statusCode == 200) {
+                        if (jwt.statusCode == 502) {
+                          Fluttertoast.showToast(
+                              msg: "Server nicht erreichbar",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: ColorPalette.orange.rgb,
+                              textColor: ColorPalette.white.rgb);
+                        } else if (jwt.statusCode == 200) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
