@@ -41,6 +41,7 @@ dependencies:
   email_validator: ^1.0.0
   image_picker: ^0.7.4
   fluttertoast: ^8.0.3
+  url_launcher: ^6.0.3
 
 dev_dependencies:
   flutter_test:

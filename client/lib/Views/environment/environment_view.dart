@@ -117,11 +117,9 @@ class _EnvironmentViewState extends State<EnvironmentView> {
                   padding: const EdgeInsets.all(10.0),
                   child: Text('Allgemein')),
               Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Datum')),
+                  padding: const EdgeInsets.all(10.0), child: Text('Datum')),
               Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Zeitraum')),
+                  padding: const EdgeInsets.all(10.0), child: Text('Zeitraum')),
             ],
             isSelected: isSelected,
             onPressed: (int index) {

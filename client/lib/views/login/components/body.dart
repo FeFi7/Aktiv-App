@@ -27,7 +27,7 @@ class _BodyState extends State<Body> {
   final formKey = GlobalKey<FormState>();
   bool rememberMe = false;
   var mail;
-  var passwort;
+  var password;
 
   final SecureStorage storage = SecureStorage();
 
@@ -45,7 +45,7 @@ class _BodyState extends State<Body> {
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
                 CircleAvatar(
                   radius: 120,
-                  backgroundImage: AssetImage("assets/images/logo.png"),
+                  backgroundImage: AssetImage("assets/images/wir_logo.png"),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
                 RoundedInputEmailField(
@@ -57,7 +57,7 @@ class _BodyState extends State<Body> {
                 RoundedPasswordField(
                   hintText: "Passwort",
                   onChanged: (value) {
-                    passwort = value;
+                    password = value;
                   },
                 ),
                 RoundedButton(
@@ -66,14 +66,14 @@ class _BodyState extends State<Body> {
                   press: () async {
                     if (mail.toString().isNotEmpty &&
                         mail != null &&
-                        passwort.toString().isNotEmpty &&
-                        passwort != null) {
+                        password.toString().isNotEmpty &&
+                        password != null) {
                       if (formKey.currentState.validate()) {
                         formKey.currentState.save();
                       }
 
                       if (EmailValidator.validate(mail)) {
-                        var jwt = await attemptLogIn(mail, passwort);
+                        var jwt = await attemptLogIn(mail, password);
 
                         if (jwt.statusCode == 200) {
                           var parsedJson = json.decode(jwt.body);
@@ -97,37 +97,32 @@ class _BodyState extends State<Body> {
                             ),
                           );
                         } else {
-                          setState(() {
-                            Fluttertoast.showToast(
-                                msg: "Ungültige Anmeldedaten",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: ColorPalette.orange.rgb,
-                                textColor: ColorPalette.white.rgb);
-                          });
-                        }
-                      } else {
-                        setState(() {
                           Fluttertoast.showToast(
-                              msg: "Bitte gültige Email eingeben",
+                              msg: "Ungültige Anmeldedaten",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.CENTER,
                               timeInSecForIosWeb: 1,
                               backgroundColor: ColorPalette.orange.rgb,
                               textColor: ColorPalette.white.rgb);
-                        });
-                      }
-                    } else {
-                      setState(() {
+                        }
+                      } else {
                         Fluttertoast.showToast(
-                            msg: "Bitte Email und Passwort eingeben",
+                            msg: "Bitte gültige Email eingeben",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.CENTER,
                             timeInSecForIosWeb: 1,
-                            backgroundColor: ColorPalette.white.rgb,
-                            textColor: ColorPalette.orange.rgb);
-                      });
+                            backgroundColor: ColorPalette.orange.rgb,
+                            textColor: ColorPalette.white.rgb);
+                      }
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: "Bitte Email und Passwort eingeben",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: ColorPalette.white.rgb,
+                        textColor: ColorPalette.orange.rgb,
+                      );
                     }
                   },
                 ),

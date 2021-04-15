@@ -14,11 +14,10 @@ class EventPreviewBox extends StatefulWidget {
   final String additive;
   bool liked;
 
-
-  // TODO: Überprüfe ob Box höhe wirklich einheitlich ist 
+  // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
 
   // TODO: Ob die veranstaltung geliked ist, sollte nicht übergeben werden,
-  // sondern aus einer singleton Klasse durch die id entnommen werdem 
+  // sondern aus einer singleton Klasse durch die id entnommen werdem
   EventPreviewBox(
       this.id, this.titel, this.description, this.additive, this.liked);
 
@@ -34,12 +33,10 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
     return FractionallySizedBox(
       widthFactor: 1,
       child: Container(
-        
         margin: const EdgeInsets.all(10.0),
         padding: const EdgeInsets.all(10.0),
         decoration: BoxDecoration(
-          borderRadius:
-              BorderRadius.all(Radius.circular(10.0)), 
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
           color: ColorPalette.french_pass.rgb,
         ),
         height: size.height * 0.2,
@@ -55,8 +52,8 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                   margin: const EdgeInsets.all(2.0),
                   child: CircleAvatar(
                     // TODO: Bild der Preview Box muss noch dynamisch werden
-                    backgroundImage: AssetImage(
-                        "assets/images/lq_logo_klein.png"),
+                    backgroundImage:
+                        AssetImage("assets/images/lq_logo_klein.png"),
                   ),
                 ),
               ),

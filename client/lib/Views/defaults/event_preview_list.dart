@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:provider/provider.dart';
 
@@ -55,9 +56,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
       setState(() {
         // TODO: Möglichkeit coden, damit Event dynamisch hinzugefügt werden...
         log("reach the bottom");
-
       });
-      
     }
   }
 
@@ -72,7 +71,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
   Widget build(BuildContext context) {
     return Container(
       child: ListView.builder(
-        // shrinkWrap: true, 
+          // shrinkWrap: true,
           controller: _controller,
           padding: const EdgeInsets.all(8),
           itemCount: widget.widgetList.length,

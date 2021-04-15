@@ -77,8 +77,8 @@ class _WelcomeScreen extends State<WelcomeScreen> {
               children: <Widget>[
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
                 CircleAvatar(
-                  radius: 200.0,
-                  backgroundImage: AssetImage("assets/images/logo.png"),
+                  radius: 180.0,
+                  backgroundImage: AssetImage("assets/images/wir_logo.png"),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
                 RoundedButton(

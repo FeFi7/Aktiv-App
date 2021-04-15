@@ -25,47 +25,52 @@ Future<http.Response> attemptLogIn(String mail, String passwort) async {
     return null;
 }
 
-Future<String> attemptSignUpWithPLZ(
+Future<http.Response> attemptSignUpWithPLZ(
     String mail, String passwort, String plz) async {
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort, 'plz': plz};
+  if (mail.isNotEmpty && passwort.isNotEmpty && plz.isNotEmpty) {
+    final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
+        headers: <String, String>{
+          'Content-Type': "application/x-www-form-urlencoded"
+        },
+        body: body,
+        encoding: Encoding.getByName("utf-8"));
 
-  final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
-      headers: <String, String>{
-        'Content-Type': "application/x-www-form-urlencoded"
-      },
-      body: body,
-      encoding: Encoding.getByName("utf-8"));
+    if (response.statusCode == 200) {
+      print("Registrierung erfolgreich");
+    } else {
+      print(response.statusCode);
+    }
 
-  if (response.statusCode == 200) {
-    print("Registrierung erfolgreich");
-  } else {
-    print(response.statusCode);
-  }
+    print(response);
 
-  print(response.body);
-
-  return response.body;
+    return response;
+  } else
+    return null;
 }
 
-Future<String> attemptSignUp(String mail, String passwort) async {
+Future<http.Response> attemptSignUp(String mail, String passwort) async {
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
-  final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
-      headers: <String, String>{
-        'Content-Type': "application/x-www-form-urlencoded"
-      },
-      body: body,
-      encoding: Encoding.getByName("utf-8"));
+  if (mail.isNotEmpty && passwort.isNotEmpty) {
+    final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
+        headers: <String, String>{
+          'Content-Type': "application/x-www-form-urlencoded"
+        },
+        body: body,
+        encoding: Encoding.getByName("utf-8"));
 
-  if (response.statusCode == 200) {
-    print("Registrierung erfolgreich");
-  } else {
-    print(response.statusCode);
-  }
+    if (response.statusCode == 200) {
+      print("Registrierung erfolgreich");
+    } else {
+      print(response.statusCode);
+    }
 
-  print(response.body);
+    print(response);
 
-  return response.body;
+    return response;
+  } else
+    return null;
 }
 
 Future<String> attemptNewAccessToken(String refreshToken) async {
