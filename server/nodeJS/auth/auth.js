@@ -23,7 +23,6 @@ passport.use(
           return done(user.error, false, { message: user.error });
         }
         const _user = { mail: user[0].mail, erstellt_ts: user[0].erstellt_ts };
-        console.log(_user);
         await userService.logLogintoDB(mail);
         return done(null, _user, { message: "Erfolgreich eingeloggt" });
       } catch (error) {

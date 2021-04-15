@@ -209,4 +209,35 @@ router.put(
   }
 );
 
+// [POST] Generiere Favorit Verbindung von User zu Veranstaltung
+router.post(
+  "/:userId/favorit",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const veranstaltungId = req.body.veranstaltungId;
+    const userId = req.params.userId;
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+    if (veranstaltungId) {
+      if (!/^\d+$/.test(veranstaltungId)) {
+        return res.status(400).send("veranstaltungId keine Zahl");
+      }
+    } else {
+      return res.status(400).send("veranstaltungId wird benötigt");
+    }
+
+    const result = await userService.favoritVeranstaltung(
+      userId,
+      veranstaltungId
+    );
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
 module.exports = router;

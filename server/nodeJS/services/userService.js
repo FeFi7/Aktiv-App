@@ -182,6 +182,19 @@ async function userExists(mail) {
   return results;
 }
 
+async function favoritVeranstaltung(userId, veranstaltungId) {
+  const query = `INSERT INTO Favorit(veranstaltungId, userId) VALUES(?, ?) ON DUPLICATE KEY UPDATE valide = IF(valide=1, 0, 1)`;
+
+  const results = (
+    await conn.query(query, [veranstaltungId, userId]).catch((error) => {
+      console.log(error);
+      return {error: "Fehler in Db"};
+    })
+  )[0];
+
+  return results;
+}
+
 async function updateUserInformation(id, mail, vorname, nachname, plz, tel) {
   // Falls noch keine ID für PLZ angelegt
   if (plz) {
@@ -231,4 +244,5 @@ module.exports = {
   saveProfilbildIdToUser: saveProfilbildIdToUser,
   getUserInfo: getUserInfo,
   updateUserInformation: updateUserInformation,
+  favoritVeranstaltung: favoritVeranstaltung
 };
