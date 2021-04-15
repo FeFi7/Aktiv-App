@@ -28,8 +28,15 @@ async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis){
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?
     LIMIT ?`
 
-    const result = (await conn.query(query, [istGenehmigt, bis, limit]).catch(error => {console.log(error); return null;}))[0]
-    return result;
+    let results = (await conn.query(query, [istGenehmigt, bis, limit]).catch(error => {console.log(error); return null;}))
+
+    if(results){
+        const result = results[0];
+        return result;
+    }
+    else{
+        return {error: "Fehler in db"};
+    }
 }
 
 async function createVeranstaltung(titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt ){

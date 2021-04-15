@@ -132,7 +132,7 @@ async function existRefreshToken(token) {
     })
   )[0];
 
-  if (results.length > 0) {
+  if (results && results.length > 0) {
     return true;
   } else {
     return false;

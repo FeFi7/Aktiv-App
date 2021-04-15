@@ -103,7 +103,7 @@ router.post("/token", async function (req, res) {
     return res.status(400).json({ error: "Refreshtoken nicht korrekt" });
   }
 
-  jwt.verify(refreshToken, SECRET_TOKEN_REFRESH, (err, user) => {
+  jwt.verify(refreshToken, SECRET_TOKEN_REFRESH, async (err, user) => {
     if (err) {
       return res.sendStatus(403);
     }
@@ -111,9 +111,12 @@ router.post("/token", async function (req, res) {
     const accessToken = jwt.sign({ user: user.user }, SECRET_TOKEN, {
       expiresIn: "20m",
     });
+    const refreshTokenNeu = jwt.sign({ user: user.user }, SECRET_TOKEN_REFRESH);
 
-    res.json({
-      accessToken,
+    await userService.deleteRefreshToken(refreshToken).catch((error) => console.log(error));
+    await userService.saveRefreshToken(refreshTokenNeu).catch((error) => console.log(error));
+    return res.json({
+      accessToken, refreshTokenNeu
     });
   });
 });
