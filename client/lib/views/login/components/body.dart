@@ -74,14 +74,24 @@ class _BodyState extends State<Body> {
 
                       if (EmailValidator.validate(mail)) {
                         var jwt = await attemptLogIn(mail, password);
+                        var test = await attemptGetAllVeranstaltungen();
+                        var test1 = await attemptCreateVeranstaltung(
+                            "testveranstlatung123123",
+                            "das ist nur zum test da333123123",
+                            "Eins Kontakt33",
+                            "2021-05-01",
+                            "2021-05-01",
+                            "Eins Ort",
+                            "0000",
+                            "0000",
+                            "2",
+                            "1",
+                            "1");
 
                         if (jwt.statusCode == 200) {
                           var parsedJson = json.decode(jwt.body);
                           var accessToken = parsedJson['accessToken'];
                           var refreshToken = parsedJson['refreshToken'];
-
-                          print(accessToken);
-                          print(refreshToken);
 
                           if (jwt != null) {
                             storage.write("accessToken", accessToken);
