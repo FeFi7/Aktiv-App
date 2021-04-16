@@ -38,37 +38,38 @@ class _CalendarViewState extends State<CalendarView> {
 
     
 
-    _groupEvents([
-      Veranstaltung.create(
-          'Heutige bsp Veranstaltung',
-          'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-          'kontakt',
-          'ortBeschr',
-          DateTime.now(),
-          DateTime.now(),
-          0,
-          0),
-      Veranstaltung.create(
-          'Morgige Veranstaltung ',
-          'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-          'kontakt',
-          'ortBeschr',
-          DateTime.utc(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day + 1),
-          DateTime.now(),
-          0,
-          0),
-      Veranstaltung.create(
-          'Zweite Morgige Veranstaltung ',
-          'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-          'kontakt',
-          'ortBeschr',
-          DateTime.utc(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day + 1),
-          DateTime.now(),
-          0,
-          0)
-    ]);
+    // _groupEvents([
+    //   Veranstaltung.create(
+    //       'Heutige bsp Veranstaltung',
+    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
+    //       'kontakt',
+    //       'ortBeschr',
+    //       DateTime.now(),
+    //       DateTime.now(),
+    //       0,
+    //       0),
+    //   Veranstaltung.create(
+    //       'Morgige Veranstaltung ',
+    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
+    //       'kontakt',
+    //       'ortBeschr',
+    //       DateTime.utc(DateTime.now().year, DateTime.now().month,
+    //           DateTime.now().day + 1),
+    //       DateTime.now(),
+    //       0,
+    //       0),
+    //   Veranstaltung.create(
+    //       'Zweite Morgige Veranstaltung ',
+    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
+    //       'kontakt',
+    //       'ortBeschr',
+    //       DateTime.utc(DateTime.now().year, DateTime.now().month,
+    //           DateTime.now().day + 1),
+    //       DateTime.now(),
+    //       0,
+    //       0)
+    // ]);
+    _groupEvents([]);
   }
 
   // @override
@@ -109,6 +110,8 @@ class _CalendarViewState extends State<CalendarView> {
             isSelected: isSelected,
             onPressed: (int index) {
               setState(() {
+                // TODO: Persnlicher Kalender soll nur ausgeführt werden können, wenn man registrierter user ist
+
                 for (int buttonIndex = 0;
                     buttonIndex < isSelected.length;
                     buttonIndex++) {

@@ -6,3 +6,7 @@ class UserProvider extends ChangeNotifier {
 }
 
 enum ROLE { USER, GENEHMIGER, BETREIBER }
+
+Future<bool> likedEvent(int id) {
+
+}
