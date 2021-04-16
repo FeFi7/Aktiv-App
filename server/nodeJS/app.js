@@ -31,6 +31,7 @@ app.get('/api/*',async (req, res) => res.send('Hello Aktiv App API!'))
 app.get('/',async (req, res) =>  res.send('Hello Aktiv App!'))
 
 app.use(function(err, req, res, next) {
+    console.error(err)
     res.status(err.status || 500);
     res.json({ error: err });
   });
