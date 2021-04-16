@@ -86,7 +86,12 @@ router.get("/*", async function (req, res) {
 
   const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis);
 
-  return res.send(veranstaltungen);
+  if(veranstaltungen.error){
+    res.status(400).json(veranstaltungen);
+  }
+  else{
+    res.status(200).json(veranstaltungen)
+  }
 });
 
 // [POST] Erstelle eine Veranstaltung
@@ -144,7 +149,7 @@ router.post("/*", async function (req, res) {
       return res.status(400).send({ error: "institutionId muss numerisch sein" });
     }
   } else {
-    return res.status(400).send({ error: "institutionId benötigt"});
+    institutionId = 0;
   }
   if (userId) {
     // ist numerisch?

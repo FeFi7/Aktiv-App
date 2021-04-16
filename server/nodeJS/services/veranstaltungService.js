@@ -7,8 +7,13 @@ async function getVeranstaltungById(veranstaltungId){
     WHERE v.id = ?
     LIMIT 10`
 
-    const result =  (await conn.query(query, [veranstaltungId]).catch(error => {console.log(error); return null;}))[0]
-    return result;
+    let result =  (await conn.query(query, [Number(veranstaltungId)]).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
+    if(result){
+        return result[0]
+    }
+    else{
+        return { error: "Fehler bei Db" };
+    }
 }
 
 async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis){
@@ -27,10 +32,10 @@ async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis){
     LEFT JOIN Institution i ON v.institutionId = i.id
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?
     LIMIT ?`
-    let results = (await conn.query(query, [Number(istGenehmigt), bis, Number(limit)]).catch(error => {console.log(error); return null;}))
+    let results = (await conn.query(query, [Number(istGenehmigt), bis, Number(limit)]).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
 
     if(results){
-        const result = results[0];
+        let result = results[0];
         return result;
     }
     else{
@@ -40,13 +45,18 @@ async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis){
 
 async function createVeranstaltung(titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt ){
     const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt)
-    VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), ?, ?, ?)`
+    VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), IF(?=0, Null, ?) , ?, ?)`
 
-    const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt];
+    const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, Number(institutionId), Number(institutionId), Number(userId), Number(istGenehmigt)];
 
-    const result = (await conn.query(query, params).catch(error => {console.log(error); return null;}))[0]
-    return result;
+    let result = (await conn.query(query, params).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
 
+    if(result){
+        return result[0]
+    }
+    else{
+        return { error: "Fehler bei Db" };
+    }
 }
 
 

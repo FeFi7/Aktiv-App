@@ -67,6 +67,7 @@ router.post("/login", async (req, res, next) => {
       }
 
       req.login(user, { session: false }, async (error) => {
+        console.log("bin hier")
         if (error) return next(error);
 
         const body = { _id: user.id, mail: user.mail };

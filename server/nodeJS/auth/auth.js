@@ -18,7 +18,6 @@ passport.use(
     async (mail, passwort, done) => {
       try {
         const user = await userService.userExists(mail, passwort);
-        console.log(user)
         if (user.error) {
           return done(null, false, { message: user.error });
         }

@@ -21,42 +21,54 @@ async function registerUser(mail, passwort, rolleId) {
 
   const queryUser = `INSERT INTO User(mail, passwort, rolleId) VALUES(?,?,?)`;
 
-  const result = (
+  let results = (
     await conn
       .query(queryUser, [mail, passwortHashed, rolleId])
       .catch((_error) => {
         console.log(_error);
         return { error: _error };
       })
-  )[0];
+  )
 
-  return result;
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return { error: "User nicht vorhanden" };
+  }
 }
 
 async function logLogintoDB(mail) {
   const query = `UPDATE User u SET u.lastLogin_ts = NOW() WHERE u.mail = ?`;
 
-  const results = (
+  let results = (
     await conn.query(query, [mail]).catch((error) => {
       console.log(error);
-      return null;
+      return { error: "Fehler bei Db" };
     })
-  )[0];
+  )
 
-  return results;
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return { error: "User nicht vorhanden" };
+  }
 }
 
 async function saveProfilbildIdToUser(userId, pofilbildId) {
   const query = `UPDATE User u SET u.pofilbildId = ? WHERE u.id = ?`;
 
-  const results = (
+  let results = (
     await conn.query(query, [pofilbildId, userId]).catch((error) => {
       console.log(error);
-      return null;
+      return { error: "Fehler bei Db" };
     })
-  )[0];
+  )
 
-  return results;
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return { error: "User nicht vorhanden" };
+  }
 }
 
 async function getUserInfo(id, mail) {
@@ -73,7 +85,13 @@ async function getUserInfo(id, mail) {
         console.log(error);
         return { error: "Fehler bei Db" };
       })
-    )[0];
+    )
+    if(results){
+      results = results[0];
+    }
+    else{
+      return { error: "Fehler bei Db" };
+    }
   } else {
     const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild FROM User u
     INNER JOIN Rolle r ON u.rolleId = r.id
@@ -86,7 +104,13 @@ async function getUserInfo(id, mail) {
         console.log(error);
         return { error: "Fehler bei Db" };
       })
-    )[0];
+    )
+    if(results){
+      results = results[0];
+    }
+    else{
+      return { error: "Fehler bei Db" };
+    }
   }
 
   if (results.length > 0) {
@@ -99,38 +123,53 @@ async function getUserInfo(id, mail) {
 async function saveRefreshToken(token) {
   const query = `INSERT INTO JwtRefreshToken(token) VALUES(?)`;
 
-  const results = (
+  let results = (
     await conn.query(query, [token]).catch((_error) => {
       console.log(_error);
       return { error: _error };
     })
-  )[0];
+  )
 
-  return results;
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 async function deleteRefreshToken(token) {
   const query = `DELETE FROM JwtRefreshToken j WHERE j.token = ?`;
 
-  const results = (
+  let results = (
     await conn.query(query, [token]).catch((_error) => {
       console.log(_error);
       return { error: _error };
     })
-  )[0];
+  )
 
-  return results;
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 async function existRefreshToken(token) {
   const query = `SELECT * FROM JwtRefreshToken j WHERE j.token = ?`;
-
-  const results = (
+  
+  let results = (
     await conn.query(query, [token]).catch((_error) => {
       console.log(_error);
-      return false;
+      return { error: "Fehler bei Db" };
     })
-  )[0];
+  )
+
+  if(results){
+    results = results[0];
+  }
+  else{
+    return { error: "Fehler bei Db" };
+  }
 
   if (results && results.length > 0) {
     return true;
@@ -141,18 +180,27 @@ async function existRefreshToken(token) {
 
 async function userExists(mail, passwort) {
   const query = `SELECT u.id, u.mail, u.passwort, u.erstellt_ts FROM User u WHERE u.mail = ?`;
-  const results = (
+  let result = {}
+  let results = (
     await conn.query(query, [mail]).catch((error) => {
       console.log(error);
-      return null;
+      return { error: "Fehler bei Db" };
     })
-  )[0];
+  )
+    
+  if (!results) {
+    return { error: "Fehler bei Db" };
+  }
+  else{
+    results = results[0];
+  }
 
   if (results.length > 0) {
-    const validPasswort = await bcrypt.compare(passwort, results[0].passwort);
-    console.log("Passwort valide: " + validPasswort)
+    result = results[0];
+    const validPasswort = await bcrypt.compare(passwort, result.passwort);
+    console.log("Passwort valide: " + validPasswort);
     if (validPasswort) {
-      return results[0];
+      return result;
     } else {
       return { error: "Passwort nicht korrekt" };
     }
@@ -164,27 +212,35 @@ async function userExists(mail, passwort) {
 async function mailExists(mail) {
   const query = `SELECT u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
-  const results = (
+  let results = (
     await conn.query(query, [mail]).catch((error) => {
       console.log(error);
-      return null;
+      return { error: "Fehler bei Db" };
     })
-  )[0];
+  )
 
-  return results;
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 async function favoritVeranstaltung(userId, veranstaltungId) {
   const query = `INSERT INTO Favorit(veranstaltungId, userId) VALUES(?, ?) ON DUPLICATE KEY UPDATE valide = IF(valide=1, 0, 1)`;
 
-  const results = (
+  let results = (
     await conn.query(query, [veranstaltungId, userId]).catch((error) => {
       console.log(error);
-      return {error: "Fehler in Db"};
+      return { error: "Fehler in Db" };
     })
-  )[0];
+  )
 
-  return results;
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 async function updateUserInformation(id, mail, vorname, nachname, plz, tel) {
@@ -201,27 +257,29 @@ async function updateUserInformation(id, mail, vorname, nachname, plz, tel) {
   u.nachname = IF(1=?, u.nachname, ?), u.tel = IF(1=?, u.tel, ?), u.plzId = IF(1=?, u.plzId, (SELECT PLZ.id FROM PLZ WHERE PLZ.plz = ?))
   WHERE id = ? and mail = ?`;
 
-  const results = (
-    await conn
-      .query(query, [
-        vorname ? 0 : 1,
-        vorname,
-        nachname ? 0 : 1,
-        nachname,
-        tel ? 0 : 1,
-        tel,
-        plz ? 0 : 1,
-        plz ? plz : "00000",
-        id,
-        mail,
-      ])
-      .catch((error) => {
-        console.log(error);
-        return { error: "Fehler in DB" };
-      })
-  )[0];
+  let results = await conn
+    .query(query, [
+      vorname ? 0 : 1,
+      vorname,
+      nachname ? 0 : 1,
+      nachname,
+      tel ? 0 : 1,
+      tel,
+      plz ? 0 : 1,
+      plz ? plz : "00000",
+      id,
+      mail,
+    ])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler in DB" };
+    });
 
-  return results;
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 module.exports = {
@@ -236,5 +294,5 @@ module.exports = {
   saveProfilbildIdToUser: saveProfilbildIdToUser,
   getUserInfo: getUserInfo,
   updateUserInformation: updateUserInformation,
-  favoritVeranstaltung: favoritVeranstaltung
+  favoritVeranstaltung: favoritVeranstaltung,
 };
