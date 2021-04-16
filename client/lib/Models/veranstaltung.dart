@@ -19,10 +19,10 @@ class Veranstaltung {
   ) {
     // Muss noch code für id von database geschrieben werden
     // Aktuell noch nur platzhalter
-    int maxid = 0;
-    maxid++;
-    this.id = maxid;
-    this.erstelltTs = DateTime.now();
+    //int maxid = 0;
+    //maxid++;
+    //this.id = maxid;
+    //this.erstelltTs = DateTime.now();
   }
 
   Veranstaltung.load(

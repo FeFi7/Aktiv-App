@@ -1,6 +1,7 @@
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
+import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -136,7 +137,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                         onPressed: () {
                           /// TODO: Verweise auf detail anischt der Veransanstaltung
                           Provider.of<BodyProvider>(context, listen: false)
-                              .setBody(Container());
+                              .setBody(VeranstaltungDetailView());
                           Provider.of<AppBarTitleProvider>(context,
                                   listen: false)
                               .setTitle('Übersicht');
