@@ -10,6 +10,8 @@ services:
             - /data/uploads/:/uploads
         depends_on: 
             - db
+        environment:
+            - NODE_ENV=production
     node2:
         restart: unless-stopped
         build:
@@ -20,6 +22,8 @@ services:
             - /data/uploads/:/uploads
         depends_on: 
             - db
+        environment:
+            - NODE_ENV=production
     node3: 
         restart: unless-stopped
         build: 
@@ -30,6 +34,8 @@ services:
             - /data/uploads/:/uploads
         depends_on:
             - db
+        environment:
+            - NODE_ENV=production
     node4:
         restart: unless-stopped
         build:
@@ -40,6 +46,8 @@ services:
             - /data/uploads/:/uploads       
         depends_on:
             - db
+        environment:
+            - NODE_ENV=production
     nginx:
         restart: unless-stopped
         build:
