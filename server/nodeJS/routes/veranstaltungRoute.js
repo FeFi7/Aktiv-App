@@ -49,26 +49,39 @@ router.delete("/:veranstaltungId", async function (req, res) {
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
-  let page = 1;
+  
   const query = req.query;
+  let page = query.page;
   let bis = query.bis;
   let istGenehmigt = query.istGenehmigt;
   let limit = query.limit;
-  
+  let userId = query.userId;
 
   if (limit) {
     // ist query eine Zahl?
-    if (!(/^\d+$/.test(req.query.limit) && req.query.limit < 100)) {
+    if (!(/^\d+$/.test(limit) && limit < 100)) {
       limit = 25;
     }
   }
   else{
     limit = 25;
   }
-  if (req.query.page) {
-    if (/^\d+$/.test(req.query.page)) {
-      page = req.query.page;
+  if (page) {
+    if (!/^\d+$/.test(page)) {
+      page = 1;
     }
+  }
+  else{
+    page = 1;
+  }
+  // falls keine userId mitgegeben Wert 0 und es wird in der Funktion nicht beachtet
+  if (userId) {
+    if (!/^\d+$/.test(userId)) {
+      userId = 0; 
+    }
+  }
+  else{
+    userId = 0;
   }
   if (!istGenehmigt) {
     istGenehmigt = 1;
@@ -84,7 +97,7 @@ router.get("/*", async function (req, res) {
             dt.getSeconds().toString().padStart(2, '0')}`
   }
 
-  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis);
+  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis, userId);
 
   if(veranstaltungen.error){
     res.status(400).json(veranstaltungen);
