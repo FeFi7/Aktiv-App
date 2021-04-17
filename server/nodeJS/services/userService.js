@@ -74,7 +74,8 @@ async function saveProfilbildIdToUser(userId, pofilbildId) {
 async function getUserInfo(id, mail) {
   let results;
   if (mail) {
-    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild FROM User u
+    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
+    FROM User u
     INNER JOIN Rolle r ON u.rolleId = r.id
     INNER JOIN PLZ p ON u.plzId = p.id
     LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
@@ -93,7 +94,8 @@ async function getUserInfo(id, mail) {
       return { error: "Fehler bei Db" };
     }
   } else {
-    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild FROM User u
+    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
+    FROM User u
     INNER JOIN Rolle r ON u.rolleId = r.id
     INNER JOIN PLZ p ON u.plzId = p.id
     LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
@@ -116,7 +118,7 @@ async function getUserInfo(id, mail) {
   if (results.length > 0) {
     return results[0];
   } else {
-    return { error: "User nicht vorhanden" };
+    return { error: "User nicht vorhanden oder falscher Token" };
   }
 }
 
@@ -243,6 +245,31 @@ async function favoritVeranstaltung(userId, veranstaltungId) {
   }
 }
 
+async function updateUserEinstellungen(userId, umkreisEinstellung, baldEinstellung) {
+  if(!umkreisEinstellung){
+    umkreisEinstellung = -1;
+  }
+  if(!baldEinstellung){
+    baldEinstellung = -1;
+  }
+
+  const query = `UPDATE User u SET u.umkreisEinstellung = IF(? > 0, ?, u.umkreisEinstellung), u.baldEinstellung = IF(? > 0, ?, u.baldEinstellung)
+  WHERE u.id = ?`;
+
+  let results = (
+    await conn.query(query, [Number(umkreisEinstellung), Number(umkreisEinstellung), Number(baldEinstellung), Number(baldEinstellung), Number(userId)]).catch((error) => {
+      console.log(error);
+      return { error: "Fehler in Db" };
+    })
+  )
+
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function updateUserInformation(id, mail, vorname, nachname, plz, tel) {
   // Falls noch keine ID für PLZ angelegt
   if (plz) {
@@ -295,4 +322,5 @@ module.exports = {
   getUserInfo: getUserInfo,
   updateUserInformation: updateUserInformation,
   favoritVeranstaltung: favoritVeranstaltung,
+  updateUserEinstellungen: updateUserEinstellungen
 };
