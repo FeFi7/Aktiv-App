@@ -1,13 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 
 const SERVER_IP = "85.214.166.230";
 
+// [POST] Login User
 Future<http.Response> attemptLogIn(String mail, String passwort) async {
+  String route = "api/user/login";
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
   if (mail.isNotEmpty && passwort.isNotEmpty) {
-    final response = await http.post(Uri.http(SERVER_IP, 'api/user/login'),
+    final response = await http.post(Uri.http(SERVER_IP, route),
         headers: <String, String>{
           'Content-Type': "application/x-www-form-urlencoded"
         },
@@ -25,35 +29,13 @@ Future<http.Response> attemptLogIn(String mail, String passwort) async {
     return null;
 }
 
-Future<http.Response> attemptSignUpWithPLZ(
-    String mail, String passwort, String plz) async {
-  Map<String, dynamic> body = {'mail': mail, 'passwort': passwort, 'plz': plz};
-  if (mail.isNotEmpty && passwort.isNotEmpty && plz.isNotEmpty) {
-    final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
-        headers: <String, String>{
-          'Content-Type': "application/x-www-form-urlencoded"
-        },
-        body: body,
-        encoding: Encoding.getByName("utf-8"));
-
-    if (response.statusCode == 200) {
-      print("Registrierung erfolgreich");
-    } else {
-      print(response.statusCode);
-    }
-
-    print(response);
-
-    return response;
-  } else
-    return null;
-}
-
+// [POST] Registriere neuen User
 Future<http.Response> attemptSignUp(String mail, String passwort) async {
+  String route = "api/user/signup";
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
   if (mail.isNotEmpty && passwort.isNotEmpty) {
-    final response = await http.post(Uri.http(SERVER_IP, '/api/user/signup'),
+    final response = await http.post(Uri.http(SERVER_IP, route),
         headers: <String, String>{
           'Content-Type': "application/x-www-form-urlencoded"
         },
@@ -73,10 +55,12 @@ Future<http.Response> attemptSignUp(String mail, String passwort) async {
     return null;
 }
 
-Future<String> attemptNewAccessToken(String refreshToken) async {
+// [POST] Generiere neuen AccessToken mithilfe des RefreshToken
+Future<http.Response> attemptNewAccessToken(String refreshToken) async {
+  String route = "api/user/token";
   Map<String, dynamic> body = {'token': refreshToken};
 
-  final response = await http.post(Uri.http(SERVER_IP, 'api/user/token'),
+  final response = await http.post(Uri.http(SERVER_IP, route),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -84,18 +68,20 @@ Future<String> attemptNewAccessToken(String refreshToken) async {
       encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
-    print("Neuer AccessToken vorhanden");
+    print("Neuer AccessToken und RefreshToken generiert");
   } else {
     print(response.statusCode);
   }
 
-  return response.body;
+  return response;
 }
 
-Future<String> attemptGetUser(String mail) async {
+// [GET] Bekomme Daten eines einzelnen User
+Future<http.Response> attemptGetUser(String mail) async {
+  String route = "api/user";
   Map<String, dynamic> qParams = {'mail': mail};
 
-  final response = await http.get(Uri.http(SERVER_IP, 'api/user/', qParams),
+  final response = await http.get(Uri.http(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       });
@@ -106,9 +92,10 @@ Future<String> attemptGetUser(String mail) async {
     print(response.statusCode);
   }
 
-  return response.body;
+  return response;
 }
 
+// [GET] Bekomme einzelne Veranstaltung mithilfe von VeranstaltungsId
 Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   String route = "api/veranstaltungen/" + veranstaltungsId.toString();
 
@@ -123,10 +110,10 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
     print(response.statusCode);
   }
 
-  print(response.body);
   return response;
 }
 
+// [DELETE] Lösche einzelne Veranstaltung mithilfe von VeranstaltungsId
 Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
   String route = "api/veranstaltungen" + veranstaltungsId.toString();
 
@@ -147,15 +134,22 @@ Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
 //TODO bis muss + 1 tag sein
 ////Jahr-Monat-Tag // Ein Tag draufrechnen, da dieser nicht von mysql berechtigt wird
 //datetime.utc draufrechnen
+//
+// [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
+// Maximallimit und Page
 Future<http.Response> attemptGetAllVeranstaltungen(
     {String bis = "-1",
     String istGenehmigt = "1",
     String limit = "25",
-    String page = "1"}) async {
+    String page = "1",
+    String userId = "-1"}) async {
   Map<String, dynamic> qParams = {'istGenehmigt': istGenehmigt, 'limit': limit};
 
   if (bis != "-1") {
     qParams.putIfAbsent('bis', () => bis);
+  }
+  if (userId != "-1") {
+    qParams.putIfAbsent('userId', () => userId);
   }
 
   String route = "api/veranstaltungen";
@@ -171,7 +165,6 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     print(response.statusCode);
   }
 
-  print(response.body);
   return response;
 }
 
@@ -179,8 +172,8 @@ Future<http.Response> attemptCreateVeranstaltung(
     String titel,
     String beschreibung,
     String kontakt,
-    String beginn_ts,
-    String ende_ts,
+    String beginnts,
+    String endets,
     String ortBeschreibung,
     String latitude,
     String longitude,
@@ -193,8 +186,8 @@ Future<http.Response> attemptCreateVeranstaltung(
     'titel': titel,
     'beschreibung': beschreibung,
     'kontakt': kontakt,
-    'beginn_ts': beginn_ts,
-    'ende_ts': ende_ts,
+    'beginn_ts': beginnts,
+    'ende_ts': endets,
     'ortBeschreibung': ortBeschreibung,
     'latitude': latitude,
     'longitude': longitude,
@@ -219,10 +212,135 @@ Future<http.Response> attemptCreateVeranstaltung(
   return response;
 }
 
-Future<int> testapi() async {
+// [POST] File Upload für Bilder- und PDF-Dateien des Users
+Future<http.Response> attemptFileUpload(String filename, File file) async {
+  var uri = Uri.parse('http://h2931685.stratoserver.net/api/fileupload/');
+  final request = http.MultipartRequest('POST', uri);
+  //request.fields['file'] = ;
+  var _file = await http.MultipartFile.fromPath('file', file.path);
+
+  request.files.add(_file);
+  http.Response response = await http.Response.fromStream(await request.send());
+
+  if (response.statusCode == 200) {
+    print("FileUpload erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Profilbild für User hinterlegen
+Future<http.Response> attemptNewProfilImage(
+    String filename, File file, String userId) async {
+  String route = "/api/user/" + userId + "/profilbild";
+  var uri = Uri.parse("http://h2931685.stratoserver.net" + route);
+  final request = http.MultipartRequest('POST', uri);
+
+  var _file = await http.MultipartFile.fromPath('file', file.path);
+
+  request.files.add(_file);
+  http.Response response = await http.Response.fromStream(await request.send());
+
+  if (response.statusCode == 200) {
+    print("Neues Profilbild erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] Bekomme User Info mit AccessToken
+Future<http.Response> attemptGetUserInfo(
+    String userId, String accessToken) async {
+  String route = "api/user/" + userId;
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.get(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      });
+
+  if (response.statusCode == 200) {
+    print("Userinfo erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [PUT] User Informationen werden erweitert/erneuert
+Future<http.Response> attemptUpdateUserInfo(
+    String mail,
+    String vorname,
+    String nachname,
+    String plz,
+    String tel,
+    String userId,
+    String accessToken) async {
+  String route = "api/user/" + userId + "/";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {
+    'mail': mail,
+    'vorname': vorname,
+    'nachname': nachname,
+    'plz': plz,
+    'tel': tel
+  };
+
+  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Datensatz erfolgreich geändert");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] User favorisiert Veranstaltung (Beachte TOGGLE Funktion!!)
+Future<http.Response> attemptFavor(
+    String userId, String veranstaltungId, String accessToken) async {
+  String route = "api/user/" + userId + "/favorit/";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {
+    'veranstaltungId': veranstaltungId,
+  };
+
+  final response = await http.post(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Favorisierung erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] TEST API
+Future<http.Response> testapi() async {
   final response = await http.get(Uri.http('85.214.166.230', 'api/'));
+
   if (response.statusCode == 200) {
     print("Verbindung erfolgreich");
+  } else {
+    print(response.statusCode);
   }
-  return response.statusCode;
+
+  return response;
 }

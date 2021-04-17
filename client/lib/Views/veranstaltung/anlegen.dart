@@ -11,6 +11,7 @@ import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../../util/rest_api_service.dart';
 
 class VeranstaltungAnlegenView extends StatefulWidget {
   const VeranstaltungAnlegenView();
@@ -136,20 +137,19 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                 textColor: Colors.white,
                 press: () {
                   setState(() {
-                        Fluttertoast.showToast(
-                            msg: "Veranstaltung gespeichert!",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 2,
-                            backgroundColor: ColorPalette.white.rgb,
-                            textColor: ColorPalette.orange.rgb);
-                      });
+                    Fluttertoast.showToast(
+                        msg: "Veranstaltung gespeichert!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 2,
+                        backgroundColor: ColorPalette.white.rgb,
+                        textColor: ColorPalette.orange.rgb);
+                  });
                   // Austauschen durch Event Provider sobald fertig
                   Provider.of<BodyProvider>(context, listen: false)
-                              .setBody(VeranstaltungDetailView());
-                          Provider.of<AppBarTitleProvider>(context,
-                                  listen: false)
-                              .setTitle('Übersicht');
+                      .setBody(VeranstaltungDetailView());
+                  Provider.of<AppBarTitleProvider>(context, listen: false)
+                      .setTitle('Übersicht');
                 }),
           ),
         ],
