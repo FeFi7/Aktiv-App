@@ -163,8 +163,7 @@ class _BodyState extends State<Body> {
                             backgroundColor: ColorPalette.orange.rgb,
                             textColor: ColorPalette.white.rgb);
                       } else {
-                        var jwt =
-                            await attemptSignUpWithPLZ(mail, password, "89075");
+                        var jwt = await attemptSignUp(mail, password);
 
                         if (jwt.statusCode == 502) {
                           Fluttertoast.showToast(
