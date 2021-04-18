@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarView extends StatefulWidget {
@@ -15,7 +19,7 @@ class CalendarView extends StatefulWidget {
 
 // TODO: Namen der Monate auf Deutsch ändern
 class _CalendarViewState extends State<CalendarView> {
-  Map<DateTime, List<Veranstaltung>> _groupedEvents;
+  Map<DateTime, List<Veranstaltung>> _groupedEvents = { DateTime.now(): [Veranstaltung.create('titel', 'beschreibung', 'kontakt', 'ortBeschr', DateTime.now(), DateTime.now(), 0, 0)]};
 
   //late final
   ValueNotifier<List<Veranstaltung>> _selectedEvents;
@@ -29,47 +33,14 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   void initState() {
     super.initState();
-    _groupedEvents = {};
+    // _groupedEvents = {};
     // _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_focusedDay));
 
     // Muss zu beginn ausgeführt werden um die Veransatltungen erstmals zu laden
     // Können anfangs einfach nur die veransatltung von diesem Monat sein
 
-    
-
-    // _groupEvents([
-    //   Veranstaltung.create(
-    //       'Heutige bsp Veranstaltung',
-    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-    //       'kontakt',
-    //       'ortBeschr',
-    //       DateTime.now(),
-    //       DateTime.now(),
-    //       0,
-    //       0),
-    //   Veranstaltung.create(
-    //       'Morgige Veranstaltung ',
-    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-    //       'kontakt',
-    //       'ortBeschr',
-    //       DateTime.utc(DateTime.now().year, DateTime.now().month,
-    //           DateTime.now().day + 1),
-    //       DateTime.now(),
-    //       0,
-    //       0),
-    //   Veranstaltung.create(
-    //       'Zweite Morgige Veranstaltung ',
-    //       'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-    //       'kontakt',
-    //       'ortBeschr',
-    //       DateTime.utc(DateTime.now().year, DateTime.now().month,
-    //           DateTime.now().day + 1),
-    //       DateTime.now(),
-    //       0,
-    //       0)
-    // ]);
-    _groupEvents([]);
+    // _groupEvents(Provider.of<EventProvider>(context, listen: false).getLoadedEvents());
   }
 
   // @override
@@ -86,6 +57,7 @@ class _CalendarViewState extends State<CalendarView> {
       if (_groupedEvents[date] == null) _groupedEvents[date] = [];
       _groupedEvents[date].add(event);
     });
+    setState(() {});
   }
 
   List<Veranstaltung> _getEventsForDay(DateTime day) {
@@ -108,7 +80,7 @@ class _CalendarViewState extends State<CalendarView> {
                   child: Text('Persönlich')),
             ],
             isSelected: isSelected,
-            onPressed: (int index) {
+            onPressed: (int index) async {
               setState(() {
                 // TODO: Persnlicher Kalender soll nur ausgeführt werden können, wenn man registrierter user ist
 
@@ -122,8 +94,28 @@ class _CalendarViewState extends State<CalendarView> {
                   }
                 }
 
-                /// TODO: Die verwendeten Events austauschen (Zwischen Persönlich und allgemein wechseln)
+                for (var event
+                    in Provider.of<EventProvider>(context, listen: false)
+                        .getLoadedEvents()) {
+                  DateTime date = DateTime.utc(event.beginnTs.year,
+                      event.beginnTs.month, event.beginnTs.day);
 
+                  if(_groupedEvents[date] == null) {
+                    _groupedEvents[date] = [event];
+                  } else {
+                    _groupedEvents[date].add(event);
+                  }
+                  
+                }
+                // List<Veranstaltung> events;
+                // Provider.of<EventProvider>(context, listen: false)
+                //     .loadAllEvents();
+
+                // log(events.length.toString());
+
+                //
+
+                /// TODO: Die verwendeten Events austauschen (Zwischen Persönlich und allgemein wechseln)
               });
             },
             borderRadius: BorderRadius.circular(30),
@@ -136,7 +128,8 @@ class _CalendarViewState extends State<CalendarView> {
         Container(
             padding: const EdgeInsets.all(10.0),
             child: TableCalendar(
-              firstDay: DateTime.now(),
+              // firstDay: DateTime.now(),
+              firstDay: DateTime.utc(200),
               focusedDay: _focusedDay,
               lastDay: DateTime(_focusedDay.year + 10),
               startingDayOfWeek: StartingDayOfWeek.monday,
