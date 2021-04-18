@@ -9,8 +9,9 @@ const config = require("config");
 const jwtConfig = config.get("Customer.jwtConfig");
 const SECRET_TOKEN = jwtConfig.secret;
 const SECRET_TOKEN_REFRESH = jwtConfig.refreshSecret;
+const TOKEN_EXPIRE = jwtConfig.tokenExpire;
 
-// [PUT] Änder persönliche AppEinstellungen (Umkreis und Bald)
+// [PUT] Ändern der persönlichen AppEinstellungen (Umkreis und Bald)
 router.put(
   "/:userId/einstellungen",
   passport.authenticate("jwt", { session: false }),
@@ -40,6 +41,39 @@ router.put(
       umkreisEinstellung,
       baldEinstellung
     );
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [PUT] Ändern der Rolle des Users
+router.put(
+  "/:userId/rolle",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+    const body = req.body;
+    let rolleId = body.rolleId;
+    const user = req.user;
+
+
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+    if (rolleId) {
+      // ist query eine Zahl?
+      if (!/^\d+$/.test(rolleId)) {
+        return res.status(400).send("rolleId muss numerisch sein");
+      }
+    }
+    else{
+      return res.status(400).send("rolleId nicht vorhanden")
+    }
+
+    const result = await userService.updateUserRolle(userId, rolleId, user._id);
     if (result.error) {
       return res.status(400).json(result);
     } else {
@@ -109,7 +143,7 @@ router.post("/login", async (req, res, next) => {
 
         const body = { _id: user.id, mail: user.mail };
         const accessToken = jwt.sign({ user: body }, SECRET_TOKEN, {
-          expiresIn: "30m",
+          expiresIn: TOKEN_EXPIRE,
         });
         const refreshToken = jwt.sign({ user: body }, SECRET_TOKEN_REFRESH);
 
@@ -147,7 +181,7 @@ router.post("/token", async function (req, res) {
     }
 
     const accessToken = jwt.sign({ user: user.user }, SECRET_TOKEN, {
-      expiresIn: "20m",
+      expiresIn: TOKEN_EXPIRE,
     });
     const refreshTokenNeu = jwt.sign({ user: user.user }, SECRET_TOKEN_REFRESH);
 
