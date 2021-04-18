@@ -137,7 +137,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                         onPressed: () {
                           /// TODO: Verweise auf detail anischt der Veransanstaltung
                           Provider.of<BodyProvider>(context, listen: false)
-                              .setBody(VeranstaltungDetailView());
+                              .setBody(VeranstaltungDetailView(widget.id));
                           Provider.of<AppBarTitleProvider>(context,
                                   listen: false)
                               .setTitle('Übersicht');

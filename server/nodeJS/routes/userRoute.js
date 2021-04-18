@@ -9,6 +9,78 @@ const config = require("config");
 const jwtConfig = config.get("Customer.jwtConfig");
 const SECRET_TOKEN = jwtConfig.secret;
 const SECRET_TOKEN_REFRESH = jwtConfig.refreshSecret;
+const TOKEN_EXPIRE = jwtConfig.tokenExpire;
+
+// [PUT] Ändern der persönlichen AppEinstellungen (Umkreis und Bald)
+router.put(
+  "/:userId/einstellungen",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+    const body = req.body;
+    let umkreisEinstellung = body.umkreisEinstellung;
+    let baldEinstellung = body.baldEinstellung;
+
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+    if (umkreisEinstellung) {
+      // ist query eine Zahl?
+      if (!/^\d+$/.test(umkreisEinstellung)) {
+        return res.status(400).send("umkreisEinstellung muss numerisch sein");
+      }
+    }
+    if (baldEinstellung) {
+      // ist query eine Zahl?
+      if (!/^\d+$/.test(baldEinstellung)) {
+        return res.status(400).send("baldEinstellung muss numerisch sein");
+      }
+    }
+    const result = await userService.updateUserEinstellungen(
+      userId,
+      umkreisEinstellung,
+      baldEinstellung
+    );
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [PUT] Ändern der Rolle des Users
+router.put(
+  "/:userId/rolle",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+    const body = req.body;
+    let rolleId = body.rolleId;
+    const user = req.user;
+
+
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+    if (rolleId) {
+      // ist query eine Zahl?
+      if (!/^\d+$/.test(rolleId)) {
+        return res.status(400).send("rolleId muss numerisch sein");
+      }
+    }
+    else{
+      return res.status(400).send("rolleId nicht vorhanden")
+    }
+
+    const result = await userService.updateUserRolle(userId, rolleId, user._id);
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
 
 // [POST] register User
 router.post("/signup", async function (req, res) {
@@ -71,7 +143,7 @@ router.post("/login", async (req, res, next) => {
 
         const body = { _id: user.id, mail: user.mail };
         const accessToken = jwt.sign({ user: body }, SECRET_TOKEN, {
-          expiresIn: "30m",
+          expiresIn: TOKEN_EXPIRE,
         });
         const refreshToken = jwt.sign({ user: body }, SECRET_TOKEN_REFRESH);
 
@@ -109,14 +181,19 @@ router.post("/token", async function (req, res) {
     }
 
     const accessToken = jwt.sign({ user: user.user }, SECRET_TOKEN, {
-      expiresIn: "20m",
+      expiresIn: TOKEN_EXPIRE,
     });
     const refreshTokenNeu = jwt.sign({ user: user.user }, SECRET_TOKEN_REFRESH);
 
-    await userService.deleteRefreshToken(refreshToken).catch((error) => console.log(error));
-    await userService.saveRefreshToken(refreshTokenNeu).catch((error) => console.log(error));
+    await userService
+      .deleteRefreshToken(refreshToken)
+      .catch((error) => console.log(error));
+    await userService
+      .saveRefreshToken(refreshTokenNeu)
+      .catch((error) => console.log(error));
     return res.json({
-      accessToken, refreshTokenNeu
+      accessToken,
+      refreshTokenNeu,
     });
   });
 });
@@ -171,7 +248,7 @@ router.get(
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("Id keine Zahl");
     }
-    console.log("mail: " + req.user.mail);
+    console.log("mail:: " + req.user.mail);
     const result = await userService.getUserInfo(userId, req.user.mail);
     if (result.error) {
       res.status(400).json(result);

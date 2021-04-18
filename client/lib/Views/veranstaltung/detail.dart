@@ -6,6 +6,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class VeranstaltungDetailView extends StatefulWidget {
+  int id;
+  VeranstaltungDetailView(this.id);
   @override
   _VeranstaltungDetailViewState createState() =>
       _VeranstaltungDetailViewState();

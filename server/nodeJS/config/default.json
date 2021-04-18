@@ -8,7 +8,8 @@
       },
       "jwtConfig":{
           "secret": "epNpU5bT6fB8vn6A",
-          "refreshSecret": "epMpU5bT6fB8vn6A"
+          "refreshSecret": "epMpU5bT6fB8vn6A",
+          "tokenExpire" : "30m"
       }
     }
   }
