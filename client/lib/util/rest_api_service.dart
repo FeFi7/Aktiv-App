@@ -138,11 +138,11 @@ Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
 Future<http.Response> attemptGetAllVeranstaltungen(
-    {String bis = "-1",
+    [String bis = "-1",
     String istGenehmigt = "1",
     String limit = "25",
     String page = "1",
-    String userId = "-1"}) async {
+    String userId = "-1"]) async {
   Map<String, dynamic> qParams = {'istGenehmigt': istGenehmigt, 'limit': limit};
 
   if (bis != "-1") {

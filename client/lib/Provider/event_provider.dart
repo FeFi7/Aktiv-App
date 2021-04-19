@@ -18,16 +18,37 @@ class EventProvider extends ChangeNotifier {
   EventProvider() {
     // loaded = HashMap<int, Veranstaltung>();
     List<Veranstaltung> events;
-    _loadAllEvents().then((value) {
+    _loadFromAllEvents().then((value) {
       for (Veranstaltung event in value) loaded[event.id] = event;
     });
   }
   //   notifyListeners();
 
+  //TODO Lublist parameter
   List<Veranstaltung> getLoadedEvents() {
     List<Veranstaltung> events = loaded.values.toList();
     return events;
   }
+
+  List<Veranstaltung> getEventsFromMonth(DateTime monat) {
+    //TODO: Natürlich aktuell noch kompletter blödsinn, aber zum testen mal:
+    return getLoadedEvents();
+  }
+
+  List<Veranstaltung> getLikedEventsFromMonth(DateTime monat, int userId) {}
+
+  List<Veranstaltung> getFavoriteEvents(int userId, int page) {}
+
+  List<Veranstaltung> getEventsNearBy(
+      double longitude, double latitude, int page) {}
+
+  List<Veranstaltung> getUpComingEvents(double longitude, double latitude, int page) {}
+
+  List<Veranstaltung> getEventsContaining(String content, int page) {}
+
+  List<Veranstaltung> getEventsAt(DateTime day, int page) {}
+
+  List<Veranstaltung> getEventsUntil(DateTime day, int page) {}
 
   Future<Veranstaltung> getEventById(int id) async {
     if (isEventLoaded(id)) return loaded[id];
@@ -37,6 +58,7 @@ class EventProvider extends ChangeNotifier {
 
       Veranstaltung event = getEventFromJson(parsedJson);
 
+      //TODO: add funktion separieren
       loaded[event.id] = event;
 
       return event;
@@ -49,8 +71,14 @@ class EventProvider extends ChangeNotifier {
   }
 
   // TODO: Soll nicht alle events laden und tuts aktuell auc nicht
-  Future<List<Veranstaltung>> _loadAllEvents() async {
-    var response = await attemptGetAllVeranstaltungen();
+  Future<List<Veranstaltung>> _loadFromAllEvents(
+      {DateTime until, bool approved, int limit, int page, int userId}) async {
+    var response = await attemptGetAllVeranstaltungen(
+        until.toString(),
+        (approved ? "1" : "2"),
+        limit.toString(),
+        page.toString(),
+        userId.toString());
     if (response.statusCode == 200) {
       var parsedJson = json.decode(response.body);
 
