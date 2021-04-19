@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 const SERVER_IP = "85.214.166.230";
 
@@ -214,10 +217,21 @@ Future<http.Response> attemptCreateVeranstaltung(
 
 // [POST] File Upload für Bilder- und PDF-Dateien des Users
 Future<http.Response> attemptFileUpload(String filename, File file) async {
-  var uri = Uri.parse('http://h2931685.stratoserver.net/api/fileupload/');
+  final uri = Uri.parse('http://' + SERVER_IP + '/api/fileupload');
   final request = http.MultipartRequest('POST', uri);
-  //request.fields['file'] = ;
-  var _file = await http.MultipartFile.fromPath('file', file.path);
+
+  final mimetype = lookupMimeType(file.path);
+  if ((mimetype != "image/jpeg") &&
+      (mimetype != 'image/png') &&
+      (mimetype != 'application/pdf')) {
+    return http.Response("File types allowed .jpeg, .jpg .png and .pdf!", 500);
+  }
+
+  var _file = await http.MultipartFile.fromPath(
+    'file',
+    file.path,
+    contentType: MediaType.parse(mimetype),
+  );
 
   request.files.add(_file);
   http.Response response = await http.Response.fromStream(await request.send());
@@ -234,11 +248,21 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
 // [POST] Profilbild für User hinterlegen
 Future<http.Response> attemptNewProfilImage(
     String filename, File file, String userId) async {
-  String route = "/api/user/" + userId + "/profilbild";
-  var uri = Uri.parse("http://h2931685.stratoserver.net" + route);
+  String route = '/api/user/' + userId + '/profilbild';
+  var uri = Uri.parse('http://' + SERVER_IP + route);
+  //var uri = Uri.parse("http://h2931685.stratoserver.net" + route);
   final request = http.MultipartRequest('POST', uri);
 
-  var _file = await http.MultipartFile.fromPath('file', file.path);
+  final mimetype = lookupMimeType(file.path);
+  if ((mimetype != "image/jpeg") && (mimetype != 'image/png')) {
+    return http.Response("File types allowed .jpeg, .jpg and png!", 500);
+  }
+
+  var _file = await http.MultipartFile.fromPath(
+    'file',
+    file.path,
+    contentType: MediaType.parse(mimetype),
+  );
 
   request.files.add(_file);
   http.Response response = await http.Response.fromStream(await request.send());
@@ -331,6 +355,21 @@ Future<http.Response> attemptFavor(
 
   return response;
 }
+
+// [GET] Bekomme einzelne Institution
+Future<http.Response> attemptGetInstitutionById() async {}
+
+// [PUT] Update eine Institution
+Future<http.Response> attemptUpdateInstitution() async {}
+
+// [DELETE] Lösche eine Institution
+Future<http.Response> attemptDeleteInstitution() async {}
+
+// [GET] Bekomme alle Institutionen
+Future<http.Response> attemptGetAllInstitutionen() async {}
+
+// [POST] Erstelle eine Institution
+Future<http.Response> attemptCreateInstitution() async {}
 
 // [GET] TEST API
 Future<http.Response> testapi() async {
