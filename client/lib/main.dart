@@ -16,6 +16,8 @@ void main() {
     if (kReleaseMode) exit(1);
   };
   runApp(AktivApp());
+
+  
 }
 
 class AktivApp extends StatelessWidget {

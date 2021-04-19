@@ -19,7 +19,12 @@ class CalendarView extends StatefulWidget {
 
 // TODO: Namen der Monate auf Deutsch ändern
 class _CalendarViewState extends State<CalendarView> {
-  Map<DateTime, List<Veranstaltung>> _groupedEvents = { DateTime.now(): [Veranstaltung.create('titel', 'beschreibung', 'kontakt', 'ortBeschr', DateTime.now(), DateTime.now(), 0, 0)]};
+  Map<DateTime, List<Veranstaltung>> _groupedEvents = {
+    DateTime.now(): [
+      Veranstaltung.create('titel', 'beschreibung', 'kontakt', 'ortBeschr',
+          DateTime.now(), DateTime.now(), 0, 0)
+    ]
+  };
 
   //late final
   ValueNotifier<List<Veranstaltung>> _selectedEvents;
@@ -41,6 +46,18 @@ class _CalendarViewState extends State<CalendarView> {
     // Können anfangs einfach nur die veransatltung von diesem Monat sein
 
     // _groupEvents(Provider.of<EventProvider>(context, listen: false).getLoadedEvents());
+
+    for (var event in Provider.of<EventProvider>(context, listen: false)
+        .getLoadedEvents()) {
+      DateTime date = DateTime.utc(
+          event.beginnTs.year, event.beginnTs.month, event.beginnTs.day);
+
+      if (_groupedEvents[date] == null) {
+        _groupedEvents[date] = [event];
+      } else {
+        _groupedEvents[date].add(event);
+      }
+    }
   }
 
   // @override
@@ -50,7 +67,7 @@ class _CalendarViewState extends State<CalendarView> {
   // }
 
   _groupEvents(List<Veranstaltung> events) {
-    _groupedEvents = {};
+    // _groupedEvents = {};
     events.forEach((event) {
       DateTime date = DateTime.utc(
           event.beginnTs.year, event.beginnTs.month, event.beginnTs.day);
@@ -61,7 +78,17 @@ class _CalendarViewState extends State<CalendarView> {
   }
 
   List<Veranstaltung> _getEventsForDay(DateTime day) {
-    return _groupedEvents[day] ?? [];
+    if (isSelected[0])
+      return _groupedEvents[day] ?? [];
+    else if (_groupedEvents[day] != null) {
+       List<Veranstaltung> favoritesOfTheDay = [];
+       for(Veranstaltung event in _groupedEvents[day]) 
+          // if() TODO: if Abfrage, ob Event geliket ist
+          favoritesOfTheDay.add(event);
+       
+      return favoritesOfTheDay;
+    } else
+      return [];
   }
 
   @override
@@ -94,19 +121,6 @@ class _CalendarViewState extends State<CalendarView> {
                   }
                 }
 
-                for (var event
-                    in Provider.of<EventProvider>(context, listen: false)
-                        .getLoadedEvents()) {
-                  DateTime date = DateTime.utc(event.beginnTs.year,
-                      event.beginnTs.month, event.beginnTs.day);
-
-                  if(_groupedEvents[date] == null) {
-                    _groupedEvents[date] = [event];
-                  } else {
-                    _groupedEvents[date].add(event);
-                  }
-                  
-                }
                 // List<Veranstaltung> events;
                 // Provider.of<EventProvider>(context, listen: false)
                 //     .loadAllEvents();
