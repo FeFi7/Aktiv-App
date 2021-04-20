@@ -145,7 +145,11 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     String limit = "25",
     String page = "1",
     String userId = "-1"]) async {
-  Map<String, dynamic> qParams = {'istGenehmigt': istGenehmigt, 'limit': limit};
+  Map<String, dynamic> qParams = {
+    'istGenehmigt': istGenehmigt,
+    'limit': limit,
+    'page': page
+  };
 
   if (bis != "-1") {
     qParams.putIfAbsent('bis', () => bis);
