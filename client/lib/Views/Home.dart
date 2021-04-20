@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
 import 'package:aktiv_app_flutter/Views/environment/environment_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
@@ -66,6 +67,10 @@ class _HomePageState extends State<HomePage> {
 
     Provider.of<BodyProvider>(context, listen: false)
         .initializeBody(_widgetOptions.elementAt(0));
+
+    Provider.of<EventProvider>(context, listen: false).loadEventsOfMonth(
+        DateTime.utc(
+            DateTime.now().year, DateTime.now().month + 1, DateTime.now().day));
   }
 
   @override
@@ -155,4 +160,3 @@ class AppBarTitleProvider extends ChangeNotifier {
     this._title = title;
   }
 }
-

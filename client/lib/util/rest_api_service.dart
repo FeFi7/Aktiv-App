@@ -167,6 +167,7 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
   if (response.statusCode == 200) {
     print("GET All Veranstaltungen erfolgreich");
+    print(response.body); // TODO, wieder entfernen
   } else {
     print(response.statusCode);
   }
