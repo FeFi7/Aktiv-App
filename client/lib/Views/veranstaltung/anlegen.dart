@@ -204,7 +204,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                 color: ColorPalette.orange.rgb,
                 textColor: Colors.white,
                 press: () async {
-                  Provider.of<EventProvider>(context,listen: false).createVeranstaltung(titel, beschreibung, email, start, ende, adresse).then((event) =>{
+                  Provider.of<EventProvider>(context,listen: false).createEvent(titel, beschreibung, email, start, ende, adresse).then((event) =>{
                 
                     Provider.of<BodyProvider>(context, listen: false)
                       .setBody(VeranstaltungDetailView(event.id))

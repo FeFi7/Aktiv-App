@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 import 'dart:convert';
 
+import 'package:http/http.dart';
+
 class EventProvider extends ChangeNotifier {
   // List<Veranstaltung> events;
 
@@ -42,13 +44,14 @@ class EventProvider extends ChangeNotifier {
     List<Veranstaltung> events = getLoadedEventsOfDay(day);
     for (int index = 0; index < events.length; index++) {
       Veranstaltung event = events[index];
-      if(!favorites.contains(event.id))
-        events.removeAt(index--);
+      if (!favorites.contains(event.id)) events.removeAt(index--);
     }
     return events;
   }
 
-  List<Veranstaltung> getLoadedEventsOfMonth(DateTime month, int userId) {
+  List<Veranstaltung> getLoadedEventsOfMonth(DateTime month) {
+    int userId = 11;
+
     int year = month.year;
 
     DateTime start = DateTime.utc(year, month.month, 1);
@@ -74,7 +77,8 @@ class EventProvider extends ChangeNotifier {
     for (int index = 0; index < events.length; index++) {
       Veranstaltung event = events[index];
       if (event.beginnTs.isBefore(start) || end.isBefore(event.beginnTs))
-        events.remove(event);}
+        events.remove(event);
+    }
     return events;
   }
 
@@ -192,6 +196,12 @@ class EventProvider extends ChangeNotifier {
     // Alle Events bis zu zum day stattfinden aus laden und zurückgeben
   }
 
+  Veranstaltung getLoadedEventById(int id) {
+    if (isEventLoaded(id)) return loaded[id];
+
+    return null;
+  }
+
   Future<Veranstaltung> getEventById(int id) async {
     if (isEventLoaded(id)) return loaded[id];
     var response = await attemptGetVeranstaltungByID(id);
@@ -201,6 +211,35 @@ class EventProvider extends ChangeNotifier {
       Veranstaltung event = getEventFromJson(parsedJson);
 
       return event;
+    }
+    return null;
+  }
+
+  Future<Veranstaltung> createEvent(String titel, String beschreibung,
+      String email, String start, String ende, String adresse) async {
+    int id = 0;
+    Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
+        start, ende, adresse, '0.0', '0.0', '1', '1', '1');
+    print(resp.body);
+    String toastmsg = "";
+    if (resp.statusCode == 200) {
+      var parsedJson = json.decode(resp.body);
+      id = parsedJson['insertId'];
+      // Austauschen durch Event Provider sobald fertig
+      //
+      DateTime start_Ts = DateTime.parse(start);
+      DateTime ende_Ts = DateTime.parse(ende);
+      DateTime erstellt_Ts = DateTime.now();
+      Veranstaltung veranstaltung = Veranstaltung.load(id, titel, beschreibung,
+          email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0, false);
+      loadEvent(veranstaltung);
+      return veranstaltung;
+
+      toastmsg = "Neue Veranstaltung angelegt";
+    } else {
+      var parsedJson = json.decode(resp.body);
+      var error = parsedJson['error'];
+      toastmsg = error;
     }
     return null;
   }
