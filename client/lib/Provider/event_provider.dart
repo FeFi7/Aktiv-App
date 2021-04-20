@@ -1,10 +1,17 @@
 import 'dart:collection';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Views/Home.dart';
+import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
+
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
+
+import 'body_provider.dart';
 
 class EventProvider extends ChangeNotifier {
   // List<Veranstaltung> events;
@@ -96,8 +103,7 @@ class EventProvider extends ChangeNotifier {
   List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
     if (dated[day] != null)
       return dated[day].map((entry) => loaded[entry]).toList();
-    return null;// Alle Events an dem Tag aus der Datenbank laden und zurückgeben => loadEventsAt...
-    
+    return null; // Alle Events an dem Tag aus der Datenbank laden und zurückgeben => loadEventsAt...
   }
 
   List<Veranstaltung> getEventsUntil(DateTime day, int page) {
@@ -116,6 +122,11 @@ class EventProvider extends ChangeNotifier {
 
       return event;
     }
+    return null;
+  }
+
+  Veranstaltung getLoadedEventById(int id) {
+    if (isEventLoaded(id)) return loaded[id];
     return null;
   }
 
@@ -147,6 +158,34 @@ class EventProvider extends ChangeNotifier {
       return List<Veranstaltung>.from(list);
     }
     return null;
+  }
+
+  Future<Veranstaltung> createVeranstaltung(String titel, String beschreibung,
+      String email, String start, String ende, String adresse) async {
+    int id = 0;
+    Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
+        start, ende, adresse, '0.0', '0.0', '1', '1', '1');
+    print(resp.body);
+    String toastmsg = "";
+    if (resp.statusCode == 200) {
+      var parsedJson = json.decode(resp.body);
+      id = parsedJson['insertId'];
+      // Austauschen durch Event Provider sobald fertig
+      //
+      DateTime start_Ts = DateTime.parse(start);
+      DateTime ende_Ts = DateTime.parse(ende);
+      DateTime erstellt_Ts = DateTime.now();
+      Veranstaltung veranstaltung = Veranstaltung.load(id, titel, beschreibung,
+          email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0, false);
+      loadEvent(veranstaltung);
+      return veranstaltung;
+
+      toastmsg = "Neue Veranstaltung angelegt";
+    } else {
+      var parsedJson = json.decode(resp.body);
+      var error = parsedJson['error'];
+      toastmsg = error;
+    }
   }
 
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
