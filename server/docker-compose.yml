@@ -57,7 +57,7 @@ services:
             - "443:443"
         volumes: 
             - /data/uploads/:/uploads
-            - /data/certs:/etc/nginx/certs
+            - /etc/letsencrypt/archive/app.lebensqualitaet-burgrieden.de/:/etc/nginx/certs
             - /data/logs/:/var/log/nginx
         depends_on:
             - node1
