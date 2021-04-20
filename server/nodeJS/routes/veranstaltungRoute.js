@@ -97,7 +97,7 @@ router.get("/*", async function (req, res) {
             dt.getSeconds().toString().padStart(2, '0')}`
   }
 
-  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis, userId);
+  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis, userId, page);
 
   if(veranstaltungen.error){
     res.status(400).json(veranstaltungen);

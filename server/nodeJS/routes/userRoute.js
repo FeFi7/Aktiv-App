@@ -49,6 +49,34 @@ router.put(
   }
 );
 
+// [POST] Verknüpfung von User mit Institution als Verwalter
+router.post(
+  "/:userId/institutionen/:institutionId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+    const institutionId = req.params.institutionId;
+
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+    if (!/^\d+$/.test(institutionId)) {
+      return res.status(400).send("institutionId keine Zahl");
+    }
+
+    //ToDo: Ist Anfrageuser schon als Verwalter in der Institution?
+    //ToDo: Ist Institution angelegt? 
+
+    const result = await userService.addUserToInstitut(userId, institutionId)
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
 // [PUT] Ändern der Rolle des Users
 router.put(
   "/:userId/rolle",

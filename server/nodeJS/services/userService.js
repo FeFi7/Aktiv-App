@@ -223,6 +223,23 @@ async function favoritVeranstaltung(userId, veranstaltungId) {
   }
 }
 
+async function addUserToInstitut(userId, institutionId) {
+  const query = `INSERT INTO MitgliedUserInstitution(userId, institutionId) VALUES(?, ?) ON DUPLICATE KEY UPDATE userId=userId`;
+
+  let results = await conn
+    .query(query, [userId, institutionId])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler in Db" };
+    });
+
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function updateUserEinstellungen(
   userId,
   umkreisEinstellung,
@@ -349,5 +366,6 @@ module.exports = {
   updateUserInformation: updateUserInformation,
   favoritVeranstaltung: favoritVeranstaltung,
   updateUserEinstellungen: updateUserEinstellungen,
-  updateUserRolle: updateUserRolle
+  updateUserRolle: updateUserRolle,
+  addUserToInstitut: addUserToInstitut
 };
