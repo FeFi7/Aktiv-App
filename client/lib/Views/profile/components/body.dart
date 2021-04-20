@@ -10,6 +10,8 @@ import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../util/rest_api_service.dart';
+import 'package:mime/mime.dart';
 
 import '../../Home.dart';
 import 'profile_persoenlich.dart';
@@ -226,9 +228,8 @@ class _BodyState extends State<Body> {
 
     setState(
       () {
-        pickedFile != null
-            ? profileImage = File(pickedFile.path)
-            : profileImage = null;
+        if (pickedFile != null) profileImage = File(pickedFile.path);
+        var test1 = attemptNewProfilImage("hase", profileImage, "11");
       },
     );
   }

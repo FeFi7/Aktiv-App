@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
-import 'package:http_parser/http_parser.dart';
 
 const SERVER_IP = "85.214.166.230";
 
@@ -123,7 +121,8 @@ Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
   final response = await http.delete(Uri.http(SERVER_IP, route),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
-      });
+      },
+      encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
     print("Veranstaltung erfolgreich gelöscht");
@@ -356,8 +355,79 @@ Future<http.Response> attemptFavor(
   return response;
 }
 
+// [PUT] Update User Einstellungen
+Future<http.Response> attemptUpdateSettings(
+    String userId, String accessToken, String umkreis, String bald) async {
+  String route = "api/user/" + userId + "/einstellungen";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {
+    'umkreisEinstellung': umkreis,
+    'baldEinstellung': bald
+  };
+
+  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Usereinstellungen erfolgreich ");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [PUT] Update User Rolle
+Future<http.Response> attemptUpdateRole(
+    String userId, String rolleId, String accessToken) async {
+  String route = "api/user/" + userId + "/rolle";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {'rolleId': rolleId};
+
+  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Userrolle erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Verknüpfung User mit Institution als Verwalter
+Future<http.Response> attemptSetVerwalter(
+    String userId, String institutionsId, String accessToken) async {
+  String route = "api/user/" + userId + "/institutionen/" + institutionsId;
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.post(Uri.http(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Verknüpfung Verwalter - Institution erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
 // [GET] Bekomme einzelne Institution
-Future<http.Response> attemptGetInstitutionById() async {}
+Future<http.Response> attemptGetInstitutionById(String institutionsId) async {}
 
 // [PUT] Update eine Institution
 Future<http.Response> attemptUpdateInstitution() async {}
@@ -373,7 +443,12 @@ Future<http.Response> attemptCreateInstitution() async {}
 
 // [GET] TEST API
 Future<http.Response> testapi() async {
-  final response = await http.get(Uri.http('85.214.166.230', 'api/'));
+  final response = await http.get(
+    Uri.http('85.214.166.230', 'api/'),
+    headers: <String, String>{
+      'Content-Type': "application/x-www-form-urlencoded"
+    },
+  );
 
   if (response.statusCode == 200) {
     print("Verbindung erfolgreich");
