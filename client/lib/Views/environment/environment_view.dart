@@ -38,23 +38,21 @@ class _EnvironmentViewState extends State<EnvironmentView> {
       List<Widget> widgetList = <Widget>[
         PreviewListHeading('Bald'),
         EventPreviewBox(1, 'Erste Beispiel Veranstaltung',
-            'Sehr kurze Beschreibung', 'Beginnt in 57 Minuten', false),
+            'Sehr kurze Beschreibung', 'Beginnt in 57 Minuten'),
         EventPreviewBox(
             1,
             'Zweite viel tollere Beispiel Veranstaltung',
             'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-            'Beginnt in 3 Stunden',
-            false),
+            'Beginnt in 3 Stunden'),
         PreviewListDots(EventPreviewList(<Widget>[]), 'Bald'),
         PreviewListHeading('In der Nähe'),
         EventPreviewBox(1, 'Erste Beispiel Veranstaltung',
-            'Sehr kurze Beschreibung', 'Am 15.04 nur 3km entfernt', false),
+            'Sehr kurze Beschreibung', 'Am 15.04 nur 3km entfernt'),
         EventPreviewBox(
             1,
             'Zweite viel tollere Beispiel Veranstaltung',
             'Mit einer viel längeren Beschreibung die natürlich aussagt, dass es sich um eine seriöse Veranstaltung handelt. Und mit zu viel Text xD',
-            'Am 20.04 nur 7km entfernt',
-            false),
+            'Am 20.04 nur 7km entfernt'),
         PreviewListDots(EventPreviewList(<Widget>[]), 'In der Nähe')
       ];
 
@@ -153,7 +151,7 @@ class _EnvironmentViewState extends State<EnvironmentView> {
       // crossAxisCount: 1,
       onItemFound: (Post post, int index) {
         return EventPreviewBox(
-            index, post.title, post.body, 'noch kein ', false);
+            index, post.title, post.body, 'noch kein ');
       },
     ));
   }

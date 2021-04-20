@@ -148,7 +148,7 @@ class EventProvider extends ChangeNotifier {
     // notifyListeners(); // TODO: Sicherstellen dass das eine gute Idee ist...
   }
 
-  List<Veranstaltung> getFavoriteEvents(int page) {
+  List<Veranstaltung> getFavoriteEvents() {
     return favorites.map((entry) => loaded[entry]).toList();
   }
 
@@ -230,12 +230,15 @@ class EventProvider extends ChangeNotifier {
       DateTime start_Ts = DateTime.parse(start);
       DateTime ende_Ts = DateTime.parse(ende);
       DateTime erstellt_Ts = DateTime.now();
+
       Veranstaltung veranstaltung = Veranstaltung.load(id, titel, beschreibung,
           email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0, false);
+
       loadEvent(veranstaltung);
+
       return veranstaltung;
 
-      toastmsg = "Neue Veranstaltung angelegt";
+      // toastmsg = "Neue Veranstaltung angelegt";
     } else {
       var parsedJson = json.decode(resp.body);
       var error = parsedJson['error'];
@@ -245,6 +248,7 @@ class EventProvider extends ChangeNotifier {
   }
 
   void loadEvent(Veranstaltung event) {
+    if (event == null) return;
     loaded[event.id] = event;
     if (dated[event.beginnTs] != null)
       dated[event.beginnTs].add(event.id);
@@ -254,6 +258,20 @@ class EventProvider extends ChangeNotifier {
 
   bool isEventLoaded(int id) {
     return loaded.containsKey(id);
+  }
+
+  bool isEventFavorite(int id) {
+    return favorites.contains(id);
+  }
+
+  //TODO: Mit BackEnd verbinden, warte auf User Provider
+  bool toggleEventFavorite(int id) {
+    if (isEventFavorite(id)) {
+      favorites.remove(id);
+    } else {
+      favorites.add(id);
+    }
+    return isEventFavorite(id);
   }
 
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {

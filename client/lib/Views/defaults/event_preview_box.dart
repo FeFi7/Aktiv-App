@@ -1,6 +1,6 @@
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
-import 'package:aktiv_app_flutter/Views/favorites/favorites_provider.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,14 +13,12 @@ class EventPreviewBox extends StatefulWidget {
   final String titel;
   final String description;
   final String additive;
-  bool liked;
 
   // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
 
   // TODO: Ob die veranstaltung geliked ist, sollte nicht übergeben werden,
   // sondern aus einer singleton Klasse durch die id entnommen werdem
-  EventPreviewBox(
-      this.id, this.titel, this.description, this.additive, this.liked);
+  EventPreviewBox(this.id, this.titel, this.description, this.additive);
 
   @override
   _EventPreviewBoxState createState() => _EventPreviewBoxState();
@@ -30,6 +28,9 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
+    bool liked = Provider.of<EventProvider>(context, listen: false)
+        .isEventFavorite(widget.id);
 
     return FractionallySizedBox(
       widthFactor: 1,
@@ -107,26 +108,19 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                   children: <Widget>[
                     IconButton(
                         icon: Icon(
-                          widget.liked
+                          liked
                               ? Icons.favorite_rounded
                               : Icons.favorite_border,
-                          color: widget.liked
+                          color: liked
                               ? ColorPalette.orange.rgb
                               : ColorPalette.black.rgb,
                           size: 32,
                         ),
                         onPressed: () {
                           setState(() {
-                            widget.liked = !widget.liked;
-                            if (widget.liked) {
-                              Provider.of<FavoritesProvider>(context,
-                                      listen: false)
-                                  .addFavorite(widget);
-                            } else {
-                              Provider.of<FavoritesProvider>(context,
-                                      listen: false)
-                                  .removeFavorite(widget);
-                            }
+                            liked = Provider.of<EventProvider>(context,
+                                    listen: false)
+                                .toggleEventFavorite(widget.id);
                           });
                         }),
                     IconButton(

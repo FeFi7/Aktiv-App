@@ -41,6 +41,6 @@ class Veranstaltung {
   );
 
   EventPreviewBox getPreviewBox() {
-    return EventPreviewBox(id, titel, beschreibung, beginnTs.toIso8601String(), false);
+    return EventPreviewBox(id, titel, beschreibung, beginnTs.toIso8601String());
   }
 }
