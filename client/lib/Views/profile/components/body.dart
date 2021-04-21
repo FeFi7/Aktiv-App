@@ -3,10 +3,10 @@ import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/background.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen.dart';
-import 'package:aktiv_app_flutter/Views/profile/profile_screen.dart';
+import 'package:aktiv_app_flutter/Views/profile/components/profile_verwalten.dart';
 import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
-import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
+import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +29,11 @@ class _BodyState extends State<Body> {
   var sliderValueNaehe = 5.0;
   var sliderValueBald = 2.0;
 
+  final List<bool> userGruppe = [true, false, false];
+  int userGruppeIndex = 0;
+
+  final SecureStorage storage = SecureStorage();
+
   @override
   Widget build(BuildContext context) {
     return Background(
@@ -36,10 +41,9 @@ class _BodyState extends State<Body> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: 40),
             avatarBild(),
-            SizedBox(
-              height: 60,
-            ),
+            SizedBox(height: 40),
             Text(
               "LQ Burgrieden",
               style: TextStyle(
@@ -48,9 +52,7 @@ class _BodyState extends State<Body> {
                   letterSpacing: 2.0,
                   fontWeight: FontWeight.w400),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Text(
               "Burgrieden, Deutschland",
               style: TextStyle(
@@ -59,9 +61,7 @@ class _BodyState extends State<Body> {
                   letterSpacing: 2.0,
                   fontWeight: FontWeight.w300),
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Text(
               "Testaccount für die App-Entwicklung",
               style: TextStyle(
@@ -70,60 +70,112 @@ class _BodyState extends State<Body> {
                   letterSpacing: 2.0,
                   fontWeight: FontWeight.w300),
             ),
-            SizedBox(
-              height: 25,
-            ),
-            mitgliederUndVeranstaltungen(),
-            SizedBox(
-              height: 25,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RoundedButton(
-                  text: "Platzhalter",
-                  color: ColorPalette.endeavour.rgb,
-                  press: () {},
-                ),
-                RoundedButton(
-                  text: "Persönliche Angaben",
-                  color: ColorPalette.endeavour.rgb,
-                  press: () {
-                    Provider.of<BodyProvider>(context, listen: false)
-                        .setBody(ProfilePersoenlich());
-                    Provider.of<AppBarTitleProvider>(context, listen: false)
-                        .setTitle('Persönliche Angaben');
-                  },
-                ),
-                RoundedButton(
-                  text: "Einstellungen",
-                  color: ColorPalette.endeavour.rgb,
-                  press: () {
-                    Provider.of<BodyProvider>(context, listen: false)
-                        .setBody(ProfileEinstellungen());
-                    Provider.of<AppBarTitleProvider>(context, listen: false)
-                        .setTitle('Einstellungen');
-                  },
-                ),
-                RoundedButton(
-                  text: "Abmelden",
-                  color: ColorPalette.orange.rgb,
-                  press: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return WelcomeScreen();
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+            SizedBox(height: 25),
+            buttons(context),
           ],
         ),
       ),
+    );
+  }
+
+  Column buttons(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Container(
+          height: 60.0,
+          //Temporäre ToggleButtons zum wählen der Rolle
+          child: ToggleButtons(
+            children: [
+              Container(
+                  alignment: Alignment.center,
+                  width: size.width * 0.8 / userGruppe.length,
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Verwalter')),
+              Container(
+                  alignment: Alignment.center,
+                  width: size.width * 0.8 / userGruppe.length,
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('Genehmiger')),
+              Container(
+                  alignment: Alignment.center,
+                  width: size.width * 0.8 / userGruppe.length,
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text('LQ')),
+            ],
+            isSelected: userGruppe,
+            onPressed: (int index) {
+              setState(
+                () {
+                  for (int buttonIndex = 0;
+                      buttonIndex < userGruppe.length;
+                      buttonIndex++) {
+                    if (buttonIndex == index) {
+                      userGruppe[buttonIndex] = true;
+                    } else {
+                      userGruppe[buttonIndex] = false;
+                    }
+                  }
+                  userGruppeIndex = index;
+                },
+              );
+            },
+            borderRadius: BorderRadius.circular(30),
+            borderWidth: 1,
+            selectedColor: ColorPalette.white.rgb,
+            fillColor: ColorPalette.endeavour.rgb,
+            disabledBorderColor: ColorPalette.french_pass.rgb,
+          ),
+        ),
+        SizedBox(height: 10),
+        RoundedButton(
+          text: "Verwalten",
+          color: ColorPalette.endeavour.rgb,
+          press: () {
+            Provider.of<BodyProvider>(context, listen: false)
+                .setBody(ProfileVerwalten(userGruppe: userGruppeIndex));
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .setTitle('Verwalten');
+          },
+        ),
+        RoundedButton(
+          text: "Persönliche Angaben",
+          color: ColorPalette.endeavour.rgb,
+          press: () {
+            Provider.of<BodyProvider>(context, listen: false)
+                .setBody(ProfilePersoenlich());
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .setTitle('Persönliche Angaben');
+          },
+        ),
+        RoundedButton(
+          text: "Einstellungen",
+          color: ColorPalette.endeavour.rgb,
+          press: () {
+            Provider.of<BodyProvider>(context, listen: false)
+                .setBody(ProfileEinstellungen());
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .setTitle('Einstellungen');
+          },
+        ),
+        RoundedButton(
+          text: "Abmelden",
+          color: Colors.grey[400],
+          press: () {
+            storage.deleteAll(); //Token löschen
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return WelcomeScreen();
+                },
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -189,35 +241,46 @@ class _BodyState extends State<Body> {
 
   Container avatarBild() {
     return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage("assets/images/wir_logo.png"), fit: BoxFit.cover),
-      ),
-      child: Container(
-        width: double.infinity,
+      child: SizedBox(
         height: 200,
-        child: Container(
-          alignment: Alignment(0.0, 2.0),
-          child: InkWell(
-            onTap: getImage,
-            child: CircleAvatar(
-              radius: 60.0,
-              child: ClipOval(
-                child: Container(
-                  height: 120.0,
-                  width: 120.0,
-                  child: FittedBox(
-                    alignment: Alignment.center,
-                    fit: BoxFit.cover,
-                    child: (profileImage != null)
-                        ? Image.file(profileImage)
-                        : Image.asset("assets/images/lq_logo_klein.png"),
+        width: 200,
+        child: Stack(
+          clipBehavior: Clip.none,
+          fit: StackFit.expand,
+          children: [
+            CircleAvatar(
+              backgroundImage: (profileImage != null)
+                  ? Image.file(profileImage).image
+                  : Image.asset("assets/images/profilePic_default.png").image,
+            ),
+            Positioned(
+              right: -16,
+              bottom: 0,
+              child: SizedBox(
+                height: 60,
+                width: 60,
+                // ignore: deprecated_member_use
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    side: BorderSide(
+                      width: 3.0,
+                      color: ColorPalette.white.rgb,
+                    ),
+                  ),
+                  color: ColorPalette.malibu.rgb,
+                  onPressed: getImage,
+                  child: CircleAvatar(
+                    backgroundColor: ColorPalette.malibu.rgb,
+                    child: Icon(
+                      Icons.edit,
+                      color: ColorPalette.white.rgb,
+                    ),
                   ),
                 ),
               ),
-              backgroundColor: Colors.white,
-            ),
-          ),
+            )
+          ],
         ),
       ),
     );
@@ -229,7 +292,6 @@ class _BodyState extends State<Body> {
     setState(
       () {
         if (pickedFile != null) profileImage = File(pickedFile.path);
-        var test1 = attemptNewProfilImage("hase", profileImage, "11");
       },
     );
   }

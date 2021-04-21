@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
+import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'Home.dart';
 import 'defaults/color_palette.dart';
@@ -13,10 +14,11 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreen extends State<WelcomeScreen> {
+  final SecureStorage storage = SecureStorage();
   @override
   void initState() {
     super.initState();
-    //startTime();
+    //if (storage.read("accessToken") != null) startTime();
   }
 
   @override
@@ -121,12 +123,12 @@ class _WelcomeScreen extends State<WelcomeScreen> {
   }
 
   startTime() async {
-    var duration = new Duration(seconds: 3);
+    var duration = new Duration(seconds: 2);
     return new Timer(duration, route);
   }
 
   route() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        context, MaterialPageRoute(builder: (context) => HomePage()));
   }
 }
