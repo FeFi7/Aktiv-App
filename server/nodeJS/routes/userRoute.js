@@ -237,7 +237,7 @@ router.post(
     }
     try {
       if (req.file == undefined) {
-        return res.status(400).send({ error: "Kein datei gefunden" });
+        return res.status(400).send({ error: "Keine Datei gefunden" });
       }
 
       const result = await fileUploadService.createFileInDb(
