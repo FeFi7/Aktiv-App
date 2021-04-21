@@ -5,7 +5,6 @@ import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
-import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -19,14 +18,6 @@ class CalendarView extends StatefulWidget {
 
 // TODO: Namen der Monate auf Deutsch ändern
 class _CalendarViewState extends State<CalendarView> {
-  Map<DateTime, List<Veranstaltung>> _groupedEvents = {
-    DateTime.now(): [
-      Veranstaltung.create('titel', 'beschreibung', 'kontakt', 'ortBeschr',
-          DateTime.now(), DateTime.now(), 0, 0)
-    ]
-  };
-
-  //late final
   ValueNotifier<List<Veranstaltung>> _selectedEvents;
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -35,156 +26,142 @@ class _CalendarViewState extends State<CalendarView> {
 
   final List<bool> isSelected = [true, false];
 
+  int futureMonthsLoaded = 1;
+
   @override
   void initState() {
     super.initState();
-    // _groupedEvents = {};
-    // _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_focusedDay));
 
-    // Muss zu beginn ausgeführt werden um die Veransatltungen erstmals zu laden
-    // Können anfangs einfach nur die veransatltung von diesem Monat sein
-
-    // _groupEvents(Provider.of<EventProvider>(context, listen: false).getLoadedEvents());
-
-    for (var event in Provider.of<EventProvider>(context, listen: false)
-        .getLoadedEvents()) {
-      DateTime date = DateTime.utc(
-          event.beginnTs.year, event.beginnTs.month, event.beginnTs.day);
-
-      if (_groupedEvents[date] == null) {
-        _groupedEvents[date] = [event];
-      } else {
-        _groupedEvents[date].add(event);
-      }
-    }
-  }
-
-  // @override
-  // void dispose() {
-  //   _selectedEvents.dispose();
-  //   super.dispose();
-  // }
-
-  _groupEvents(List<Veranstaltung> events) {
-    // _groupedEvents = {};
-    events.forEach((event) {
-      DateTime date = DateTime.utc(
-          event.beginnTs.year, event.beginnTs.month, event.beginnTs.day);
-      if (_groupedEvents[date] == null) _groupedEvents[date] = [];
-      _groupedEvents[date].add(event);
-    });
-    setState(() {});
-  }
-
-  List<Veranstaltung> _getEventsForDay(DateTime day) {
-    if (isSelected[0])
-      return _groupedEvents[day] ?? [];
-    else if (_groupedEvents[day] != null) {
-       List<Veranstaltung> favoritesOfTheDay = [];
-       for(Veranstaltung event in _groupedEvents[day]) 
-          // if() TODO: if Abfrage, ob Event geliket ist
-          favoritesOfTheDay.add(event);
-       
-      return favoritesOfTheDay;
-    } else
-      return [];
+    _selectedEvents = ValueNotifier([]);
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.all(10.0),
-          child: ToggleButtons(
-            children: [
-              Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Allgemein')),
-              Container(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Persönlich')),
-            ],
-            isSelected: isSelected,
-            onPressed: (int index) async {
-              setState(() {
-                // TODO: Persnlicher Kalender soll nur ausgeführt werden können, wenn man registrierter user ist
+        Stack(
+          children: [
+            
+            Container(
+                padding: const EdgeInsets.all(10.0),
+                child: TableCalendar(
+                  firstDay: DateTime.now(),
+                  // firstDay: DateTime.utc(200),
+                  focusedDay: _focusedDay,
+                  lastDay: DateTime(9999),
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  calendarFormat: _calendarFormat,
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                  ),
+                  calendarBuilders: calendarBuilder(),
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDay, day);
+                  },
+                  eventLoader: (day) {
+                    return isSelected[0]
+                        ? Provider.of<EventProvider>(context, listen: false)
+                            .getLoadedEventsOfDay(day)
+                        : Provider.of<EventProvider>(context, listen: false)
+                            .getLikedEventsOfDay(day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    if (!isSameDay(_selectedDay, selectedDay)) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
 
-                for (int buttonIndex = 0;
-                    buttonIndex < isSelected.length;
-                    buttonIndex++) {
-                  if (buttonIndex == index) {
-                    isSelected[buttonIndex] = true;
-                  } else {
-                    isSelected[buttonIndex] = false;
-                  }
-                }
-
-                // List<Veranstaltung> events;
-                // Provider.of<EventProvider>(context, listen: false)
-                //     .loadAllEvents();
-
-                // log(events.length.toString());
-
-                //
-
-                /// TODO: Die verwendeten Events austauschen (Zwischen Persönlich und allgemein wechseln)
-              });
-            },
-            borderRadius: BorderRadius.circular(30),
-            borderWidth: 1,
-            selectedColor: ColorPalette.white.rgb,
-            fillColor: ColorPalette.endeavour.rgb,
-            disabledBorderColor: ColorPalette.french_pass.rgb,
-          ),
-        ),
-        Container(
-            padding: const EdgeInsets.all(10.0),
-            child: TableCalendar(
-              // firstDay: DateTime.now(),
-              firstDay: DateTime.utc(200),
-              focusedDay: _focusedDay,
-              lastDay: DateTime(_focusedDay.year + 10),
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              calendarFormat: _calendarFormat,
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-              ),
-              calendarBuilders: calendarBuilder(),
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
-              },
-              eventLoader: (day) {
-                return _getEventsForDay(day);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, selectedDay)) {
-                  setState(() {
-                    _selectedDay = selectedDay;
+                        _selectedEvents.value = isSelected[0]
+                            ? Provider.of<EventProvider>(context, listen: false)
+                                .getLoadedEventsOfDay(_selectedDay)
+                            : Provider.of<EventProvider>(context, listen: false)
+                                .getLikedEventsOfDay(_selectedDay);
+                        log("menge gelandener evnets: " +
+                            Provider.of<EventProvider>(context, listen: false)
+                                .getLoadedEvents()
+                                .length
+                                .toString());
+                      });
+                    }
+                  },
+                  onPageChanged: (focusedDay) {
                     _focusedDay = focusedDay;
 
-                    _selectedEvents.value = _getEventsForDay(selectedDay);
-                  });
-                }
-              },
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
+                    Provider.of<EventProvider>(context, listen: false)
+                        .loadEventsOfMonth(DateTime(
+                            DateTime.now().year,
+                            DateTime.now().month + futureMonthsLoaded,
+                            DateTime.now().day));
 
-                /// TODO: Events für entsprechenden Monat dynamisch laden
-              },
-            )),
+                    /// TODO: Erkennen in welhc richtung gescrollt wird => aktuell laden auch seiten wenn man nach links wischt
+                  },
+                )),Positioned(
+              right: 60,
+              child: Container(
+                margin: const EdgeInsets.all(10.0),
+                child: ToggleButtons(
+                  children: [
+                    Container(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Allgemein')),
+                    Container(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('Persönlich')),
+                  ],
+                  isSelected: isSelected,
+                  onPressed: (int index) async {
+                    setState(() {
+                      // TODO: Persnlicher Kalender soll nur ausgeführt werden können, wenn man registrierter user ist
+
+                      for (int buttonIndex = 0;
+                          buttonIndex < isSelected.length;
+                          buttonIndex++) {
+                        if (buttonIndex == index) {
+                          isSelected[buttonIndex] = true;
+                        } else {
+                          isSelected[buttonIndex] = false;
+                        }
+                      }
+
+                      _selectedDay = null;
+                      //
+                      _selectedEvents.value = [];
+
+                      // List<Veranstaltung> events;
+                      // Provider.of<EventProvider>(context, listen: false)
+                      //     .loadAllEvents();
+
+                      // log(events.length.toString());
+
+                      //
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(30),
+                  borderWidth: 1,
+                  selectedColor: ColorPalette.white.rgb,
+                  fillColor: ColorPalette.endeavour.rgb,
+                  disabledBorderColor: ColorPalette.french_pass.rgb,
+                ),
+              ),
+            )
+          ],
+        ),
         Expanded(
             child: ValueListenableBuilder<List<Veranstaltung>>(
           valueListenable: _selectedEvents,
           builder: (context, value, _) {
-            return ListView.builder(
-              itemCount: value.length,
-              itemBuilder: (context, index) {
-                return EventPreviewBox(value[index].id, value[index].titel,
-                    value[index].beschreibung, value[index].titel, false);
-              },
-            );
+            return value != null && value.length > 0
+                ? ListView.builder(
+                    itemCount: value.length,
+                    itemBuilder: (context, index) {
+                      return EventPreviewBox(
+                          value[index].id,
+                          value[index].titel,
+                          value[index].beschreibung,
+                          value[index].titel);
+                    },
+                  )
+                : Container(child: Text(_selectedDay != null ? "Keine Veranstaltungen eingetragen" : "Für eine generauer Übersicht Tag auswählen"));
           },
         ))
       ],

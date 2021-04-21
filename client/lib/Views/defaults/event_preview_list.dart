@@ -26,7 +26,7 @@ class EventPreviewList extends StatefulWidget {
         0,
         PreviewListDots(
             EventPreviewList(<Widget>[
-              EventPreviewBox(0, 'titel', 'description', 'additive', false)
+              EventPreviewBox(0, 'titel', 'description', 'additive')
             ]),
             ''));
   }

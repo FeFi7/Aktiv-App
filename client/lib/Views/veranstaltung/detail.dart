@@ -1,21 +1,33 @@
 import 'dart:io';
 
+import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class VeranstaltungDetailView extends StatefulWidget {
-  int id;
+    int id;
+  
+  
   VeranstaltungDetailView(this.id);
+  
   @override
   _VeranstaltungDetailViewState createState() =>
       _VeranstaltungDetailViewState();
 }
 
 class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
+  Veranstaltung veranstaltung;
+   
+  
   @override
   Widget build(BuildContext context) {
+    
+  veranstaltung = Provider.of<EventProvider>(context, listen: false).getLoadedEventById(widget.id);
     Size size = MediaQuery.of(context).size;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -49,8 +61,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               width: size.width * 0.40,
                               child: RichText(
                                 text: TextSpan(
-                                  text:
-                                      'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos  labore et dolore magna al',
+                                  text: veranstaltung.titel,
                                   style: DefaultTextStyle.of(context).style,
                                 ),
                                 softWrap: true,

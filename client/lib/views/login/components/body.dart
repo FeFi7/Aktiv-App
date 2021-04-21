@@ -25,7 +25,7 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   final formKey = GlobalKey<FormState>();
-  bool rememberMe = false;
+  bool rememberMe = true;
   var mail;
   var password;
 
@@ -77,12 +77,15 @@ class _BodyState extends State<Body> {
 
                         if (jwt.statusCode == 200) {
                           var parsedJson = json.decode(jwt.body);
-                          var accessToken = parsedJson['accessToken'];
-                          var refreshToken = parsedJson['refreshToken'];
 
-                          if (jwt != null) {
-                            storage.write("accessToken", accessToken);
-                            storage.write("refreshToken", refreshToken);
+                          if (rememberMe) {
+                            var accessToken = parsedJson['accessToken'];
+                            var refreshToken = parsedJson['refreshToken'];
+
+                            if (jwt != null) {
+                              storage.write("accessToken", accessToken);
+                              storage.write("refreshToken", refreshToken);
+                            }
                           }
 
                           Navigator.push(
@@ -94,40 +97,15 @@ class _BodyState extends State<Body> {
                             ),
                           );
                         } else if (jwt.statusCode == 401) {
-                          Fluttertoast.showToast(
-                              msg: "Unauthorisierter Benutzer",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: ColorPalette.orange.rgb,
-                              textColor: ColorPalette.white.rgb);
+                          errorToast("Ungültige Anmeldedaten");
                         } else {
-                          Fluttertoast.showToast(
-                              msg: "Ungültige Anmeldedaten",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: ColorPalette.orange.rgb,
-                              textColor: ColorPalette.white.rgb);
+                          errorToast("Ungültige Anmeldedaten");
                         }
                       } else {
-                        Fluttertoast.showToast(
-                            msg: "Bitte gültige Email eingeben",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: ColorPalette.orange.rgb,
-                            textColor: ColorPalette.white.rgb);
+                        errorToast("Bitte gültige Email eingeben");
                       }
                     } else {
-                      Fluttertoast.showToast(
-                        msg: "Bitte Email und Passwort eingeben",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: ColorPalette.white.rgb,
-                        textColor: ColorPalette.orange.rgb,
-                      );
+                      errorToast("Bitte Email und Passwort eingeben");
                     }
                   },
                 ),
@@ -200,5 +178,17 @@ class _BodyState extends State<Body> {
         ),
       ),
     );
+  }
+
+  errorToast(String errorMessage) {
+    Fluttertoast.showToast(
+      msg: errorMessage,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: ColorPalette.orange.rgb,
+      textColor: ColorPalette.white.rgb,
+    );
+    FocusManager.instance.primaryFocus.unfocus();
   }
 }

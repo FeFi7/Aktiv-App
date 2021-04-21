@@ -1,6 +1,7 @@
 import 'package:aktiv_app_flutter/components/text_field_container.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class RoundedInputFieldNumeric extends StatelessWidget {
   final String hintText;
@@ -19,6 +20,9 @@ class RoundedInputFieldNumeric extends StatelessWidget {
       child: TextField(
         onChanged: onChanged,
         keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+        ],
         decoration: InputDecoration(
           icon: Icon(
             icon,

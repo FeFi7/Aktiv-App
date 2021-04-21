@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
@@ -27,7 +28,7 @@ class VeranstaltungAnlegenView extends StatefulWidget {
 class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
-  int id = 0;
+ //int id = 0;
   String starttext = "Beginn";
   String endtext = "Ende";
   String titel = "Titel",
@@ -203,49 +204,19 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                 color: ColorPalette.orange.rgb,
                 textColor: Colors.white,
                 press: () async {
-                  /*print(titel +
-                      beschreibung +
-                      email +
-                      start +
-                      ende +
-                      adresse +
-                      '0.0' +
-                      '0.0' +
-                      '1' +
-                      '1' +
-                      '1');*/
-                  Response resp = await attemptCreateVeranstaltung(
-                      titel,
-                      beschreibung,
-                      email,
-                      start,
-                      ende,
-                      adresse,
-                      '0.0',
-                      '0.0',
-                      '1',
-                      '1',
-                      '1');
-                  print(resp.body);
-                  String toastmsg = "";
-                  if (resp.statusCode == 200) {
-                    var parsedJson = json.decode(resp.body);
-                    id = parsedJson['insertId'];
-                    // Austauschen durch Event Provider sobald fertig
+                  Provider.of<EventProvider>(context,listen: false).createEvent(titel, beschreibung, email, start, ende, adresse).then((event) =>{
+                
                     Provider.of<BodyProvider>(context, listen: false)
-                        .setBody(VeranstaltungDetailView(id));
-                    Provider.of<AppBarTitleProvider>(context, listen: false)
-                        .setTitle('Übersicht');
-                        toastmsg = "Neue Veranstaltung angelegt";
+                      .setBody(VeranstaltungDetailView(event.id))
+                 // Provider.of<AppBarTitleProvider>(context, listen: false)
+                     // .setTitle('Übersicht');
 
-                  }else{var parsedJson = json.decode(resp.body);
-                    var error = parsedJson['error'];
-                    toastmsg = error;
-                  }
 
+                  });
+                  
                   setState(() {
                     Fluttertoast.showToast(
-                        msg: toastmsg,
+                        msg: "Test",
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.CENTER,
                         timeInSecForIosWeb: 2,

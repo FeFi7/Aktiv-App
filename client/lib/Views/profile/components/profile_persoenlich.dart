@@ -1,8 +1,7 @@
-import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
+import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
+import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
-
-import '../profile_screen.dart';
 
 class ProfilePersoenlich extends StatefulWidget {
   ProfilePersoenlich({Key key}) : super(key: key);
@@ -14,6 +13,13 @@ class ProfilePersoenlich extends StatefulWidget {
 class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   int currentStep = 0; //startIndex für Stepper
   bool complete = false; //Ausfüllen abgeschlossen?
+  static String mail;
+  static String vorname;
+  static String nachname;
+  static String plz;
+  static String tel;
+  static String userId;
+  static String accessToken;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +35,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         child: ListBody(
                           children: <Widget>[
                             Text(
-                                "Vielen Dank für die Vervollständigung Ihrer angaben.\n Sie haben nun die Möglichkeit, Veranstaltungen anzulegen."),
+                                "Vielen Dank für die Vervollständigung Ihrer angaben.\nSie haben nun die Möglichkeit, Veranstaltungen anzulegen."),
                           ],
                         ),
                       ),
@@ -38,10 +44,14 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                             onPressed: () {
                               setState(() => complete = false);
                             },
-                            child: Text("Weiterleiten"))
+                            child: Text("Bestätigen"))
                       ],
                     ),
                   )
+
+                //ToDo: Wenn User Provider done, Daten ergänzen
+                // attemptUpdateUserInfo(
+                //     mail, vorname, nachname, plz, tel, userId, accessToken),
                 : Stepper(
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
@@ -53,7 +63,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                             child: const Text(
                               'Weiter',
                               style: TextStyle(
-                                color: Colors.black54,
+                                color: Colors.orange,
                               ),
                             ),
                           ),
@@ -62,7 +72,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                             child: const Text(
                               'Zurück',
                               style: TextStyle(
-                                color: Colors.orange,
+                                color: Colors.black54,
                               ),
                             ),
                           ),
@@ -104,16 +114,22 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
         children: <Widget>[
           RoundedInputField(
             hintText: "Vorname",
-            onChanged: (value) {},
+            onChanged: (value) {
+              vorname = value;
+            },
           ),
           RoundedInputField(
             hintText: "Nachname",
-            onChanged: (value) {},
+            onChanged: (value) {
+              nachname = value;
+            },
           ),
-          RoundedInputField(
+          RoundedInputFieldNumeric(
             hintText: "Telefonnummer",
             icon: Icons.phone,
-            onChanged: (value) {},
+            onChanged: (value) {
+              tel = value;
+            },
           ),
         ],
       ),
@@ -123,12 +139,24 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       content: Column(
         children: <Widget>[
           RoundedInputField(
-            hintText: "Straße, Hausnummer",
+            hintText: "Straße",
             icon: Icons.home,
             onChanged: (value) {},
           ),
+          RoundedInputFieldNumeric(
+            hintText: "Hausnummer",
+            icon: Icons.home,
+            onChanged: (value) {},
+          ),
+          RoundedInputFieldNumeric(
+            hintText: "PLZ",
+            icon: Icons.gps_fixed_outlined,
+            onChanged: (value) {
+              plz = value;
+            },
+          ),
           RoundedInputField(
-            hintText: "PLZ, Ort",
+            hintText: "Ort",
             icon: Icons.gps_fixed_outlined,
             onChanged: (value) {},
           ),

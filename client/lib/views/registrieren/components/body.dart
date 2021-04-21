@@ -146,33 +146,19 @@ class _BodyState extends State<Body> {
                     if (formKey.currentState.validate()) {
                       formKey.currentState.save();
 
-                      if (password != confirmPassword) {
-                        Fluttertoast.showToast(
-                            msg: "Passwörter stimmen nicht überein",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: ColorPalette.orange.rgb,
-                            textColor: ColorPalette.white.rgb);
+                      if (password.toString().length < 8) {
+                        errorToast(
+                            "Passwort muss aus mindestens 8 Zeichen bestehen");
+                      } else if (password != confirmPassword) {
+                        errorToast("Passwörter stimmen nicht überein");
                       } else if (!agbsGelesen) {
-                        Fluttertoast.showToast(
-                            msg: "Bitte AGBs akzeptieren",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: ColorPalette.orange.rgb,
-                            textColor: ColorPalette.white.rgb);
+                        errorToast(
+                            "Bitte AGBs und Datenschutzerklärung akzeptieren");
                       } else {
                         var jwt = await attemptSignUp(mail, password);
 
                         if (jwt.statusCode == 502) {
-                          Fluttertoast.showToast(
-                              msg: "Server nicht erreichbar",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: ColorPalette.orange.rgb,
-                              textColor: ColorPalette.white.rgb);
+                          errorToast("Server nicht erreichbar");
                         } else if (jwt.statusCode == 200) {
                           Navigator.push(
                             context,
@@ -186,13 +172,7 @@ class _BodyState extends State<Body> {
                       }
                     }
                   } else {
-                    Fluttertoast.showToast(
-                        msg: "Ungültige Angaben",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: ColorPalette.orange.rgb,
-                        textColor: ColorPalette.white.rgb);
+                    errorToast("Ungültige Angaben");
                   }
                 },
               ),
@@ -219,5 +199,17 @@ class _BodyState extends State<Body> {
         ),
       ),
     );
+  }
+
+  errorToast(String errorMessage) {
+    Fluttertoast.showToast(
+      msg: errorMessage,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: ColorPalette.orange.rgb,
+      textColor: ColorPalette.white.rgb,
+    );
+    FocusManager.instance.primaryFocus.unfocus();
   }
 }
