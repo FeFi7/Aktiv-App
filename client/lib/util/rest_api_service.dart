@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 
-const SERVER_IP = "85.214.166.230";
+//const SERVER_IP = "85.214.166.230";
+const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
 
 // [POST] Login User
 Future<http.Response> attemptLogIn(String mail, String passwort) async {
@@ -12,7 +13,7 @@ Future<http.Response> attemptLogIn(String mail, String passwort) async {
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
   if (mail.isNotEmpty && passwort.isNotEmpty) {
-    final response = await http.post(Uri.http(SERVER_IP, route),
+    final response = await http.post(Uri.https(SERVER_IP, route),
         headers: <String, String>{
           'Content-Type': "application/x-www-form-urlencoded"
         },
@@ -36,7 +37,7 @@ Future<http.Response> attemptSignUp(String mail, String passwort) async {
   Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
 
   if (mail.isNotEmpty && passwort.isNotEmpty) {
-    final response = await http.post(Uri.http(SERVER_IP, route),
+    final response = await http.post(Uri.https(SERVER_IP, route),
         headers: <String, String>{
           'Content-Type': "application/x-www-form-urlencoded"
         },
@@ -61,7 +62,7 @@ Future<http.Response> attemptNewAccessToken(String refreshToken) async {
   String route = "api/user/token";
   Map<String, dynamic> body = {'token': refreshToken};
 
-  final response = await http.post(Uri.http(SERVER_IP, route),
+  final response = await http.post(Uri.https(SERVER_IP, route),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -82,7 +83,7 @@ Future<http.Response> attemptGetUser(String mail) async {
   String route = "api/user";
   Map<String, dynamic> qParams = {'mail': mail};
 
-  final response = await http.get(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       });
@@ -100,7 +101,7 @@ Future<http.Response> attemptGetUser(String mail) async {
 Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   String route = "api/veranstaltungen/" + veranstaltungsId.toString();
 
-  final response = await http.get(Uri.http(SERVER_IP, route),
+  final response = await http.get(Uri.https(SERVER_IP, route),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       });
@@ -118,7 +119,7 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
 Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
   String route = "api/veranstaltungen" + veranstaltungsId.toString();
 
-  final response = await http.delete(Uri.http(SERVER_IP, route),
+  final response = await http.delete(Uri.https(SERVER_IP, route),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -160,14 +161,13 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
   String route = "api/veranstaltungen";
 
-  final response = await http.get(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       });
 
   if (response.statusCode == 200) {
     print("GET All Veranstaltungen erfolgreich");
-    print(response.body); // TODO, wieder entfernen
   } else {
     print(response.statusCode);
   }
@@ -221,7 +221,7 @@ Future<http.Response> attemptCreateVeranstaltung(
 
 // [POST] File Upload für Bilder- und PDF-Dateien des Users
 Future<http.Response> attemptFileUpload(String filename, File file) async {
-  final uri = Uri.parse('http://' + SERVER_IP + '/api/fileupload');
+  final uri = Uri.parse('https://' + SERVER_IP + '/api/fileupload');
   final request = http.MultipartRequest('POST', uri);
 
   final mimetype = lookupMimeType(file.path);
@@ -253,8 +253,7 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
 Future<http.Response> attemptNewProfilImage(
     String filename, File file, String userId) async {
   String route = '/api/user/' + userId + '/profilbild';
-  var uri = Uri.parse('http://' + SERVER_IP + route);
-  //var uri = Uri.parse("http://h2931685.stratoserver.net" + route);
+  var uri = Uri.parse('https://' + SERVER_IP + route);
   final request = http.MultipartRequest('POST', uri);
 
   final mimetype = lookupMimeType(file.path);
@@ -286,7 +285,7 @@ Future<http.Response> attemptGetUserInfo(
   String route = "api/user/" + userId;
   Map<String, dynamic> qParams = {'secret_token': accessToken};
 
-  final response = await http.get(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       });
@@ -319,7 +318,7 @@ Future<http.Response> attemptUpdateUserInfo(
     'tel': tel
   };
 
-  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.put(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -344,7 +343,7 @@ Future<http.Response> attemptFavor(
     'veranstaltungId': veranstaltungId,
   };
 
-  final response = await http.post(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -370,7 +369,7 @@ Future<http.Response> attemptUpdateSettings(
     'baldEinstellung': bald
   };
 
-  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.put(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -393,7 +392,7 @@ Future<http.Response> attemptUpdateRole(
   Map<String, dynamic> qParams = {'secret_token': accessToken};
   Map<String, dynamic> body = {'rolleId': rolleId};
 
-  final response = await http.put(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.put(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -415,7 +414,7 @@ Future<http.Response> attemptSetVerwalter(
   String route = "api/user/" + userId + "/institutionen/" + institutionsId;
   Map<String, dynamic> qParams = {'secret_token': accessToken};
 
-  final response = await http.post(Uri.http(SERVER_IP, route, qParams),
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
         'Content-Type': "application/x-www-form-urlencoded"
       },
@@ -449,7 +448,7 @@ Future<http.Response> attemptCreateInstitution() async {}
 // [GET] TEST API
 Future<http.Response> testapi() async {
   final response = await http.get(
-    Uri.http('85.214.166.230', 'api/'),
+    Uri.https('85.214.166.230', 'api/'),
     headers: <String, String>{
       'Content-Type': "application/x-www-form-urlencoded"
     },
