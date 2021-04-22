@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
+import 'compress_service.dart';
 
 //const SERVER_IP = "85.214.166.230";
 const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
@@ -225,15 +226,23 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
   final request = http.MultipartRequest('POST', uri);
 
   final mimetype = lookupMimeType(file.path);
-  if ((mimetype != "image/jpeg") &&
+  if ((mimetype != 'image/jpeg') &&
       (mimetype != 'image/png') &&
       (mimetype != 'application/pdf')) {
     return http.Response("File types allowed .jpeg, .jpg .png and .pdf!", 500);
   }
 
+  var compressedFile;
+
+  if (mimetype == 'application/pdf') {
+    compressedFile = await compressPDF(file);
+  } else {
+    compressedFile = await compressImage(file);
+  }
+
   var _file = await http.MultipartFile.fromPath(
     'file',
-    file.path,
+    compressedFile.path,
     contentType: MediaType.parse(mimetype),
   );
 
@@ -261,9 +270,11 @@ Future<http.Response> attemptNewProfilImage(
     return http.Response("File types allowed .jpeg, .jpg and png!", 500);
   }
 
+  var compressedFile = await compressImage(file);
+
   var _file = await http.MultipartFile.fromPath(
     'file',
-    file.path,
+    compressedFile.path,
     contentType: MediaType.parse(mimetype),
   );
 
@@ -423,6 +434,19 @@ Future<http.Response> attemptSetVerwalter(
 
   if (response.statusCode == 200) {
     print("Verknüpfung Verwalter - Institution erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] Bekomme einzelnes File
+Future<http.Response> attemptGetFile(String fileName) async {
+  final response = await http.get(Uri.https(SERVER_IP, fileName));
+
+  if (response.statusCode == 200) {
+    print("File erfolgreich geholt");
   } else {
     print(response.statusCode);
   }

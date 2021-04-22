@@ -97,6 +97,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_image_compress:
+    dependency: "direct main"
+    description:
+      name: flutter_image_compress
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -240,6 +247,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4"
+  pdf_compressor:
+    dependency: "direct main"
+    description:
+      name: pdf_compressor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1"
   pedantic:
     dependency: transitive
     description:

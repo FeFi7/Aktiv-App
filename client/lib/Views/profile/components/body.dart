@@ -288,7 +288,6 @@ class _BodyState extends State<Body> {
 
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
     setState(
       () {
         if (pickedFile != null) profileImage = File(pickedFile.path);

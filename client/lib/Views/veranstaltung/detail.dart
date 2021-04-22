@@ -4,17 +4,19 @@ import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/components/rounded_button_dynamic.dart';
+import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class VeranstaltungDetailView extends StatefulWidget {
-    int id;
-  
-  
+  int id;
+
   VeranstaltungDetailView(this.id);
-  
+
   @override
   _VeranstaltungDetailViewState createState() =>
       _VeranstaltungDetailViewState();
@@ -22,12 +24,16 @@ class VeranstaltungDetailView extends StatefulWidget {
 
 class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
   Veranstaltung veranstaltung;
-   
-  
+  File profileImage;
+  final picker = ImagePicker();
   @override
   Widget build(BuildContext context) {
-    
-  veranstaltung = Provider.of<EventProvider>(context, listen: false).getLoadedEventById(widget.id);
+    DateTime start = DateTime.now();
+    DateTime ende = DateTime.now();
+    DateTime erstellt = DateTime.now();
+    //veranstaltung = Provider.of<EventProvider>(context, listen: false).getLoadedEventById(widget.id);
+    veranstaltung = Veranstaltung.load(0, 'Titel', 'Beschreibung', 'kontakt',
+        'Ortbeschreibung', start, ende, erstellt, 0, 0, false);
     Size size = MediaQuery.of(context).size;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {
@@ -61,7 +67,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               width: size.width * 0.40,
                               child: RichText(
                                 text: TextSpan(
-                                  text: veranstaltung.titel,
+                                  text: 'Name Veranstalter, + kurze Beschreibung',
                                   style: DefaultTextStyle.of(context).style,
                                 ),
                                 softWrap: true,
@@ -104,14 +110,30 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               }).toList(),
                             ),
                           ),
+                          Container(
+                            child: Container(margin: EdgeInsets.fromLTRB(5, 15, 0, 0),
+                              alignment: Alignment.bottomLeft,
+                              child: RoundedButtonDynamic(
+                                  width: size.width * 0.2,
+                                  text: '+',
+                                  textSize: 24,
+                                  color: ColorPalette.orange.rgb,
+                                  textColor: Colors.white,
+                                  press: () async {
+                                    await getImage();
+                                    await attemptFileUpload('Bild1', profileImage);
+                                  }),
+                            ),
+                          )
                         ],
                       ),
                     ),
                   ),
                   Expanded(
-                    child: Container(width:size.width*0.9,
-                      child: Column(mainAxisAlignment: MainAxisAlignment.start,
-                      
+                    child: Container(
+                      width: size.width * 0.9,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
                             margin: EdgeInsets.symmetric(
@@ -127,7 +149,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               width: size.width * 0.9,
                               alignment: Alignment.topLeft,
                               child: Text(
-                                'Bsp Veranstaltung\n',
+                                veranstaltung.titel + '\n',
                                 maxLines: 1,
                                 style: TextStyle(
                                     fontSize: 16.0,
@@ -138,7 +160,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               alignment: Alignment.topLeft,
                               width: size.width * 0.9,
                               child: Text(
-                                'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolo',
+                                veranstaltung.beschreibung,
                                 maxLines: 5,
                                 style: TextStyle(
                                     fontSize: 14.0,
@@ -150,8 +172,9 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                     ),
                   ),
                   Expanded(
-                    child: Container(margin: EdgeInsets.only(bottom:10),
-                    alignment: Alignment.center,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      alignment: Alignment.center,
                       child: Column(
                         children: [
                           Container(
@@ -174,7 +197,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               Container(
                                   width: size.width * 0.4,
                                   alignment: Alignment.centerRight,
-                                  child: Text('Prittwitzstraße 10, 89075 Ulm')),
+                                  child: Text(veranstaltung.ortBeschr)),
                             ],
                           ),
                           Container(
@@ -197,7 +220,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               Container(
                                   width: size.width * 0.4,
                                   alignment: Alignment.centerRight,
-                                  child: Text('16.04.2021, 16:00 Uhr')),
+                                  child: Text(veranstaltung.beginnTs.toString())),
                             ],
                           ),
                           Container(
@@ -220,7 +243,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               Container(
                                   width: size.width * 0.4,
                                   alignment: Alignment.centerRight,
-                                  child: Text('19.04.2021, 20:00 Uhr')),
+                                  child: Text(veranstaltung.endeTs.toString())),
                             ],
                           ),
                           Container(
@@ -243,7 +266,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               Container(
                                   width: size.width * 0.4,
                                   alignment: Alignment.centerRight,
-                                  child: Text('max@mustermann.de')),
+                                  child: Text(veranstaltung.kontakt)),
                             ],
                           ),
                           Container(
@@ -311,6 +334,16 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(
+      () {
+        if (pickedFile != null) profileImage = File(pickedFile.path);
       },
     );
   }
