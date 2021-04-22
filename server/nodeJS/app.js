@@ -4,17 +4,18 @@ const compression = require("compression");
 const routerVeranstaltungen = require("./routes/veranstaltungRoute");
 const routerUser = require("./routes/userRoute");
 const routerFileUpload = require("./routes/fileUploadRoute");
+const routerInstitution = require("./routes/institutionRoute");
 const secureRoute = require("./routes/secureRoute");
 const passport = require("passport");
 const cors = require("cors");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 
 app.use(compression());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(function timeLog(req, res, next) {
   console.log(
@@ -29,6 +30,7 @@ require("./auth/auth");
 app.use("/api/veranstaltungen", routerVeranstaltungen);
 app.use("/api/fileupload", routerFileUpload);
 app.use("/api/user", routerUser);
+app.use("/api/institutionen",routerInstitution);
 app.use(
   "/api/auth",
   passport.authenticate("jwt", { session: false }),

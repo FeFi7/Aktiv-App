@@ -240,6 +240,48 @@ async function addUserToInstitut(userId, institutionId) {
   }
 }
 
+async function getInstitutionenFromUser(userId) {
+  const query = `SELECT i.id, i.name, i.beschreibung FROM MitgliedUserInstitution m 
+  INNER JOIN Institution i ON m.institutionId = i.id 
+  WHERE istGenehmigt = 1 AND m.userId = ?`;
+
+  let results = await conn
+    .query(query, [userId])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler in Db" };
+    });
+
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
+async function isUserBetreiber(userId) {
+  const query = `SELECT * FROM User u 
+  INNER JOIN Rolle r ON u.rolleId = r.id AND r.id = 3
+  WHERE u.id = ?
+  `;
+
+  let results = await conn.query(query, [Number(userId)]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler in Db" };
+  });
+
+  if (results) {
+    results = results[0];
+    if (results.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function updateUserEinstellungen(
   userId,
   umkreisEinstellung,
@@ -367,5 +409,7 @@ module.exports = {
   favoritVeranstaltung: favoritVeranstaltung,
   updateUserEinstellungen: updateUserEinstellungen,
   updateUserRolle: updateUserRolle,
-  addUserToInstitut: addUserToInstitut
+  addUserToInstitut: addUserToInstitut,
+  isUserBetreiber: isUserBetreiber,
+  getInstitutionenFromUser: getInstitutionenFromUser
 };

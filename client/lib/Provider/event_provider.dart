@@ -231,7 +231,7 @@ class EventProvider extends ChangeNotifier {
       String email, String start, String ende, String adresse) async {
     int id = 0;
     Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
-        start, ende, adresse, '0.0', '0.0', '1', '1', '1');
+        start, ende, adresse, '89231', '1', '1', '1');
     print(resp.body);
     String toastmsg = "";
     if (resp.statusCode == 200) {

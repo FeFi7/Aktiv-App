@@ -209,7 +209,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     Provider.of<BodyProvider>(context, listen: false)
                       .setBody(VeranstaltungDetailView(event.id))
                  // Provider.of<AppBarTitleProvider>(context, listen: false)
-                     // .setTitle('Übersicht');
+                 //     .setTitle('Übersicht');
 
 
                   });

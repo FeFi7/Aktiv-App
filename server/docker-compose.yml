@@ -12,42 +12,46 @@ services:
             - db
         environment:
             - NODE_ENV=production
+            - PORT=3000
     node2:
         restart: unless-stopped
         build:
             context: ./nodeJS
         ports:
-            - "3001:3000"
+            - "3001:3001"
         volumes: 
             - /data/uploads/:/uploads
         depends_on: 
             - db
         environment:
             - NODE_ENV=production
+            - PORT=3001
     node3: 
         restart: unless-stopped
         build: 
             context: ./nodeJS
         ports: 
-            - "3002:3000"
+            - "3002:3002"
         volumes: 
             - /data/uploads/:/uploads
         depends_on:
             - db
         environment:
             - NODE_ENV=production
+            - PORT=3002
     node4:
         restart: unless-stopped
         build:
             context: ./nodeJS
         ports:
-            - "3003:3000"
+            - "3003:3003"
         volumes: 
             - /data/uploads/:/uploads       
         depends_on:
             - db
         environment:
             - NODE_ENV=production
+            - PORT=3003
     nginx:
         restart: unless-stopped
         build:
