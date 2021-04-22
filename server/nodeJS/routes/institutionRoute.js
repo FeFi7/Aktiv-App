@@ -94,27 +94,33 @@ router.post(
 );
 
 // [POST] Erstelle eine institution (mit Fabi gecoded)
-router.post("/*", async function (req, res) {
-  let body = req.body;
+router.post(
+  "/*",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    let body = req.body;
+    const userId = req.user._id;
 
-  if (!body.name) {
-    return res.status(400).send({ error: "Name nicht vorhanden" });
-  }
-  if (!body.beschreibung) {
-    return res.status(400).send({ error: "Beschreibung nicht vorhanden" });
-  }
+    if (!body.name) {
+      return res.status(400).send({ error: "Name nicht vorhanden" });
+    }
+    if (!body.beschreibung) {
+      return res.status(400).send({ error: "Beschreibung nicht vorhanden" });
+    }
 
-  const result = await institutionService.erstelleInstitution(
-    body.name,
-    body.beschreibung
-  );
+    const result = await institutionService.erstelleInstitution(
+      body.name,
+      body.beschreibung,
+      userId
+    );
 
-  if (result.error) {
-    return res.status(400).send(result);
-  } else {
-    return res.send(result);
+    if (result.error) {
+      return res.status(400).send(result);
+    } else {
+      return res.send(result);
+    }
   }
-});
+);
 
 // [PUT] update einzelne institution
 router.put(
@@ -173,13 +179,15 @@ router.delete(
       return res.status(400).send("institutionId ist keine Zahl");
     }
 
-    const resultInstitution = await institutionService.getInstitutionById(institutionId)
+    const resultInstitution = await institutionService.getInstitutionById(
+      institutionId
+    );
 
-    if(resultInstitution.error){
-      return res.status(400).json(resultInstitution)
+    if (resultInstitution.error) {
+      return res.status(400).json(resultInstitution);
     }
-    if(resultInstitution.length < 1){
-      return res.status(400).json({error: "Institution nicht vorhanden"})
+    if (resultInstitution.length < 1) {
+      return res.status(400).json({ error: "Institution nicht vorhanden" });
     }
 
     const resultIsUserInInstitution = await institutionService.isUserInInstitution(
@@ -188,21 +196,28 @@ router.delete(
     );
     const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
 
-    if(resultIsUserBetreiber.error || resultIsUserInInstitution.error){
-      return res.status(400).json(resultIsUserBetreiber || resultIsUserInInstitution)
+    if (resultIsUserBetreiber.error || resultIsUserInInstitution.error) {
+      return res
+        .status(400)
+        .json(resultIsUserBetreiber || resultIsUserInInstitution);
     }
-    if((!resultIsUserBetreiber) && (!resultIsUserInInstitution)){
-      return res.status(400).send("Sie haben nicht die nötigen Rechte, um diese Institution zu löschen")
+    if (!resultIsUserBetreiber && !resultIsUserInInstitution) {
+      return res
+        .status(400)
+        .send(
+          "Sie haben nicht die nötigen Rechte, um diese Institution zu löschen"
+        );
     }
 
-    const result = await institutionService.deleteInstitutionById(institutionId);
+    const result = await institutionService.deleteInstitutionById(
+      institutionId
+    );
 
     if (result.error) {
       return res.status(400).send(result);
     } else {
       return res.send(result);
     }
-
   }
 );
 

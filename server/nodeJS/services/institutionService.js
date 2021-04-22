@@ -1,23 +1,33 @@
 let conn = require("../db").getConnection();
 
-async function erstelleInstitution(name, beschreibung) {
-  //  if ((await mailExists(mail)).length > 0) {
-  //    return { error: "User schon vorhanden" };
-  // }
-
-  const query = `INSERT INTO Institution(name,beschreibung) VALUES (?,?)`;
+async function erstelleInstitution(name, beschreibung, ersteller) {
+  const query = `INSERT INTO Institution(name,beschreibung,ersteller,istGenehmigt) VALUES (?,?,?,0)`;
+  const queryInsertUserToInstitution = `INSERT INTO MitgliedUserInstitution(userId, institutionId) VALUES(?, ?) ON DUPLICATE KEY UPDATE userId=userId`;
 
   let results = await conn
-    .query(query, [name, beschreibung])
+    .query(query, [name, beschreibung, ersteller])
     .catch((_error) => {
       console.log(_error);
       return { error: _error };
     });
 
-  if (results.length > 0) {
-    return results[0];
+  if (!results) {
+    return { error: "Fehler bei Db" };
   } else {
-    return { error: "Institution nicht vorhanden" };
+    results = results[0];
+  }
+
+  let resultsInsertUser = await conn
+    .query(queryInsertUserToInstitution, [ersteller, results.insertId])
+    .catch((_error) => {
+      console.log(_error);
+      return { error: _error };
+    });
+
+  if (resultsInsertUser) {
+    return results;
+  } else {
+    return { error: "Fehler bei Db" };
   }
 }
 
