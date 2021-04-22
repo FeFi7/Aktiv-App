@@ -65,7 +65,7 @@ async function createVeranstaltung(titel, beschreibung, kontakt, plz, beginn, en
       return { error: "Fehler in DB" };
     });
 
-    const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt, plz)
+    const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt, plzId)
     VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), IF(?=0, Null, ?) , ?, ?, (SELECT id from PLZ where plz = ?))`
 
     const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, Number(institutionId), Number(institutionId), Number(userId), Number(istGenehmigt), plz];
