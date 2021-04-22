@@ -23,12 +23,25 @@ router.get("/:institutionId", async function (req, res) {
 // [POST] Hinterlege Profilbild für Institution
 router.post(
   "/:institutionId/profilbild",
+  passport.authenticate("jwt", { session: false }),
   fileUploadService.upload.single("file"),
   async function (req, res) {
+    const userId = req.user._id;
     const institutionId = req.params.institutionId;
     if (!/^\d+$/.test(institutionId)) {
       return res.status(400).send("institutionId keine Zahl");
     }
+    const resultIsUserInInstitution = await institutionService.isUserInInstitution(
+      userId,
+      institutionId
+    );
+
+    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+      return res.status(400).json({
+        error: "User ist nicht als Verwalter in Institution registriert",
+      });
+    }
+
     try {
       if (req.file == undefined) {
         return res.status(400).send({ error: "Keine Datei gefunden" });

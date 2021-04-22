@@ -14,7 +14,15 @@ async function erstelleInstitution(name, beschreibung, ersteller) {
   if (!results) {
     return { error: "Fehler bei Db" };
   } else {
-    results = results[0];
+    if (!results[0]) {
+      return { error: "Fehler bei Db" };
+    } else {
+      results = results[0];
+    }
+  }
+
+  if (!results.insertId) {
+    return { error: "Fehler bei Db" };
   }
 
   let resultsInsertUser = await conn

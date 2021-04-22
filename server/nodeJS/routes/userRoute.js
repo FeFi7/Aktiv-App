@@ -1,5 +1,6 @@
 var userService = require("../services/userService");
 const fileUploadService = require("../services/fileUploadService");
+var institutionService = require("../services/institutionService");
 var express = require("express");
 var router = express.Router();
 const passport = require("passport");
@@ -49,6 +50,27 @@ router.put(
   }
 );
 
+// [GET] Bekomme alle verwalteten Institutionen von User
+router.get(
+  "/:userId/institutionen",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+
+    const result = await userService.getInstitutionenFromUser(userId);
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
 // [POST] Verknüpfung von User mit Institution als Verwalter
 router.post(
   "/:userId/institutionen/:institutionId",
@@ -64,10 +86,18 @@ router.post(
       return res.status(400).send("institutionId keine Zahl");
     }
 
-    //ToDo: Ist Anfrageuser schon als Verwalter in der Institution?
-    //ToDo: Ist Institution angelegt? 
+    const resultIsUserInInstitution = await institutionService.isUserInInstitution(
+      userId,
+      institutionId
+    );
 
-    const result = await userService.addUserToInstitut(userId, institutionId)
+    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+      return res.status(400).json({
+        error: "User ist nicht als Verwalter in Institution registriert",
+      });
+    }
+
+    const result = await userService.addUserToInstitut(userId, institutionId);
 
     if (result.error) {
       return res.status(400).json(result);
@@ -87,7 +117,6 @@ router.put(
     let rolleId = body.rolleId;
     const user = req.user;
 
-
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("Id keine Zahl");
     }
@@ -96,9 +125,8 @@ router.put(
       if (!/^\d+$/.test(rolleId)) {
         return res.status(400).send("rolleId muss numerisch sein");
       }
-    }
-    else{
-      return res.status(400).send("rolleId nicht vorhanden")
+    } else {
+      return res.status(400).send("rolleId nicht vorhanden");
     }
 
     const result = await userService.updateUserRolle(userId, rolleId, user._id);

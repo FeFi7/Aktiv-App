@@ -127,6 +127,7 @@ router.post("/*", async function (req, res) {
   let userId = req.body.userId;
   let istGenehmigt = req.body.istGenehmigt;
   let fileIds = req.body.fileIds;
+  let plz = req.body.plz;
 
   //-------------------------Überprüfung Parameter---------------------------
   if (!titel) {
@@ -137,6 +138,9 @@ router.post("/*", async function (req, res) {
   }
   if (!kontakt) {
     return res.status(400).send({ error: "kontakt benötigt" });
+  }
+  if (!plz) {
+    return res.status(400).send({ error: "plz benötigt" });
   }
   if (!beginn_ts) {
     return res.status(400).send({ error: "beginn_ts benötigt" });
@@ -205,6 +209,7 @@ router.post("/*", async function (req, res) {
     titel,
     beschreibung,
     kontakt,
+    plz,
     beginn_ts,
     ende_ts,
     ortBeschreibung,

@@ -58,11 +58,17 @@ async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis, userId = 0,
     }
 }
 
-async function createVeranstaltung(titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt ){
-    const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt)
-    VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), IF(?=0, Null, ?) , ?, ?)`
+async function createVeranstaltung(titel, beschreibung, kontakt, plz, beginn, ende, ortBeschreibung, latitude, longitude, institutionId, userId, istGenehmigt ){
+    const queryPlz = `INSERT INTO PLZ(PLZ.plz) VALUES(?) ON DUPLICATE KEY UPDATE PLZ.plz = PLZ.plz;`;
+    await conn.query(queryPlz, [plz]).catch((error) => {
+      console.log(error);
+      return { error: "Fehler in DB" };
+    });
 
-    const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, Number(institutionId), Number(institutionId), Number(userId), Number(istGenehmigt)];
+    const query = `INSERT INTO Veranstaltung(titel, beschreibung, kontakt, beginn_ts, ende_ts, ortBeschreibung, koordinaten, institutionId, userId, istGenehmigt, plz)
+    VALUES( ?, ?, ?, ?, ?, ?, ST_SRID( POINT(?, ?) ,4326), IF(?=0, Null, ?) , ?, ?, (SELECT id from PLZ where plz = ?))`
+
+    const params = [titel, beschreibung, kontakt, beginn, ende, ortBeschreibung, latitude, longitude, Number(institutionId), Number(institutionId), Number(userId), Number(istGenehmigt), plz];
 
     let result = (await conn.query(query, params).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
 
