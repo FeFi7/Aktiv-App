@@ -6,6 +6,7 @@ class RoundedButtonDynamic extends StatelessWidget {
   final Color color, textColor;
   final EdgeInsets margin;
   final double width;
+  final double textSize;
   const RoundedButtonDynamic({
     Key key,
     this.text,
@@ -13,7 +14,8 @@ class RoundedButtonDynamic extends StatelessWidget {
     this.color,
     this.textColor = Colors.white, 
     this.margin,
-    this.width,
+    this.width, 
+    this.textSize,
 
     
   }) : super(key: key);
@@ -29,13 +31,15 @@ class RoundedButtonDynamic extends StatelessWidget {
         // ignore: deprecated_member_use
         child: FlatButton(
           padding: EdgeInsets.symmetric(
-              vertical: 20, horizontal: 40), //max Höhe/Breite
+              vertical: 20, horizontal: 20), //max Höhe/Breite
           color: color,
           onPressed: press,
           child: Text(
             text,
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: textColor,
+              fontSize: textSize
             ),
           ),
         ),

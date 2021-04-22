@@ -235,9 +235,9 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
   var compressedFile;
 
   if (mimetype == 'application/pdf') {
-    compressedFile = compressPDF(file);
+    compressedFile = await compressPDF(file);
   } else {
-    compressedFile = compressImage(file);
+    compressedFile = await compressImage(file);
   }
 
   var _file = await http.MultipartFile.fromPath(
