@@ -74,10 +74,22 @@ async function createVeranstaltung(titel, beschreibung, kontakt, beginn, ende, o
     }
 }
 
+async function addFileIdsToVeranstaltung(veranstaltungId, fileIds){
+    const query = `INSERT INTO VeranstaltungFile(veranstaltungId, fileId) VALUES(?, ?)`
+
+    await fileIds.forEach(async function(fileId){
+        const params = [veranstaltungId, fileId];
+        (await conn.query(query, params).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
+    })
+
+    return true
+}
+
 
 
 module.exports = {
     getVeranstaltungById: getVeranstaltungById,
     getVeranstaltungen: getVeranstaltungen,
-    createVeranstaltung: createVeranstaltung
+    createVeranstaltung: createVeranstaltung,
+    addFileIdsToVeranstaltung: addFileIdsToVeranstaltung
 }

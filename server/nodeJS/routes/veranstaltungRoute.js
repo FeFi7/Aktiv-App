@@ -1,7 +1,7 @@
 var veranstaltungService = require("../services/veranstaltungService");
 var express = require("express");
 var router = express.Router();
-const passport = require('passport');
+const passport = require("passport");
 
 // [GET] bekomme einzelne Veranstaltung
 router.get("/:veranstaltungId", async function (req, res) {
@@ -49,7 +49,6 @@ router.delete("/:veranstaltungId", async function (req, res) {
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
-  
   const query = req.query;
   let page = query.page;
   let bis = query.bis;
@@ -62,48 +61,55 @@ router.get("/*", async function (req, res) {
     if (!(/^\d+$/.test(limit) && limit < 100)) {
       limit = 25;
     }
-  }
-  else{
+  } else {
     limit = 25;
   }
   if (page) {
     if (!/^\d+$/.test(page)) {
       page = 1;
     }
-  }
-  else{
+  } else {
     page = 1;
   }
   // falls keine userId mitgegeben Wert 0 und es wird in der Funktion nicht beachtet
   if (userId) {
     if (!/^\d+$/.test(userId)) {
-      userId = 0; 
+      userId = 0;
     }
-  }
-  else{
+  } else {
     userId = 0;
   }
   if (!istGenehmigt) {
     istGenehmigt = 1;
   }
-  if (!bis){
+  if (!bis) {
     const dt = new Date();
-        bis = `${
-            dt.getFullYear().toString().padStart(4, '0')}-${
-            (dt.getMonth()+2).toString().padStart(2, '0')}-${
-            dt.getDate().toString().padStart(2, '0')} ${
-            dt.getHours().toString().padStart(2, '0')}:${
-            dt.getMinutes().toString().padStart(2, '0')}:${
-            dt.getSeconds().toString().padStart(2, '0')}`
+    bis = `${dt.getFullYear().toString().padStart(4, "0")}-${(dt.getMonth() + 2)
+      .toString()
+      .padStart(2, "0")}-${dt
+      .getDate()
+      .toString()
+      .padStart(2, "0")} ${dt
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${dt
+      .getMinutes()
+      .toString()
+      .padStart(2, "0")}:${dt.getSeconds().toString().padStart(2, "0")}`;
   }
 
-  const veranstaltungen = await veranstaltungService.getVeranstaltungen(limit, istGenehmigt, bis, userId, page);
+  const veranstaltungen = await veranstaltungService.getVeranstaltungen(
+    limit,
+    istGenehmigt,
+    bis,
+    userId,
+    page
+  );
 
-  if(veranstaltungen.error){
+  if (veranstaltungen.error) {
     res.status(400).json(veranstaltungen);
-  }
-  else{
-    res.status(200).json(veranstaltungen)
+  } else {
+    res.status(200).json(veranstaltungen);
   }
 });
 
@@ -120,6 +126,7 @@ router.post("/*", async function (req, res) {
   let institutionId = req.body.institutionId;
   let userId = req.body.userId;
   let istGenehmigt = req.body.istGenehmigt;
+  let fileIds = req.body.fileIds;
 
   //-------------------------Überprüfung Parameter---------------------------
   if (!titel) {
@@ -154,12 +161,14 @@ router.post("/*", async function (req, res) {
       return res.status(400).send({ error: "longitude muss numerisch sein" });
     }
   } else {
-    return res.status(400).send({ error: "longitude benötigt"});
+    return res.status(400).send({ error: "longitude benötigt" });
   }
   if (institutionId) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(institutionId)) {
-      return res.status(400).send({ error: "institutionId muss numerisch sein" });
+      return res
+        .status(400)
+        .send({ error: "institutionId muss numerisch sein" });
     }
   } else {
     institutionId = 0;
@@ -167,13 +176,28 @@ router.post("/*", async function (req, res) {
   if (userId) {
     // ist numerisch?
     if (!/^-?\d+\.?\d*$/.test(userId)) {
-      return res.status(400).send({ error: "userId muss numerisch sein"});
+      return res.status(400).send({ error: "userId muss numerisch sein" });
     }
   } else {
     return res.status(400).send({ error: "userId benötigt" });
   }
   if (!istGenehmigt) {
     istGenehmigt = 0;
+  }
+  if (fileIds) {
+    try {
+      fileIds = JSON.parse(fileIds);
+    } catch (e) {
+      console.log("Fehler bei Parsung FileIds");
+      return res
+        .status(400)
+        .json({ error: "fileIds werden nicht als Array übergeben" });
+    }
+    if (!Array.isArray(fileIds)) {
+      return res
+        .status(400)
+        .json({ error: "fileIds werden nicht als Array übergeben" });
+    }
   }
   //-------------------------Überprüfung Parameter---------------------------
 
@@ -191,13 +215,21 @@ router.post("/*", async function (req, res) {
     istGenehmigt ? 1 : 0
   );
 
-  if (veranstaltungen) {
-    res.send(veranstaltungen);
-    return;
-  } else {
-    res.sendStatus(400);
-    return;
+  if (veranstaltungen.error) {
+    return res.status(400).json(veranstaltungen)
   }
+
+  if(fileIds){
+    const veranstaltungenFileIds = await veranstaltungService.addFileIdsToVeranstaltung(veranstaltungen.insertId, fileIds)
+
+    if(veranstaltungenFileIds.error){
+      return res.status(400).json(veranstaltungenFileIds)
+    }
+  }
+
+  return res.status(200).json(veranstaltungen)
+
+
 });
 
 module.exports = router;

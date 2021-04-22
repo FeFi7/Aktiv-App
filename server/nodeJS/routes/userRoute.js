@@ -179,10 +179,10 @@ router.post("/login", async (req, res, next) => {
           refreshToken
         );
 
-        if (!saveRefreshResult.error) {
-          return res.json({ accessToken, refreshToken });
-        } else {
+        if (saveRefreshResult.error) {
           return res.status(400).json({ error: "Fehler bei Db" });
+        } else {
+          return res.json({ accessToken, refreshToken });
         }
       });
     } catch (error) {
