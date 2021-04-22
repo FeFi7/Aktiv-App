@@ -455,19 +455,153 @@ Future<http.Response> attemptGetFile(String fileName) async {
 }
 
 // [GET] Bekomme einzelne Institution
-Future<http.Response> attemptGetInstitutionById(String institutionsId) async {}
+Future<http.Response> attemptGetInstitutionById(String institutionsId) async {
+  String route = "api/institutionen/" + institutionsId;
 
-// [PUT] Update eine Institution
-Future<http.Response> attemptUpdateInstitution() async {}
+  final response = await http.get(Uri.https(SERVER_IP, route));
 
-// [DELETE] Lösche eine Institution
-Future<http.Response> attemptDeleteInstitution() async {}
+  if (response.statusCode == 200) {
+    print("Bekomme einzelne Institution erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Hinterlege Profilbild für Institution
+Future<http.Response> attemptNewImageForInstitution(
+    File file, String institutionId, String accessToken) async {
+  String route = "/api/institutionen/" +
+      institutionId +
+      "/profilbild?secret_token=" +
+      accessToken;
+  var uri = Uri.parse('https://' + SERVER_IP + route);
+
+  final request = http.MultipartRequest('POST', uri);
+
+  final mimetype = lookupMimeType(file.path);
+  if ((mimetype != "image/jpeg") && (mimetype != 'image/png')) {
+    return http.Response("File types allowed .jpeg, .jpg and png!", 500);
+  }
+
+  var compressedFile = await compressImage(file);
+
+  var _file = await http.MultipartFile.fromPath(
+    'file',
+    compressedFile.path,
+    contentType: MediaType.parse(mimetype),
+  );
+
+  request.files.add(_file);
+  http.Response response = await http.Response.fromStream(await request.send());
+
+  if (response.statusCode == 200) {
+    print("Hinterlege Profilbild für Institution erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Genehmige einzelne Institution
+Future<http.Response> attemptApproveInstitution(
+    String institutionId, String accessToken) async {
+  String route = "api/institutionen/" + institutionId + "/genehmigen";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Institution erfolgreich genehmigt");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Erstelle einzelne Institution
+Future<http.Response> attemptCreateInstitution(
+    String name, String beschreibung, String accessToken) async {
+  String route = "api/institutionen";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  Map<String, dynamic> body = {'name': name, 'beschreibung': beschreibung};
+
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Institution erfolgreich erstellt");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [PUT] Update einzelne Institution
+Future<http.Response> attemptUpdateInstitution(String institutionId,
+    String name, String beschreibung, String accessToken) async {
+  String route = "api/institutionen/" + institutionId;
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {'name': name, 'beschreibung': beschreibung};
+
+  final response = await http.put(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Institution erfolgreich geupdatet");
+  } else {
+    print(response.statusCode);
+    print(response.body);
+  }
+
+  return response;
+}
+
+// [DELETE] Lösche einzelne Institution
+Future<http.Response> attemptDeleteInstitution(
+    String institutionId, String accessToken) async {
+  String route = "api/institutionen/" + institutionId;
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Institution erfolgreich gelöscht");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
 
 // [GET] Bekomme alle Institutionen
 Future<http.Response> attemptGetAllInstitutionen() async {}
 
-// [POST] Erstelle eine Institution
-Future<http.Response> attemptCreateInstitution() async {}
+// [DELETE] Lösche einzelnes File
+Future<http.Response> attemptDeleteFile() async {}
 
 // [GET] TEST API
 Future<http.Response> testapi() async {
