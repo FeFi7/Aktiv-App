@@ -430,6 +430,19 @@ Future<http.Response> attemptSetVerwalter(
   return response;
 }
 
+// [GET] Bekomme einzelnes File
+Future<http.Response> attemptGetFile(String fileName) async {
+  final response = await http.get(Uri.https(SERVER_IP, fileName));
+
+  if (response.statusCode == 200) {
+    print("File erfolgreich geholt");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
 // [GET] Bekomme einzelne Institution
 Future<http.Response> attemptGetInstitutionById(String institutionsId) async {}
 
