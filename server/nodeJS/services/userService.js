@@ -246,19 +246,16 @@ async function isUserBetreiber(userId) {
   WHERE u.id = ?
   `;
 
-  let results = await conn
-    .query(query, [Number(userId)])
-    .catch((error) => {
-      console.log(error);
-      return { error: "Fehler in Db" };
-    });
+  let results = await conn.query(query, [Number(userId)]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler in Db" };
+  });
 
   if (results) {
-    results = results[0]
-    if(results.length > 0){
+    results = results[0];
+    if (results.length > 0) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   } else {
@@ -394,5 +391,5 @@ module.exports = {
   updateUserEinstellungen: updateUserEinstellungen,
   updateUserRolle: updateUserRolle,
   addUserToInstitut: addUserToInstitut,
-  isUserBetreiber: isUserBetreiber
+  isUserBetreiber: isUserBetreiber,
 };
