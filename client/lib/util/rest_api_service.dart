@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'compress_service.dart';
+import '../util/geocoder_service.dart';
 
 //const SERVER_IP = "85.214.166.230";
 const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
@@ -176,6 +177,7 @@ Future<http.Response> attemptGetAllVeranstaltungen(
   return response;
 }
 
+// [POST] Erstelle neue Veranstaltung
 Future<http.Response> attemptCreateVeranstaltung(
     String titel,
     String beschreibung,
@@ -183,12 +185,15 @@ Future<http.Response> attemptCreateVeranstaltung(
     String beginnts,
     String endets,
     String ortBeschreibung,
-    String latitude,
-    String longitude,
+    String plz,
     String institutionId,
     String userId,
     String istGenehmigt) async {
   String route = "api/veranstaltungen/";
+
+  var coordinateList = await getCoordinates(ortBeschreibung);
+  var latitude = coordinateList.first;
+  var longitude = coordinateList.last;
 
   Map<String, dynamic> body = {
     'titel': titel,
@@ -197,6 +202,7 @@ Future<http.Response> attemptCreateVeranstaltung(
     'beginn_ts': beginnts,
     'ende_ts': endets,
     'ortBeschreibung': ortBeschreibung,
+    'plz': plz,
     'latitude': latitude,
     'longitude': longitude,
     'institutionId': institutionId,
@@ -590,6 +596,26 @@ Future<http.Response> attemptDeleteInstitution(
 
   if (response.statusCode == 200) {
     print("Institution erfolgreich gelöscht");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] Bekomme alle verwalteten Institutionen von User
+Future<http.Response> attemptGetVerwalteteInstitutionen(
+    String userId, String accessToken) async {
+  String route = "api/user/" + userId + "/institutionen";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      });
+
+  if (response.statusCode == 200) {
+    print("Verwaltene Institutionen erfolgreich bekommen");
   } else {
     print(response.statusCode);
   }
