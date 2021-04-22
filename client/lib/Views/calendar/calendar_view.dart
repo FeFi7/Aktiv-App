@@ -45,6 +45,7 @@ class _CalendarViewState extends State<CalendarView> {
             Container(
                 padding: const EdgeInsets.all(10.0),
                 child: TableCalendar(
+                  // locale: 'de_DE',
                   firstDay: DateTime.now(),
                   // firstDay: DateTime.utc(200),
                   focusedDay: _focusedDay,
@@ -90,7 +91,7 @@ class _CalendarViewState extends State<CalendarView> {
                     Provider.of<EventProvider>(context, listen: false)
                         .loadEventsOfMonth(DateTime(
                             DateTime.now().year,
-                            DateTime.now().month + futureMonthsLoaded,
+                            DateTime.now().month + futureMonthsLoaded++, //TODO: begrenzen
                             DateTime.now().day));
 
                     /// TODO: Erkennen in welhc richtung gescrollt wird => aktuell laden auch seiten wenn man nach links wischt

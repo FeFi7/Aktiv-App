@@ -1,5 +1,6 @@
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class FavoritesView extends StatelessWidget {
         child: EventPreviewList(
             Provider.of<EventProvider>(context, listen: false)
                 .getFavoriteEvents()
-                .map((event) => event.getPreviewBox())
+                .map((event) => EventPreviewBox.load(event))
                 .toList()));
   }
 }

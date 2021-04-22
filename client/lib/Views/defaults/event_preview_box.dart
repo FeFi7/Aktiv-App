@@ -1,24 +1,37 @@
+import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../Home.dart';
 
 // ignore: must_be_immutable
 class EventPreviewBox extends StatefulWidget {
-  final int id;
-  final String titel;
-  final String description;
-  final String additive;
+  int id;
+  String titel;
+  String description;
+  String additive;
 
   // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
 
   // TODO: Ob die veranstaltung geliked ist, sollte nicht übergeben werden,
   // sondern aus einer singleton Klasse durch die id entnommen werdem
   EventPreviewBox(this.id, this.titel, this.description, this.additive);
+
+  EventPreviewBox.load(Veranstaltung event) {
+    this.id = event.id;
+    this.titel = event.titel;
+    this.description = event.beschreibung;
+    this.additive = _FormatAdditiveDate(event.beginnTs);
+  }
+
+  String _FormatAdditiveDate(DateTime dateTime) {
+    return  DateFormat('dd.MM.yyyy – kk:mm').format(dateTime)+ " Uhr";
+  }
 
   @override
   _EventPreviewBoxState createState() => _EventPreviewBoxState();

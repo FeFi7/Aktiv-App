@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -23,17 +24,15 @@ class EventProvider extends ChangeNotifier {
   static Map<String, int> loadedPages = Map<String, int>();
 
   // TODO: Add loadled Months
+  // TODO: Clear Methode hinzufügen
 
-  // initstate
-  // TODO: Struktur umbauen, getter und load Provider tapisch von einander trennen
-  // TODO: Page management einbauen
-  EventProvider() {
-    // loaded = HashMap<int, Veranstaltung>();
+  // EventProvider() {
+  // loaded = HashMap<int, Veranstaltung>();
 
-    // _loadEvents().then((events) {
-    //   for (Veranstaltung event in events) loaded[event.id] = event;
-    // });
-  }
+  // _loadEvents().then((events) {
+  //   for (Veranstaltung event in events) loaded[event.id] = event;
+  // });
+  // }
   //   notifyListeners();
 
   List<Veranstaltung> getLoadedEvents() {
@@ -64,6 +63,20 @@ class EventProvider extends ChangeNotifier {
         for (int eventId in dated[date]) eventsOfMonth.add(loaded[eventId]);
 
     return eventsOfMonth;
+  }
+
+  Future<List<EventPreviewBox>> loadEventsAsBoxContaining(String text) async {
+    // await Future.delayed(Duration(seconds: text.length > 0 ? 10 : 1));
+    await Future.delayed(Duration(seconds: 1));
+    // if (isReplay) return [Post("Replaying !", "Replaying body")];
+    // if (text.length == 5) throw Error();
+    // if (text.length == 6) return [];
+    List<EventPreviewBox> events = [];
+
+    events.addAll(
+        getLoadedEvents().map((event) => EventPreviewBox.load(event)).toList());
+
+    return events;
   }
 
   List<Veranstaltung> removeEventsOutsideMonth(
@@ -153,24 +166,23 @@ class EventProvider extends ChangeNotifier {
   }
 
   List<Veranstaltung> loadFavorites() {
-    // EventsNearBy aus Datenbank in nearby laden
+    //
   }
 
-  List<Veranstaltung> getEventsNearBy(
-      double longitude, double latitude, int page) {
+  Future<List<Veranstaltung>> getEventsNearBy() async {
+    // double longitude, double latitude, int page
     if (nearby.isNotEmpty) {
       return nearby.map((entry) => loaded[entry]).toList();
     } else {
-      return loadEventsNearBy();
+      return await loadEventsNearBy();
     }
   }
 
-  List<Veranstaltung> loadEventsNearBy() {
+  Future<List<Veranstaltung>> loadEventsNearBy() async {
     // EventsNearBy aus Datenbank in nearby laden
   }
 
-  List<Veranstaltung> getUpComingEvents(
-      double longitude, double latitude, int page) {
+  List<Veranstaltung> getUpComingEvents() {
     // if (upComing.isNotEmpty) {
     return upComing.map((entry) => loaded[entry]).toList();
     // } else {
@@ -182,9 +194,9 @@ class EventProvider extends ChangeNotifier {
     // UpComingEvents aus Datenbank in upComing laden und zurückgeben
   }
 
-  List<Veranstaltung> getEventsContaining(String content, int page) {
-    // Events die in text form den conetnt enthalten laden und zurückgeben
-  }
+  // List<Veranstaltung> getEventsContaining(String content, int page) {
+  //   // Events die in text form den conetnt enthalten laden und zurückgeben
+  // }
 
   List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
     if (dated[day] != null)
@@ -291,10 +303,10 @@ class EventProvider extends ChangeNotifier {
     // TODO: if(!approved && user hat keine Rechte dazu) return;
 
     // TODO: if(ortBeschreibung < selbstDefinierter Radius entfernt) dann:
-    if (!upComing.contains(
-        id)) // idk. ob das überhaupt sein kann, aber sicher ist sicher
-      upComing
-          .add(id); // TODO: So kann es noch passieren dass durch zwischen laden
+    // if (!upComing.contains(
+    //     id)) // idk. ob das überhaupt sein kann, aber sicher ist sicher
+    upComing
+        .add(id); // TODO: So kann es noch passieren dass durch zwischen laden
     // mit anderen attemptBefehlen die reihenfolge nicht mehr stimmt...
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
