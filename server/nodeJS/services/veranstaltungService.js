@@ -16,6 +16,18 @@ async function getVeranstaltungById(veranstaltungId){
     }
 }
 
+async function genehmigeVeranstaltung(veranstaltungId){
+    const query = `UPDATE Veranstaltung v SET v.istGenehmigt = 1 WHERE v.id = ?`
+
+    let result =  (await conn.query(query, [Number(veranstaltungId)]).catch(error => {console.log(error); return { error: "Fehler bei Db" };}))
+    if(result){
+        return result[0]
+    }
+    else{
+        return { error: "Fehler bei Db" };
+    }
+}
+
 async function getVeranstaltungen(limit = 25, istGenehmigt = 1, bis, userId = 0, page = 1){
     // Falls nichts angegeben bis 1 Monat in der Zukunft
     if(!bis){
@@ -97,5 +109,6 @@ module.exports = {
     getVeranstaltungById: getVeranstaltungById,
     getVeranstaltungen: getVeranstaltungen,
     createVeranstaltung: createVeranstaltung,
-    addFileIdsToVeranstaltung: addFileIdsToVeranstaltung
+    addFileIdsToVeranstaltung: addFileIdsToVeranstaltung,
+    genehmigeVeranstaltung: genehmigeVeranstaltung
 }
