@@ -20,16 +20,16 @@ class EventPreviewList extends StatefulWidget {
     widgetList.insert(0, previewBox);
   }
 
-  void addListExtensionDots() {
-    // hier muss noch dynamisch fest gelegt werden wohin die leiten sollen
-    widgetList.insert(
-        0,
-        PreviewListDots(
-            EventPreviewList(<Widget>[
-              EventPreviewBox(0, 'titel', 'description', 'additive')
-            ]),
-            ''));
-  }
+  // void addListExtensionDots() {
+  //   // hier muss noch dynamisch fest gelegt werden wohin die leiten sollen
+  //   widgetList.insert(
+  //       0,
+  //       PreviewListDots(
+  //           EventPreviewList(<Widget>[
+  //             EventPreviewBox(0, 'titel', 'description', 'additive')
+  //           ]),
+  //           ''));
+  // }
 
   void clear() {
     widgetList.clear();
@@ -39,26 +39,18 @@ class EventPreviewList extends StatefulWidget {
 class _EventPreviewListState extends State<EventPreviewList> {
   _EventPreviewListState();
 
-  // void addEventPreview(EventPreviewBox previewBox) {
-  //   setState(() {
-  //   });
-  // }
-
-  // void addListExtensionDots(EventPreviewList list) {
-  //   setState(() {});
-  // }
-
   ScrollController _controller;
 
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      setState(() {
-        // TODO: Möglichkeit coden, damit Event dynamisch hinzugefügt werden...
-        log("reach the bottom");
+          widget.bottomReached();
+      // setState(() {
+      //   // TODO: Möglichkeit coden, damit Event dynamisch hinzugefügt werden...
+      //   log("reach the bottom");
 
-        widget.bottomReached.call();
-      });
+        
+      // });
     }
   }
 

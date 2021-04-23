@@ -50,10 +50,12 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
                             .inDays
                             .toString() +
                         " Tage"
-                    :  event.beginnTs
+                    : event.beginnTs
                             .difference(DateTime.now())
                             .inHours
-                            .toString() + " Stunden") + ""))
+                            .toString() +
+                        " Stunden") +
+                ""))
         .toList();
 
     ///TODO: Anpassen, dass auch tatsächlich die entfernung angezeigt wird
@@ -78,12 +80,21 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
     List<Widget> widgetList = <Widget>[PreviewListHeading('Bald')];
     widgetList
         .addAll(upComing.sublist(0, upComing.length < 2 ? upComing.length : 2));
-    widgetList.add(PreviewListDots(EventPreviewList(upComing), 'Bald'));
+    widgetList.add(PreviewListDots(
+        EventPreviewList(upComing, () => {
+          Provider.of<EventProvider>(context, listen: false)
+              .loadUpComingEvents()
+        }),
+        'Bald'));
 
     widgetList.add(PreviewListHeading('In der Nähe'));
     widgetList.addAll(nearBy.sublist(0, nearBy.length < 2 ? nearBy.length : 2));
-    widgetList.add(PreviewListDots(EventPreviewList(nearBy), 'In der Nähe'));
+    widgetList.add(PreviewListDots(
+        EventPreviewList(nearBy, () => {
+          Provider.of<EventProvider>(context, listen: false).loadEventsNearBy()
+        }),
+        'In der Nähe'));
 
-    return EventPreviewList(widgetList);
+    return EventPreviewList(widgetList, () {});
   }
 }

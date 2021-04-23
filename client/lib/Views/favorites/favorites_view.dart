@@ -18,6 +18,8 @@ class _FavoritesViewState extends State<FavoritesView> {
             Provider.of<EventProvider>(context, listen: false)
                 .getFavoriteEvents()
                 .map((event) => EventPreviewBox.load(event))
-                .toList()));
+                .toList(), () {
+      Provider.of<EventProvider>(context, listen: false).loadFavorites();
+    }));
   }
 }

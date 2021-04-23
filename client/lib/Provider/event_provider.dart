@@ -224,8 +224,8 @@ class EventProvider extends ChangeNotifier {
     return favorites.map((entry) => loaded[entry]).toList();
   }
 
-  List<Veranstaltung> loadFavorites() {
-    //
+  void loadFavorites() {
+    print("man sollte die favoriten weiter laden");
   }
 
   List<Veranstaltung> getEventsNearBy() {
@@ -236,8 +236,8 @@ class EventProvider extends ChangeNotifier {
 
   void loadEventsNearBy() async {
     // EventsNearBy aus Datenbank in nearby laden
-    //
-    notifyListeners();
+    print("man sollte die events nearby weiter laden");
+    // notifyListeners();
   }
 
   List<Veranstaltung> getUpComingEvents() {
@@ -251,8 +251,8 @@ class EventProvider extends ChangeNotifier {
 
   void loadUpComingEvents() {
     // UpComingEvents aus Datenbank in upComing laden und zurückgeben
-    //
-    notifyListeners();
+    print("man sollte die bald abgehenden events weiter laden");
+    // notifyListeners();
   }
 
   // List<Veranstaltung> getEventsContaining(String content, int page) {
