@@ -91,7 +91,7 @@ class _BodyState extends State<Body> {
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                         TextSpan(
-                          text: "AGBs ",
+                          text: "Verpflichtungserklärung ",
                           style: TextStyle(color: ColorPalette.white.rgb),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
@@ -106,7 +106,7 @@ class _BodyState extends State<Body> {
                             },
                         ),
                         TextSpan(
-                          text: "und",
+                          text: "\nund",
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                         TextSpan(
@@ -115,7 +115,7 @@ class _BodyState extends State<Body> {
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
                               final url =
-                                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/";
+                                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/datenschutzerklaerung/";
 
                               await launch(
                                 url,
@@ -125,7 +125,7 @@ class _BodyState extends State<Body> {
                             },
                         ),
                         TextSpan(
-                          text: " \ngelesen und akzeptiere.",
+                          text: "gelesen\nund akzeptiere.",
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                       ]),

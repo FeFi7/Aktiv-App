@@ -10,8 +10,7 @@ import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../../util/rest_api_service.dart';
-import 'package:mime/mime.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../Home.dart';
 import 'profile_persoenlich.dart';
@@ -157,6 +156,19 @@ class _BodyState extends State<Body> {
                 .setBody(ProfileEinstellungen());
             Provider.of<AppBarTitleProvider>(context, listen: false)
                 .setTitle('Einstellungen');
+          },
+        ),
+        RoundedButton(
+          text: "Hilfe",
+          color: Colors.grey[400],
+          press: () async {
+            final url =
+                "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
+            await launch(
+              url,
+              forceSafariVC: false,
+              forceWebView: false,
+            );
           },
         ),
         RoundedButton(
