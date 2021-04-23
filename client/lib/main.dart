@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ class AktivApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppBarTitleProvider()),
+        ChangeNotifierProvider(create: (_) => SearchBehaviorProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => BodyProvider()),
       ],

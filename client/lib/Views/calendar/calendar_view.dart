@@ -64,7 +64,7 @@ class _CalendarViewState extends State<CalendarView> {
                         ? Provider.of<EventProvider>(context, listen: false)
                             .getLoadedEventsOfDay(day)
                         : Provider.of<EventProvider>(context, listen: false)
-                            .getLikedEventsOfDay(day);
+                            .getLoadedAndLikedEventsOfDay(day);
                   },
                   onDaySelected: (selectedDay, focusedDay) {
                     if (!isSameDay(_selectedDay, selectedDay)) {
@@ -76,7 +76,7 @@ class _CalendarViewState extends State<CalendarView> {
                             ? Provider.of<EventProvider>(context, listen: false)
                                 .getLoadedEventsOfDay(_selectedDay)
                             : Provider.of<EventProvider>(context, listen: false)
-                                .getLikedEventsOfDay(_selectedDay);
+                                .getLoadedAndLikedEventsOfDay(_selectedDay);
                         log("menge gelandener evnets: " +
                             Provider.of<EventProvider>(context, listen: false)
                                 .getLoadedEvents()
@@ -155,11 +155,7 @@ class _CalendarViewState extends State<CalendarView> {
                 ? ListView.builder(
                     itemCount: value.length,
                     itemBuilder: (context, index) {
-                      return EventPreviewBox(
-                          value[index].id,
-                          value[index].titel,
-                          value[index].beschreibung,
-                          value[index].titel);
+                      return EventPreviewBox.load(value[index]);
                     },
                   )
                 : Container(child: Text(_selectedDay != null ? "Keine Veranstaltungen eingetragen" : "Für eine generauer Übersicht Tag auswählen"));

@@ -1,10 +1,11 @@
 import 'dart:collection';
 
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BodyProvider extends ChangeNotifier {
-  Widget _body = Text('404');
+  StatefulWidget _body = ErrorPreviewBox("404");
 
   ListQueue previous = ListQueue<Widget>();
 

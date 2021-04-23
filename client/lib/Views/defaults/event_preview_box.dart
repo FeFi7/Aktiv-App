@@ -2,6 +2,7 @@ import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -159,3 +160,4 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
     );
   }
 }
+

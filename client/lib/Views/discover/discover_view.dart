@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/discover/environment_placeholder.dart';
@@ -23,37 +25,23 @@ class DiscoverView extends StatefulWidget {
 final List<bool> isSelected = [true, false, false];
 
 class _DiscoverViewState extends State<DiscoverView> {
+  Widget _getPlaceHolder() {
+    return EnvironmentPlaceholder();
+  }
+
+  var toogleButtons =
+      Consumer<SearchBehaviorProvider>(builder: (context, value, child) {
+    return value.getToggleButtons();
+  });
+
   @override
   Widget build(BuildContext context) {
-    final SearchBarController<EventPreviewBox> _searchBarController =
+    final SearchBarController<Widget> _searchBarController =
         SearchBarController();
-    bool isReplay = false;
-
-    Widget _getPlaceHolder() {
-    //   // List<EventPreviewBox> upComing = await Provider.of<EventProvider>(context, listen: false)
-          
-
-
-    //   List<Widget> widgetList = <Widget>[
-    //     PreviewListHeading('Bald'),
-
-
-
-    //     PreviewListDots(EventPreviewList(<Widget>[]), 'Bald'),
-    //     PreviewListHeading('In der Nähe'),
-
-
-    //     PreviewListDots(EventPreviewList(<Widget>[]), 'In der Nähe')
-    //   ];
-
-    //   return EventPreviewList(widgetList);
-    return EnvironmentPlaceholder();
-    }
+    // bool isReplay = false;
 
     return Container(
-        child: SearchBar<EventPreviewBox>(
-      // searchBarPadding: EdgeInsets.symmetric(horizontal: 50),
-      // headerPadding: EdgeInsets.all(50),
+        child: SearchBar<Widget>(
       searchBarPadding: EdgeInsets.only(left: 15, right: 15, top: 15),
 
       ///symmetric(horizontal: 10), ///EdgeInsets.all(15),
@@ -65,29 +53,34 @@ class _DiscoverViewState extends State<DiscoverView> {
       ),
       icon: Icon(Icons.search_rounded, size: 35),
       onSearch: Provider.of<EventProvider>(context, listen: false)
-          .loadEventsAsBoxContaining,
+          .loadEventsAsBoxContaining, // Man soll Provider nur im context aufrufen
       searchBarStyle: SearchBarStyle(
           backgroundColor: ColorPalette.malibu.rgb,
           borderRadius: BorderRadius.all(Radius.circular(60.0)),
           padding: EdgeInsets.all(10.0)),
       searchBarController: _searchBarController,
       placeHolder: _getPlaceHolder(),
+      // placeHolder: EnvironmentPlaceholder(),
       cancellationWidget: Container(
           padding: const EdgeInsets.all(17.0),
           height: 70,
           decoration: BoxDecoration(
               color: ColorPalette.french_pass.rgb,
               borderRadius: BorderRadius.all(Radius.circular(36.0))),
-          child: Center(child: Text("Zurück"))),
-      emptyWidget: Text("empty"),
+          // child: Center(child: Text("Zurück"))),
+          child: Icon(Icons.close_rounded, size: 35)),
+      emptyWidget: ErrorPreviewBox(
+          "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden. Versuchen Sie kurze Schlagwörter, wie Musik oder Flohmarkt, für bessere Ergebnisse."),
       indexedScaledTileBuilder: (int index) => ScaledTile.count(1, 0.475),
-      // header:
+      header: Center(child: toogleButtons), //TODO:
+
       onCancelled: () {
         print("Cancelled triggered");
-        FocusScope.of(context).requestFocus(new FocusNode()); // SChließt Tastatur
+        FocusScope.of(context)
+            .requestFocus(new FocusNode()); // Schließt Tastatur
       },
-      onItemFound: (EventPreviewBox previewBox, int index) {
-        return previewBox;
+      onItemFound: (Widget widget, int index) {
+        return widget;
       },
     ));
   }

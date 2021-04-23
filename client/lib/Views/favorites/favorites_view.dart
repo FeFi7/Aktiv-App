@@ -5,9 +5,12 @@ import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-class FavoritesView extends StatelessWidget {
-  const FavoritesView();
+class FavoritesView extends StatefulWidget {
+  @override
+  _FavoritesViewState createState() => _FavoritesViewState();
+}
 
+class _FavoritesViewState extends State<FavoritesView> {
   @override
   Widget build(BuildContext context) {
     return Container(

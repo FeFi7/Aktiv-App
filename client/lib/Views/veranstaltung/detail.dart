@@ -33,7 +33,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
     DateTime erstellt = DateTime.now();
     //veranstaltung = Provider.of<EventProvider>(context, listen: false).getLoadedEventById(widget.id);
     veranstaltung = Veranstaltung.load(0, 'Titel', 'Beschreibung', 'kontakt',
-        'Ortbeschreibung', start, ende, erstellt, 0, 0, false);
+        'Ortbeschreibung', start, ende, erstellt, 0, 0);
     Size size = MediaQuery.of(context).size;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints viewportConstraints) {

@@ -5,7 +5,7 @@ class Veranstaltung {
   String titel, beschreibung, kontakt, ortBeschr;
   DateTime beginnTs, endeTs, erstelltTs;
   double latitude, longitude;
-  bool approved;
+
   //Bilder mit abspeichern
 
   Veranstaltung.create(
@@ -36,11 +36,10 @@ class Veranstaltung {
     this.endeTs,
     this.erstelltTs,
     this.latitude,
-    this.longitude,
-    this.approved
+    this.longitude
   );
 
   EventPreviewBox getPreviewBox() {
-    return EventPreviewBox(id, titel, beschreibung, beginnTs.toIso8601String());
+    return EventPreviewBox.load(this);
   }
 }

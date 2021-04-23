@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 
 class EventPreviewList extends StatefulWidget {
   final List<Widget> widgetList;
-
-  EventPreviewList(this.widgetList);
+  final VoidCallback bottomReached;
+  EventPreviewList(this.widgetList, this.bottomReached);
 
   @override
   _EventPreviewListState createState() => _EventPreviewListState();
@@ -56,6 +56,8 @@ class _EventPreviewListState extends State<EventPreviewList> {
       setState(() {
         // TODO: Möglichkeit coden, damit Event dynamisch hinzugefügt werden...
         log("reach the bottom");
+
+        widget.bottomReached.call();
       });
     }
   }

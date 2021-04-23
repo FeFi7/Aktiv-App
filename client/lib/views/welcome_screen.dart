@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'Home.dart';
 import 'defaults/color_palette.dart';
 import 'Login/login_screen.dart';

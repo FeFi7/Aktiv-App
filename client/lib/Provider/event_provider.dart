@@ -2,6 +2,9 @@ import 'dart:collection';
 import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 class EventProvider extends ChangeNotifier {
   // List<Veranstaltung> events;
@@ -20,6 +24,7 @@ class EventProvider extends ChangeNotifier {
   static List<int> nearby = [];
   static List<int> upComing = [];
   static List<int> favorites = [];
+  static List<int> approved = [];
   static final int pageSize = 25;
   static Map<String, int> loadedPages = Map<String, int>();
 
@@ -39,7 +44,7 @@ class EventProvider extends ChangeNotifier {
     return loaded.values.toList();
   }
 
-  List<Veranstaltung> getLikedEventsOfDay(DateTime day) {
+  List<Veranstaltung> getLoadedAndLikedEventsOfDay(DateTime day) {
     List<Veranstaltung> events = getLoadedEventsOfDay(day);
     for (int index = 0; index < events.length; index++) {
       Veranstaltung event = events[index];
@@ -65,19 +70,73 @@ class EventProvider extends ChangeNotifier {
     return eventsOfMonth;
   }
 
-  Future<List<EventPreviewBox>> loadEventsAsBoxContaining(String text) async {
+  Future<List<Widget>> loadEventsAsBoxContaining(String text) async {
+    //
     // await Future.delayed(Duration(seconds: text.length > 0 ? 10 : 1));
     await Future.delayed(Duration(seconds: 1));
     // if (isReplay) return [Post("Replaying !", "Replaying body")];
     // if (text.length == 5) throw Error();
     // if (text.length == 6) return [];
-    List<EventPreviewBox> events = [];
+    // List<EventPreviewBox> events = [];
+    //
+    //
+    List<Widget> eventPreviews = [];
 
-    events.addAll(
-        getLoadedEvents().map((event) => EventPreviewBox.load(event)).toList());
+    // So kann bei der suche differenziert werden, wie man
+    switch (SearchBehaviorProvider.style) {
+      case SearchStyle.FULLTEXT:
+        // TODO: Volltext Suche aus der Datenbank laden un zurück geben
 
-    return events;
+        for (Veranstaltung event in getLoadedEvents()) {
+          if (event.titel.contains(text) ||
+              event.beschreibung.contains(text) ||
+              event.ortBeschr.contains(text))
+            eventPreviews.add(EventPreviewBox.load(event));
+        }
+
+        // if (eventPreviews.length == 0)
+        // eventPreviews.add(ErrorPreviewBox(
+        //     "Es konnten keine Veranstaltungen mit dem Inhalt \"" +
+        //         text +
+        //         "\" im Titel, im Names des Veranstalters, der Beschriebung, oder in den Tags gefunden werden. Versuche sie bitte mit einem anderen Schlüsselwort erneut."));
+
+        return eventPreviews;
+      case SearchStyle.DATE:
+        // TODO: Suche nach allen Events an dem Datum aus der Datenbank laden un zurück geben
+
+        if (DateTime.tryParse(text) != null) {
+          DateTime date = DateTime.parse(text);
+        } else {
+          eventPreviews.add(ErrorPreviewBox("Bei \"" +
+              text +
+              " handelt es sich um kein gültiges Datum. Bitte Datum im format Tag.Monat.Jahr angeben."));
+          return eventPreviews;
+        }
+
+        if (eventPreviews.length == 0)
+          eventPreviews.add(ErrorPreviewBox(
+              "Es konnten keine Veranstaltungen für den " +
+                  text +
+                  " gefunden werden."));
+
+        return eventPreviews;
+      case SearchStyle.PERIOD:
+        // TODO: Volltext Scuhe aus der Datenbank laden un zurück geben
+
+        //TODO:  WIDER ENTFERNEN
+        eventPreviews.addAll(getLoadedEvents()
+            .map((event) => EventPreviewBox.load(event))
+            .toList());
+
+        return eventPreviews;
+      default:
+        return eventPreviews;
+    }
+
+    // return events;
   }
+
+  bool isValidDate(String possiblyDate) {}
 
   List<Veranstaltung> removeEventsOutsideMonth(
       DateTime month, List<Veranstaltung> events) {
@@ -169,29 +228,31 @@ class EventProvider extends ChangeNotifier {
     //
   }
 
-  Future<List<Veranstaltung>> getEventsNearBy() async {
-    // double longitude, double latitude, int page
-    if (nearby.isNotEmpty) {
-      return nearby.map((entry) => loaded[entry]).toList();
-    } else {
-      return await loadEventsNearBy();
-    }
+  List<Veranstaltung> getEventsNearBy() {
+    // TODO: Noch ändern, muss aber erstmal attemt methode geben
+    // return nearby.map((entry) => loaded[entry]).toList();
+    return getUpComingEvents();
   }
 
-  Future<List<Veranstaltung>> loadEventsNearBy() async {
+  void loadEventsNearBy() async {
     // EventsNearBy aus Datenbank in nearby laden
+    //
+    notifyListeners();
   }
 
   List<Veranstaltung> getUpComingEvents() {
     // if (upComing.isNotEmpty) {
-    return upComing.map((entry) => loaded[entry]).toList();
+    // 
+    return upComing.map((id) => loaded[id]).toList();
     // } else {
     //   return loadUpComingEvents();
     // }
   }
 
-  List<Veranstaltung> loadUpComingEvents() {
+  void loadUpComingEvents() {
     // UpComingEvents aus Datenbank in upComing laden und zurückgeben
+    //
+    notifyListeners();
   }
 
   // List<Veranstaltung> getEventsContaining(String content, int page) {
@@ -200,13 +261,13 @@ class EventProvider extends ChangeNotifier {
 
   List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
     if (dated[day] != null)
-      return dated[day].map((entry) => loaded[entry]).toList();
+      return dated[day].map((id) => loaded[id]).toList();
     return null; // Alle Events an dem Tag aus laden und zurückgeben => loadEventsAt...
   }
 
-  List<Veranstaltung> getEventsUntil(DateTime day, int page) {
-    // Alle Events bis zu zum day stattfinden aus laden und zurückgeben
-  }
+  // List<Veranstaltung> getEventsUntil(DateTime day, int page) {
+  //   // Alle Events bis zu zum day stattfinden aus laden und zurückgeben
+  // }
 
   Veranstaltung getLoadedEventById(int id) {
     if (isEventLoaded(id)) return loaded[id];
@@ -232,8 +293,8 @@ class EventProvider extends ChangeNotifier {
     int id = 0;
     Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
         start, ende, adresse, '89231', '1', '1', '1');
-    print(resp.body);
-    String toastmsg = "";
+    // print(resp.body);
+
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
       id = parsedJson['insertId'];
@@ -244,7 +305,7 @@ class EventProvider extends ChangeNotifier {
       DateTime erstellt_Ts = DateTime.now();
 
       Veranstaltung veranstaltung = Veranstaltung.load(id, titel, beschreibung,
-          email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0, false);
+          email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0);
 
       loadEvent(veranstaltung);
 
@@ -254,7 +315,8 @@ class EventProvider extends ChangeNotifier {
     } else {
       var parsedJson = json.decode(resp.body);
       var error = parsedJson['error'];
-      toastmsg = error;
+      log(error);
+      // toastmsg = error;
     }
     return null;
   }
@@ -266,6 +328,12 @@ class EventProvider extends ChangeNotifier {
       dated[event.beginnTs].add(event.id);
     else
       dated[event.beginnTs] = [event.id];
+
+    if (!upComing.contains(event.id)) 
+      upComing.add(event.id);
+    // }
+
+    notifyListeners();
   }
 
   bool isEventLoaded(int id) {
@@ -283,6 +351,7 @@ class EventProvider extends ChangeNotifier {
     } else {
       favorites.add(id);
     }
+
     return isEventFavorite(id);
   }
 
@@ -298,15 +367,14 @@ class EventProvider extends ChangeNotifier {
     DateTime end = DateTime.parse(json['ende_ts']);
     String place = json['ortBeschreibung'];
 
-    bool approved = json['istGenehmigt'] == '1';
-
+    bool isApproved = json['istGenehmigt'] == '1';
+    // if (isApproved || UserProvider.getUserRole().) approved.add(id);
     // TODO: if(!approved && user hat keine Rechte dazu) return;
 
     // TODO: if(ortBeschreibung < selbstDefinierter Radius entfernt) dann:
     // if (!upComing.contains(
     //     id)) // idk. ob das überhaupt sein kann, aber sicher ist sicher
-    upComing
-        .add(id); // TODO: So kann es noch passieren dass durch zwischen laden
+    // TODO: So kann es noch passieren dass durch zwischen laden
     // mit anderen attemptBefehlen die reihenfolge nicht mehr stimmt...
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
@@ -314,8 +382,8 @@ class EventProvider extends ChangeNotifier {
     if (json['favorit'] == '1') favorites.add(id);
 
     // TODO: latitude, longitude noch anpassen...
-    Veranstaltung event = Veranstaltung.load(id, titel, description, contact,
-        place, start, end, created, 0, 0, approved);
+    Veranstaltung event = Veranstaltung.load(
+        id, titel, description, contact, place, start, end, created, 0, 0);
 
     loadEvent(event);
 
