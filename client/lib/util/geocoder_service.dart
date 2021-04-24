@@ -1,6 +1,7 @@
 import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
 
-Future<List<String>> getCoordinates(String plz) async {
+/* Future<List<String>> getCoordinates(String plz) async {
   final query = plz;
   var addresses = await Geocoder.local.findAddressesFromQuery(query);
   var firstAddress = addresses.first;
@@ -17,4 +18,16 @@ Future<List<String>> getCoordinates(String plz) async {
   });
 
   return __coordinates;
+} */
+
+Future<List<String>> getCoordinates(String plz) async {
+  final query = plz;
+  List<Location> address = await locationFromAddress(query);
+
+  List<String> ret = [];
+
+  ret.add(address.first.latitude.toString());
+  ret.add(address.first.longitude.toString());
+
+  return ret;
 }

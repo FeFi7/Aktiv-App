@@ -192,12 +192,9 @@ Future<http.Response> attemptCreateVeranstaltung(
     [List<String> fileids = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
-/*   var coordinateList = await getCoordinates(plz);
+  var coordinateList = await getCoordinates(plz);
   var latitude = coordinateList.first;
   var longitude = coordinateList.last;
- */
-  var latitude = "48.38508136174785";
-  var longitude = "9.999954699565777";
 
   Map<String, dynamic> body = {
     'titel': titel,
