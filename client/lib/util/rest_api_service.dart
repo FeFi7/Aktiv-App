@@ -117,7 +117,7 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   return response;
 }
 
-// [DELETE] Lösche einzelne Veranstaltung mithilfe von VeranstaltungsId
+/* // [DELETE] Lösche einzelne Veranstaltung mithilfe von VeranstaltungsId
 Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
   String route = "api/veranstaltungen" + veranstaltungsId.toString();
 
@@ -134,7 +134,7 @@ Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
   }
 
   return response;
-}
+} */
 
 //TODO bis muss + 1 tag sein
 ////Jahr-Monat-Tag // Ein Tag draufrechnen, da dieser nicht von mysql berechtigt wird
@@ -188,12 +188,16 @@ Future<http.Response> attemptCreateVeranstaltung(
     String plz,
     String institutionId,
     String userId,
-    String istGenehmigt) async {
+    String istGenehmigt,
+    [List<String> fileids = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
-  var coordinateList = await getCoordinates(ortBeschreibung);
+/*   var coordinateList = await getCoordinates(plz);
   var latitude = coordinateList.first;
   var longitude = coordinateList.last;
+ */
+  var latitude = "48.38508136174785";
+  var longitude = "9.999954699565777";
 
   Map<String, dynamic> body = {
     'titel': titel,
@@ -209,6 +213,10 @@ Future<http.Response> attemptCreateVeranstaltung(
     'userId': userId,
     'istGenehmigt': istGenehmigt
   };
+
+  //if (fileids.toString() != "[-1]") {
+  body.putIfAbsent('fileIds', () => fileids.toString());
+  //}
 
   final response = await http.post(Uri.http(SERVER_IP, route),
       headers: <String, String>{
@@ -622,6 +630,12 @@ Future<http.Response> attemptGetVerwalteteInstitutionen(
 
   return response;
 }
+
+// [POST] Genehmige einzelne Veranstaltung
+Future<http.Response> attemptApproveVeranstaltung() async {}
+
+// [DELETE] Lösche einzelne Veranstaltung
+Future<http.Response> attemptDeleteVeranstaltung() async {}
 
 // [GET] Bekomme alle Institutionen
 Future<http.Response> attemptGetAllInstitutionen() async {}
