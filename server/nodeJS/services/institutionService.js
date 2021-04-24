@@ -152,6 +152,8 @@ async function saveProfilbildIdToInstitution(institutionId, pofilbildId) {
   }
 }
 
+
+
 module.exports = {
   getInstitutionById: getInstitutionById,
   erstelleInstitution: erstelleInstitution,
