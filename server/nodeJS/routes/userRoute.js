@@ -170,21 +170,7 @@ router.post("/signup", async function (req, res) {
   }
 });
 
-// [GET] bekomme einzelne user
-router.get("/", async function (req, res) {
-  let query = req.query;
 
-  if (!query.mail) {
-    return res.status(400).send({ error: "Mail nicht vorhanden" });
-  }
-  const result = await userService.userExists(query.mail);
-
-  if (result.length > 0) {
-    return res.json({ istVorhanden: true, user: result[0] });
-  } else {
-    return res.json({ istVorhanden: false });
-  }
-});
 
 // [POST] login User
 router.post("/login", async (req, res, next) => {
@@ -210,7 +196,7 @@ router.post("/login", async (req, res, next) => {
         if (saveRefreshResult.error) {
           return res.status(400).json({ error: "Fehler bei Db" });
         } else {
-          return res.json({ accessToken, refreshToken });
+          return res.json({ accessToken, refreshToken, "id": user.id });
         }
       });
     } catch (error) {
@@ -304,7 +290,7 @@ router.get(
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("Id keine Zahl");
     }
-    console.log("mail:: " + req.user.mail);
+    console.log("mail: " + req.user.mail);
     const result = await userService.getUserInfo(userId, req.user.mail);
     if (result.error) {
       res.status(400).json(result);
@@ -371,5 +357,21 @@ router.post(
     }
   }
 );
+
+// [GET] bekomme einzelne user
+router.get("/*", async function (req, res) {
+  let query = req.query;
+
+  if (!query.mail) {
+    return res.status(400).send({ error: "Mail nicht vorhanden" });
+  }
+  const result = await userService.mailExists(query.mail);
+
+  if (result.length > 0) {
+    return res.json({ istVorhanden: true, user: result[0] });
+  } else {
+    return res.json({ istVorhanden: false });
+  }
+});
 
 module.exports = router;

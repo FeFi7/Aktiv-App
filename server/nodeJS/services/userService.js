@@ -192,7 +192,7 @@ async function userExists(mail, passwort) {
 }
 
 async function mailExists(mail) {
-  const query = `SELECT u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
+  const query = `SELECT u.id, u.mail, u.erstellt_ts FROM User u WHERE u.mail = ?`;
 
   let results = await conn.query(query, [mail]).catch((error) => {
     console.log(error);
@@ -435,5 +435,6 @@ module.exports = {
   addUserToInstitut: addUserToInstitut,
   isUserBetreiber: isUserBetreiber,
   getInstitutionenFromUser: getInstitutionenFromUser,
-  isUserGenehmiger: isUserGenehmiger
+  isUserGenehmiger: isUserGenehmiger,
+  mailExists: mailExists
 };
