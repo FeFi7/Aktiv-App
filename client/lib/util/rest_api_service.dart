@@ -629,10 +629,48 @@ Future<http.Response> attemptGetVerwalteteInstitutionen(
 }
 
 // [POST] Genehmige einzelne Veranstaltung
-Future<http.Response> attemptApproveVeranstaltung() async {}
+Future<http.Response> attemptApproveVeranstaltung(
+    String veranstaltungId, String accessToken) async {
+  String route = "api/veranstaltungen/" + veranstaltungId + "/genehmigen";
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Veranstaltung erfolgreich genehmigt");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
 
 // [DELETE] Lösche einzelne Veranstaltung
-Future<http.Response> attemptDeleteVeranstaltung() async {}
+Future<http.Response> attemptDeleteVeranstaltung(
+    String veranstaltungId, String accessToken) async {
+  String route = "api/veranstaltungen/" + veranstaltungId;
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Veranstaltung erfolgreich gelöscht");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
 
 // [GET] Bekomme alle Institutionen
 Future<http.Response> attemptGetAllInstitutionen() async {}
