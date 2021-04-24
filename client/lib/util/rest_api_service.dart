@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'compress_service.dart';
-import '../util/geocoder_service.dart';
+import '../util/geo_service.dart';
 
 //const SERVER_IP = "85.214.166.230";
 const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
@@ -192,7 +192,7 @@ Future<http.Response> attemptCreateVeranstaltung(
     [List<String> fileids = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
-  var coordinateList = await getCoordinates(plz);
+  var coordinateList = await getCoordinatesFromAddress(plz);
   var latitude = coordinateList.first;
   var longitude = coordinateList.last;
 
@@ -211,9 +211,9 @@ Future<http.Response> attemptCreateVeranstaltung(
     'istGenehmigt': istGenehmigt
   };
 
-  //if (fileids.toString() != "[-1]") {
-  body.putIfAbsent('fileIds', () => fileids.toString());
-  //}
+  if (fileids.toString() != "[-1]") {
+    body.putIfAbsent('fileIds', () => fileids.toString());
+  }
 
   final response = await http.post(Uri.http(SERVER_IP, route),
       headers: <String, String>{
