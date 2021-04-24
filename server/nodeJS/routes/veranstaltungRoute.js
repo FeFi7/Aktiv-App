@@ -23,11 +23,42 @@ router.get("/:veranstaltungId", async function (req, res) {
 });
 
 // [DELETE] lösche einzelne Veranstaltung
-router.delete("/:veranstaltungId", async function (req, res) {
-  return res.json(
-    veranstaltungService.getVeranstaltungById(req.params.veranstaltungId)
-  );
-});
+router.delete(
+  "/:veranstaltungId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const veranstaltungId = req.params.veranstaltungId;
+    // ist query eine Zahl?
+    if (!/^\d+$/.test(veranstaltungId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+
+    // Ist User Betreiber oder Ersteller?
+    const resultIsUserErsteller = await veranstaltungService.isUserVeranstaltungErsteller(
+      veranstaltungId,
+      userId
+    );
+    if (resultIsUserErsteller.error || !resultIsUserErsteller) {
+      const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+      if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+        return res.status(400).json({
+          error: "Nur Ersteller und Betreiber können Veranstaltungen löschen",
+        });
+      }
+    }
+
+    const result = await veranstaltungService.deleteVeranstaltung(
+      veranstaltungId
+    );
+
+    if (result.error) {
+      return res.status(400).send(result);
+    } else {
+      return res.send(result);
+    }
+  }
+);
 
 // [POST] genehmige einzelne Veranstaltung
 router.post(
@@ -44,16 +75,18 @@ router.post(
     // Ist User Betreiber oder Genehmiger?
     const resultIsUserGenehmiger = await userService.isUserGenehmiger(userId);
     if (resultIsUserGenehmiger.error || !resultIsUserGenehmiger) {
-
-      const resultIsUserBetreiber = await userService.isUserBetreiber(userId)
+      const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
       if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
         return res.status(400).json({
-          error: "Nur Genehmiger und Betreiber können Veranstaltungen genehmigen",
+          error:
+            "Nur Genehmiger und Betreiber können Veranstaltungen genehmigen",
         });
       }
     }
 
-    const result = await veranstaltungService.genehmigeVeranstaltung(veranstaltungId)
+    const result = await veranstaltungService.genehmigeVeranstaltung(
+      veranstaltungId
+    );
 
     if (result.error) {
       return res.status(400).send(result);
