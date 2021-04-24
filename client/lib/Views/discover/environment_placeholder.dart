@@ -38,7 +38,7 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
     // TODO: Event Provider aktualisieren
 
     upComing = Provider.of<EventProvider>(context, listen: false)
-        .getUpComingEvents()
+        .getLoadedUpComingEvents()
         .map((event) => EventPreviewBox(
             event.id,
             event.titel,
@@ -74,25 +74,30 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
       });
 
     print(Provider.of<EventProvider>(context, listen: false)
-        .getUpComingEvents()
+        .getLoadedUpComingEvents()
         .length);
 
     List<Widget> widgetList = <Widget>[PreviewListHeading('Bald')];
     widgetList
         .addAll(upComing.sublist(0, upComing.length < 2 ? upComing.length : 2));
     widgetList.add(PreviewListDots(
-        EventPreviewList(upComing, () => {
-          Provider.of<EventProvider>(context, listen: false)
-              .loadUpComingEvents()
-        }),
+        EventPreviewList(
+            upComing,
+            () => {
+                  // Provider.of<EventProvider>(context, listen: false)
+                  //     .loadUpComingEvents()
+                }),
         'Bald'));
 
     widgetList.add(PreviewListHeading('In der Nähe'));
     widgetList.addAll(nearBy.sublist(0, nearBy.length < 2 ? nearBy.length : 2));
     widgetList.add(PreviewListDots(
-        EventPreviewList(nearBy, () => {
-          Provider.of<EventProvider>(context, listen: false).loadEventsNearBy()
-        }),
+        EventPreviewList(
+            nearBy,
+            () => {
+                  // Provider.of<EventProvider>(context, listen: false)
+                  //     .loadEventsNearBy()
+                }),
         'In der Nähe'));
 
     return EventPreviewList(widgetList, () {});

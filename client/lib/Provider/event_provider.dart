@@ -104,13 +104,15 @@ class EventProvider extends ChangeNotifier {
       case SearchStyle.DATE:
         // TODO: Suche nach allen Events an dem Datum aus der Datenbank laden un zurück geben
 
-        if (DateTime.tryParse(text) != null) {
-          DateTime date = DateTime.parse(text);
+        DateTime dateTime = isValidDate(text);
+        if (dateTime != null) {
+          
+          return getLoadedEventsOfDay(dateTime).map((event) => EventPreviewBox.load(event)).toList();
         } else {
-          eventPreviews.add(ErrorPreviewBox("Bei \"" +
-              text +
-              " handelt es sich um kein gültiges Datum. Bitte Datum im format Tag.Monat.Jahr angeben."));
-          return eventPreviews;
+          eventPreviews.add(ErrorPreviewBox(
+              "Bei der von Ihnen getätigten Suchanfrage \"" +
+                  text +
+                  "\" handelt es sich um kein gültiges Datum Format. Bitte Datum im Format Tag.Monat.Jahr angeben."));
         }
 
         if (eventPreviews.length == 0)
@@ -132,11 +134,14 @@ class EventProvider extends ChangeNotifier {
       default:
         return eventPreviews;
     }
-
-    // return events;
   }
 
-  bool isValidDate(String possiblyDate) {}
+  DateTime isValidDate(String possiblyDate) {
+    List<String> args = possiblyDate.split(".");
+    if (args.length > 2 && args[2].length == 4)
+      return DateTime.parse(args[2] + '-' + args[1] + '-' + args[0]);
+    return null;
+  }
 
   List<Veranstaltung> removeEventsOutsideMonth(
       DateTime month, List<Veranstaltung> events) {
@@ -224,50 +229,61 @@ class EventProvider extends ChangeNotifier {
     return favorites.map((entry) => loaded[entry]).toList();
   }
 
-  void loadFavorites() {
-    print("man sollte die favoriten weiter laden");
+  void resetFavoriteEvents() {
+    nearby.clear();
+    loadedPages["upcoming"] = 1;
+    loadFavoriteEvents();
+  }
+
+  void loadFavoriteEvents() {
+    favorites.clear();
+    int page = loadedPages["favorites"] ?? 1;
+    //TODO: attemptsGetFavEvents(page);
+    loadedPages["favorites"] = ++page;
   }
 
   List<Veranstaltung> getEventsNearBy() {
-    // TODO: Noch ändern, muss aber erstmal attemt methode geben
     // return nearby.map((entry) => loaded[entry]).toList();
-    return getUpComingEvents();
+    // TODO: Noch ändern, muss aber erstmal attemt methode geben
+    return getLoadedUpComingEvents();
+  }
+
+  void resetEventsNearBy() {
+    nearby.clear();
+    loadedPages["nearby"] = 1;
+    loadEventsNearBy();
   }
 
   void loadEventsNearBy() async {
     // EventsNearBy aus Datenbank in nearby laden
     print("man sollte die events nearby weiter laden");
     // notifyListeners();
+    int page = loadedPages["nearby"] ?? 1;
+// TODO: attemptGetEventsNearB y(page)
+    loadedPages["nearby"] = ++page;
   }
 
-  List<Veranstaltung> getUpComingEvents() {
-    // if (upComing.isNotEmpty) {
-    // 
+  List<Veranstaltung> getLoadedUpComingEvents() {
     return upComing.map((id) => loaded[id]).toList();
-    // } else {
-    //   return loadUpComingEvents();
-    // }
+  }
+
+  void resetUpComingEvents() {
+    nearby.clear();
+    loadedPages["upcoming"] = 1;
+    loadUpComingEvents();
   }
 
   void loadUpComingEvents() {
-    // UpComingEvents aus Datenbank in upComing laden und zurückgeben
-    print("man sollte die bald abgehenden events weiter laden");
-    // notifyListeners();
+    int page = loadedPages["upcoming"] ?? 1;
+    // TODO: attemptGetUpComingEvents(page)
+    //
+    loadedPages["upcoming"] = ++page;
   }
-
-  // List<Veranstaltung> getEventsContaining(String content, int page) {
-  //   // Events die in text form den conetnt enthalten laden und zurückgeben
-  // }
 
   List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
-    if (dated[day] != null)
-      return dated[day].map((id) => loaded[id]).toList();
+    if (dated[day] != null) return dated[day].map((id) => loaded[id]).toList();
     return null; // Alle Events an dem Tag aus laden und zurückgeben => loadEventsAt...
   }
-
-  // List<Veranstaltung> getEventsUntil(DateTime day, int page) {
-  //   // Alle Events bis zu zum day stattfinden aus laden und zurückgeben
-  // }
 
   Veranstaltung getLoadedEventById(int id) {
     if (isEventLoaded(id)) return loaded[id];
@@ -321,6 +337,15 @@ class EventProvider extends ChangeNotifier {
     return null;
   }
 
+  void loadFirstPages() {
+    DateTime nextMonth =
+        DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
+    loadEventsOfMonth(nextMonth);
+    loadFavoriteEvents();
+    loadUpComingEvents();
+    loadEventsNearBy();
+  }
+
   void loadEvent(Veranstaltung event) {
     if (event == null) return;
     loaded[event.id] = event;
@@ -329,8 +354,7 @@ class EventProvider extends ChangeNotifier {
     else
       dated[event.beginnTs] = [event.id];
 
-    if (!upComing.contains(event.id)) 
-      upComing.add(event.id);
+    if (!upComing.contains(event.id)) upComing.add(event.id);
     // }
 
     notifyListeners();

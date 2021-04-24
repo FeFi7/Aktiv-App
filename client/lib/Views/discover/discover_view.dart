@@ -70,9 +70,9 @@ class _DiscoverViewState extends State<DiscoverView> {
           // child: Center(child: Text("Zurück"))),
           child: Icon(Icons.close_rounded, size: 35)),
       emptyWidget: ErrorPreviewBox(
-          "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden. Versuchen Sie kurze Schlagwörter, wie Musik oder Flohmarkt, für bessere Ergebnisse."),
+          "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden."),
       indexedScaledTileBuilder: (int index) => ScaledTile.count(1, 0.475),
-      header: Center(child: toogleButtons), //TODO:
+      header: Center(child: toogleButtons), //TODO: switch when on search
 
       onCancelled: () {
         print("Cancelled triggered");

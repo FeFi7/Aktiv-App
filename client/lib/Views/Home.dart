@@ -68,9 +68,7 @@ class _HomePageState extends State<HomePage> {
     Provider.of<BodyProvider>(context, listen: false)
         .initializeBody(_widgetOptions.elementAt(0));
 
-    Provider.of<EventProvider>(context, listen: false).loadEventsOfMonth(
-        DateTime.utc(
-            DateTime.now().year, DateTime.now().month + 1, DateTime.now().day));
+    Provider.of<EventProvider>(context, listen: false).loadFirstPages();
   }
 
   @override
