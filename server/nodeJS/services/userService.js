@@ -282,6 +282,29 @@ async function isUserBetreiber(userId) {
   }
 }
 
+async function isUserGenehmiger(userId) {
+  const query = `SELECT * FROM User u 
+  INNER JOIN Rolle r ON u.rolleId = r.id AND r.id = 2
+  WHERE u.id = ?
+  `;
+
+  let results = await conn.query(query, [Number(userId)]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler in Db" };
+  });
+
+  if (results) {
+    results = results[0];
+    if (results.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function updateUserEinstellungen(
   userId,
   umkreisEinstellung,
@@ -411,5 +434,6 @@ module.exports = {
   updateUserRolle: updateUserRolle,
   addUserToInstitut: addUserToInstitut,
   isUserBetreiber: isUserBetreiber,
-  getInstitutionenFromUser: getInstitutionenFromUser
+  getInstitutionenFromUser: getInstitutionenFromUser,
+  isUserGenehmiger: isUserGenehmiger
 };

@@ -1,4 +1,5 @@
 var veranstaltungService = require("../services/veranstaltungService");
+var userService = require("../services/userService");
 var express = require("express");
 var router = express.Router();
 const passport = require("passport");
@@ -15,37 +16,85 @@ router.get("/:veranstaltungId", async function (req, res) {
     req.params.veranstaltungId
   );
   if (veranstaltung) {
-    return res.json(
-      await veranstaltungService.getVeranstaltungById(
-        req.params.veranstaltungId
-      )
-    );
+    return res.json(veranstaltung);
   } else {
     return res.status(404).send("Veranstaltung nicht vorhanden");
   }
 });
 
-// [PUT] update einzelne Veranstaltung
-router.put("/:veranstaltungId", async function (req, res) {
-  const veranstaltungId = req.params.veranstaltungId;
-  // ist query eine Zahl?
-  if (!/^\d+$/.test(veranstaltungId)) {
-    return res.status(400).send("Id keine Zahl");
-  }
-
-  if (veranstaltungService.getVeranstaltungById(veranstaltungId) === null) {
-    return res.status(404).send("Veranstaltung nicht vorhanden");
-  }
-
-  res.json(veranstaltungService.getVeranstaltungById(veranstaltungId));
-});
-
 // [DELETE] lösche einzelne Veranstaltung
-router.delete("/:veranstaltungId", async function (req, res) {
-  return res.json(
-    veranstaltungService.getVeranstaltungById(req.params.veranstaltungId)
-  );
-});
+router.delete(
+  "/:veranstaltungId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const veranstaltungId = req.params.veranstaltungId;
+    // ist query eine Zahl?
+    if (!/^\d+$/.test(veranstaltungId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+
+    // Ist User Betreiber oder Ersteller?
+    const resultIsUserErsteller = await veranstaltungService.isUserVeranstaltungErsteller(
+      veranstaltungId,
+      userId
+    );
+    if (resultIsUserErsteller.error || !resultIsUserErsteller) {
+      const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+      if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+        return res.status(400).json({
+          error: "Nur Ersteller und Betreiber können Veranstaltungen löschen",
+        });
+      }
+    }
+
+    const result = await veranstaltungService.deleteVeranstaltung(
+      veranstaltungId
+    );
+
+    if (result.error) {
+      return res.status(400).send(result);
+    } else {
+      return res.send(result);
+    }
+  }
+);
+
+// [POST] genehmige einzelne Veranstaltung
+router.post(
+  "/:veranstaltungId/genehmigen",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const veranstaltungId = req.params.veranstaltungId;
+    // ist query eine Zahl?
+    if (!/^\d+$/.test(veranstaltungId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+
+    // Ist User Betreiber oder Genehmiger?
+    const resultIsUserGenehmiger = await userService.isUserGenehmiger(userId);
+    if (resultIsUserGenehmiger.error || !resultIsUserGenehmiger) {
+      const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+      if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+        return res.status(400).json({
+          error:
+            "Nur Genehmiger und Betreiber können Veranstaltungen genehmigen",
+        });
+      }
+    }
+
+    const result = await veranstaltungService.genehmigeVeranstaltung(
+      veranstaltungId
+    );
+
+    if (result.error) {
+      return res.status(400).send(result);
+    } else {
+      return res.send(result);
+    }
+  }
+);
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
@@ -221,20 +270,21 @@ router.post("/*", async function (req, res) {
   );
 
   if (veranstaltungen.error) {
-    return res.status(400).json(veranstaltungen)
+    return res.status(400).json(veranstaltungen);
   }
 
-  if(fileIds){
-    const veranstaltungenFileIds = await veranstaltungService.addFileIdsToVeranstaltung(veranstaltungen.insertId, fileIds)
+  if (fileIds) {
+    const veranstaltungenFileIds = await veranstaltungService.addFileIdsToVeranstaltung(
+      veranstaltungen.insertId,
+      fileIds
+    );
 
-    if(veranstaltungenFileIds.error){
-      return res.status(400).json(veranstaltungenFileIds)
+    if (veranstaltungenFileIds.error) {
+      return res.status(400).json(veranstaltungenFileIds);
     }
   }
 
-  return res.status(200).json(veranstaltungen)
-
-
+  return res.status(200).json(veranstaltungen);
 });
 
 module.exports = router;
