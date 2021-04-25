@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/Login/components/background.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_password_field.dart';
@@ -9,12 +10,11 @@ import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import '../../Home.dart';
 import '../../../util/secure_storage_service.dart';
-
-import '../../../util/geo_service.dart';
 
 class Body extends StatefulWidget {
   const Body({
@@ -75,21 +75,11 @@ class _BodyState extends State<Body> {
                       }
 
                       if (EmailValidator.validate(mail)) {
-                        var jwt = await attemptLogIn(mail, password);
+                        var jwt = await Provider.of<UserProvider>(context,
+                                listen: false)
+                            .login(mail, password);
 
                         if (jwt.statusCode == 200) {
-                          var parsedJson = json.decode(jwt.body);
-
-                          if (rememberMe) {
-                            var accessToken = parsedJson['accessToken'];
-                            var refreshToken = parsedJson['refreshToken'];
-
-                            if (jwt != null) {
-                              storage.write("accessToken", accessToken);
-                              storage.write("refreshToken", refreshToken);
-                            }
-                          }
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(

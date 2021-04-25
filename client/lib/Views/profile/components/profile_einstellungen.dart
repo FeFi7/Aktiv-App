@@ -1,5 +1,9 @@
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class ProfileEinstellungen extends StatefulWidget {
   ProfileEinstellungen({Key key}) : super(key: key);
@@ -21,6 +25,19 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
         baldSlider(size),
         SizedBox(height: 25),
         naeheSlider(size),
+        SizedBox(
+          height: 25,
+        ),
+        RoundedButton(
+          text: "Einstellungen übernehmen",
+          color: ColorPalette.endeavour.rgb,
+          press: () async {
+            var jwt = await Provider.of<UserProvider>(context, listen: false)
+                .updateUserSettings(sliderValueNaehe.toInt().toString(),
+                    sliderValueBald.toInt().toString());
+            if (jwt.statusCode != 200) errorToast("Fehler bei Aktualisierung");
+          },
+        ),
       ],
     );
   }
@@ -161,5 +178,17 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
         ),
       ),
     );
+  }
+
+  errorToast(String errorMessage) {
+    Fluttertoast.showToast(
+      msg: errorMessage,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: ColorPalette.orange.rgb,
+      textColor: ColorPalette.white.rgb,
+    );
+    FocusManager.instance.primaryFocus.unfocus();
   }
 }

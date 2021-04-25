@@ -67,7 +67,7 @@ class _BodyState extends State<Body> {
                 child: Row(
                   children: <Widget>[
                     SizedBox(
-                        width: size.width * 0.1), //Abstand links von der Kante
+                        width: size.width * 0.07), //Abstand links von der Kante
                     Theme(
                       data: ThemeData(
                           unselectedWidgetColor: ColorPalette.white.rgb),
@@ -91,12 +91,12 @@ class _BodyState extends State<Body> {
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                         TextSpan(
-                          text: "Verpflichtungserklärung ",
+                          text: "Datenschutz- und \nVerpflichtungserklärung ",
                           style: TextStyle(color: ColorPalette.white.rgb),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
                               final url =
-                                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/";
+                                  "https://app.lebensqualitaet-burgrieden.de/Datenschutz_Verpflichtungserklaerung.html";
 
                               await launch(
                                 url,
@@ -106,26 +106,7 @@ class _BodyState extends State<Body> {
                             },
                         ),
                         TextSpan(
-                          text: "\nund",
-                          style: TextStyle(color: ColorPalette.malibu.rgb),
-                        ),
-                        TextSpan(
-                          text: " Datenschutzerklärung ",
-                          style: TextStyle(color: ColorPalette.white.rgb),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              final url =
-                                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/datenschutzerklaerung/";
-
-                              await launch(
-                                url,
-                                forceSafariVC: false,
-                                forceWebView: false,
-                              );
-                            },
-                        ),
-                        TextSpan(
-                          text: "gelesen\nund akzeptiere.",
+                          text: "gelesen und akzeptiere.",
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
                       ]),

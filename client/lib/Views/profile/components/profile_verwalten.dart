@@ -3,7 +3,7 @@ import 'package:aktiv_app_flutter/components/card_dropdown.dart';
 import 'package:aktiv_app_flutter/components/card_dropdown_with_image.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
-import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
+import 'package:aktiv_app_flutter/components/rounded_input_field_numeric_komma.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +18,16 @@ class ProfileVerwalten extends StatefulWidget {
 
 class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   int userGruppe;
+  String institutionValue =
+      "Institution wählen"; //erstes Item aus Insitutionen Liste
+
+  List<String> institutionen = [
+    "Institution wählen",
+    "Institution A",
+    "Institution B",
+    "Institution C"
+  ];
+
   _ProfileVerwaltenState(this.userGruppe);
   @override
   Widget build(BuildContext context) {
@@ -153,21 +163,52 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   }
 
   verwalterVerwaltenCard() {
+    Size size = MediaQuery.of(context).size;
     return CardDropDown(
       headerChildren: [
         Icon(
           Icons.person_add_alt_1,
           size: 40.0,
         ),
-        SizedBox(
-          width: 20.0,
-        ),
+        SizedBox(width: 20.0),
         Text("Verwalter hinzufügen"),
       ],
       bodyChildren: [
         Text("Email-Adresse des neuen Verwalters eingeben"),
         RoundedInputEmailField(
           hintText: "Email",
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          width: size.width * 0.75,
+          height: 60.0,
+          child: DropdownButton<String>(
+            value: institutionValue,
+            // icon: const Icon(Icons.apartment_rounded),
+            // iconSize: 24,
+            elevation: 12,
+            style: const TextStyle(color: Colors.black),
+            onChanged: (String newValue) {
+              setState(() {
+                if (newValue != null) institutionValue = newValue;
+              });
+            },
+            items: institutionen.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem(
+                value: value,
+                child: Row(
+                  children: [
+                    Icon(Icons.apartment_rounded),
+                    SizedBox(width: 20.0),
+                    Text(
+                      value,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
         ),
         SizedBox(height: 10.0),
         RoundedButton(
@@ -198,13 +239,18 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         ),
         SizedBox(height: 10.0),
         Text("Postleizahl(en) des Genehmigers eingeben"),
-        RoundedInputFieldNumeric(
+        RoundedInputFieldNumericKomma(
           hintText: "88483, 80331, 20095, ...",
         ),
         SizedBox(height: 10.0),
         RoundedButton(
-          text: "Daten aktualisieren",
+          text: "Postleizahl hinzufügen",
           color: ColorPalette.endeavour.rgb,
+          press: () {},
+        ),
+        RoundedButton(
+          text: "Postleizahl entfernen",
+          color: ColorPalette.grey.rgb,
           press: () {},
         ),
       ],
@@ -213,19 +259,17 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
 
   Card genehmigerCard() {
     return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            child: Text(
-              "Keine Berechtigung zur Benutzererwaltung vorhanden.\nBitte wenden Sie sich an den Betreiber.",
-              style: TextStyle(fontSize: 20.0, color: Colors.grey),
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          child: Text(
+            "Keine Berechtigung zur Benutzererwaltung vorhanden.\nBitte wenden Sie sich an den Betreiber.",
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.grey,
             ),
-          )
-        ],
-      ),
-    );
+            textAlign: TextAlign.center,
+          ),
+        ));
   }
 
   benutzerLoschenCard() {
@@ -248,7 +292,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         SizedBox(height: 10.0),
         RoundedButton(
           text: "Benutzer löschen",
-          color: ColorPalette.endeavour.rgb,
+          color: ColorPalette.grey.rgb,
           press: () {},
         ),
       ],
@@ -328,12 +372,9 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   institutionenVerwalten() {
     return CardDropDownImage(
       decoration: BoxDecoration(
-          // image: DecorationImage(
-          //   image: AssetImage("assets/images/logo.png"),
-          //   fit: BoxFit.scaleDown,
-          // ),
-          color: ColorPalette.endeavour.rgb,
-          shape: BoxShape.rectangle),
+        color: ColorPalette.endeavour.rgb,
+        shape: BoxShape.rectangle,
+      ),
       headerChildren: [
         Icon(
           Icons.image_aspect_ratio_sharp,

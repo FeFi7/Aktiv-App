@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/background.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen.dart';
@@ -174,8 +175,8 @@ class _BodyState extends State<Body> {
         RoundedButton(
           text: "Abmelden",
           color: Colors.grey[400],
-          press: () {
-            storage.deleteAll(); //Token löschen
+          press: () async {
+            await Provider.of<UserProvider>(context, listen: false).signOff();
 
             Navigator.push(
               context,
@@ -260,10 +261,17 @@ class _BodyState extends State<Body> {
           clipBehavior: Clip.none,
           fit: StackFit.expand,
           children: [
-            CircleAvatar(
-              backgroundImage: (profileImage != null)
-                  ? Image.file(profileImage).image
-                  : Image.asset("assets/images/profilePic_default.png").image,
+            Consumer<UserProvider>(
+              builder: (context, user, child) {
+                return CircleAvatar(
+                  backgroundImage: (user.profilBild != null)
+                      ? NetworkImage(
+                          "https://app.lebensqualitaet-burgrieden.de/" +
+                              user.profilBild)
+                      : Image.asset("assets/images/profilePic_default.png")
+                          .image,
+                );
+              },
             ),
             Positioned(
               right: -16,
@@ -302,7 +310,11 @@ class _BodyState extends State<Body> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(
       () {
-        if (pickedFile != null) profileImage = File(pickedFile.path);
+        if (pickedFile != null) {
+          profileImage = File(pickedFile.path);
+          Provider.of<UserProvider>(context, listen: false)
+              .changeProfileImage(profileImage);
+        }
       },
     );
   }

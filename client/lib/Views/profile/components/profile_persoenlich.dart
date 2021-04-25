@@ -1,7 +1,9 @@
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePersoenlich extends StatefulWidget {
   ProfilePersoenlich({Key key}) : super(key: key);
@@ -13,13 +15,13 @@ class ProfilePersoenlich extends StatefulWidget {
 class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   int currentStep = 0; //startIndex für Stepper
   bool complete = false; //Ausfüllen abgeschlossen?
-  static String mail;
   static String vorname;
   static String nachname;
   static String plz;
   static String tel;
-  static String userId;
-  static String accessToken;
+  static String ort;
+  static String hausnummer;
+  static String strasse;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,13 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                       actions: <Widget>[
                         TextButton(
                             onPressed: () {
-                              setState(() => complete = false);
+                              setState(() {
+                                complete = false;
+                                Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .updateUserInfo(
+                                        vorname, nachname, plz, tel);
+                              });
                             },
                             child: Text("Bestätigen"))
                       ],
@@ -141,12 +149,16 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
           RoundedInputField(
             hintText: "Straße",
             icon: Icons.home,
-            onChanged: (value) {},
+            onChanged: (value) {
+              strasse = value;
+            },
           ),
           RoundedInputFieldNumeric(
             hintText: "Hausnummer",
             icon: Icons.home,
-            onChanged: (value) {},
+            onChanged: (value) {
+              hausnummer = value;
+            },
           ),
           RoundedInputFieldNumeric(
             hintText: "PLZ",
@@ -158,7 +170,9 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
           RoundedInputField(
             hintText: "Ort",
             icon: Icons.gps_fixed_outlined,
-            onChanged: (value) {},
+            onChanged: (value) {
+              ort = value;
+            },
           ),
         ],
       ),

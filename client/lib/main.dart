@@ -1,4 +1,5 @@
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class AktivApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SearchBehaviorProvider()),
         ChangeNotifierProvider(create: (_) => EventProvider()),
         ChangeNotifierProvider(create: (_) => BodyProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

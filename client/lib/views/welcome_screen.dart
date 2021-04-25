@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    //if (storage.read("accessToken") != null) startTime();
+    autoSignIn();
   }
 
   @override
@@ -125,12 +125,21 @@ class _WelcomeScreen extends State<WelcomeScreen> {
   }
 
   startTime() async {
-    var duration = new Duration(seconds: 2);
+    var duration = new Duration(seconds: 1);
     return new Timer(duration, route);
   }
 
-  route() {
+  route() async {
+    await Provider.of<UserProvider>(context, listen: false).signInWithToken();
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => HomePage()));
+  }
+
+  autoSignIn() async {
+    if (await Provider.of<UserProvider>(context, listen: false)
+            .getAccessToken() !=
+        null) {
+      startTime();
+    }
   }
 }
