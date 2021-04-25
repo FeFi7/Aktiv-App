@@ -147,7 +147,8 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     String istGenehmigt = "1",
     String limit = "25",
     String page = "1",
-    String userId = "-1"]) async {
+    String userId = "-1",
+    String vollText = "-1"]) async {
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
@@ -159,6 +160,10 @@ Future<http.Response> attemptGetAllVeranstaltungen(
   }
   if (userId != "-1") {
     qParams.putIfAbsent('userId', () => userId);
+  }
+
+  if (vollText != "-1") {
+    qParams.putIfAbsent('vollText', () => vollText);
   }
 
   String route = "api/veranstaltungen";
