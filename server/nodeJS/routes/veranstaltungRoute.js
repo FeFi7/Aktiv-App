@@ -104,6 +104,7 @@ router.get("/*", async function (req, res) {
   let istGenehmigt = query.istGenehmigt;
   let limit = query.limit;
   let userId = query.userId;
+  let vollText = query.vollText;
 
   if (limit) {
     // ist query eine Zahl?
@@ -152,7 +153,8 @@ router.get("/*", async function (req, res) {
     istGenehmigt,
     bis,
     userId,
-    page
+    page,
+    vollText
   );
 
   if (veranstaltungen.error) {

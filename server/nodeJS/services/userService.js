@@ -70,7 +70,7 @@ async function saveProfilbildIdToUser(userId, pofilbildId) {
 async function getUserInfo(id, mail) {
   let results;
   if (mail) {
-    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
+    const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, u.vorname, u.nachname, u.tel, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
     FROM User u
     INNER JOIN Rolle r ON u.rolleId = r.id
     INNER JOIN PLZ p ON u.plzId = p.id
