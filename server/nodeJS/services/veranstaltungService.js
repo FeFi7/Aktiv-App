@@ -230,6 +230,25 @@ async function addFileIdsToVeranstaltung(veranstaltungId, fileIds) {
   return true;
 }
 
+async function addTagsToVeranstaltung(veranstaltungId, tags) {
+  const queryVerknuepfung = `INSERT INTO TagZuweisung(veranstaltungId, tagId) VALUES(?, (SELECT id from Tag where name = ?))`;
+  const queryErstellungTag = `INSERT INTO Tag(name) VALUES(?) ON DUPLICATE KEY UPDATE id=id`;
+
+  await tags.forEach(async function (tag) {
+    await conn.query(queryErstellungTag, tag).catch((error) => {
+      console.log(error);
+      return { error: "Fehler bei Db" };
+    });
+    const params = [veranstaltungId, tag];
+    await conn.query(queryVerknuepfung, params).catch((error) => {
+      console.log(error);
+      return { error: "Fehler bei Db" };
+    });
+  });
+  
+  return true;
+}
+
 async function isUserVeranstaltungErsteller(veranstaltungId, userId) {
   const query = `SELECT * FROM Veranstaltung v WHERE v.id = ? AND v.userId = ?`;
 
@@ -260,4 +279,5 @@ module.exports = {
   genehmigeVeranstaltung: genehmigeVeranstaltung,
   isUserVeranstaltungErsteller: isUserVeranstaltungErsteller,
   deleteVeranstaltung: deleteVeranstaltung,
+  addTagsToVeranstaltung: addTagsToVeranstaltung
 };

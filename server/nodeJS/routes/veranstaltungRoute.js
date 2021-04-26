@@ -178,6 +178,7 @@ router.post("/*", async function (req, res) {
   let userId = req.body.userId;
   let istGenehmigt = req.body.istGenehmigt;
   let fileIds = req.body.fileIds;
+  let tags = req.body.tags;
   let plz = req.body.plz;
 
   //-------------------------Überprüfung Parameter---------------------------
@@ -254,6 +255,21 @@ router.post("/*", async function (req, res) {
         .json({ error: "fileIds werden nicht als Array übergeben" });
     }
   }
+  if (tags) {
+    try {
+      tags = JSON.parse(tags);
+    } catch (e) {
+      console.log("Fehler bei Parsung tags");
+      return res
+        .status(400)
+        .json({ error: "tags werden nicht als Array übergeben" });
+    }
+    if (!Array.isArray(tags)) {
+      return res
+        .status(400)
+        .json({ error: "tags werden nicht als Array übergeben" });
+    }
+  }
   //-------------------------Überprüfung Parameter---------------------------
 
   const veranstaltungen = await veranstaltungService.createVeranstaltung(
@@ -283,6 +299,16 @@ router.post("/*", async function (req, res) {
 
     if (veranstaltungenFileIds.error) {
       return res.status(400).json(veranstaltungenFileIds);
+    }
+  }
+  if (tags) {
+    const veranstaltungTags = await veranstaltungService.addTagsToVeranstaltung(
+      veranstaltungen.insertId,
+      tags
+    );
+
+    if (veranstaltungTags.error) {
+      return res.status(400).json(veranstaltungTags);
     }
   }
 
