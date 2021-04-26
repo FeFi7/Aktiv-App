@@ -34,9 +34,14 @@ Future<http.Response> attemptLogIn(String mail, String passwort) async {
 }
 
 // [POST] Registriere neuen User
-Future<http.Response> attemptSignUp(String mail, String passwort) async {
+Future<http.Response> attemptSignUp(String mail, String passwort,
+    [String rolle = "1"]) async {
   String route = "api/user/signup";
-  Map<String, dynamic> body = {'mail': mail, 'passwort': passwort};
+  Map<String, dynamic> body = {
+    'mail': mail,
+    'passwort': passwort,
+    'rolle': rolle
+  };
 
   if (mail.isNotEmpty && passwort.isNotEmpty) {
     final response = await http.post(Uri.https(SERVER_IP, route),
