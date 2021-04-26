@@ -53,7 +53,7 @@ class _DiscoverViewState extends State<DiscoverView> {
       ),
       icon: Icon(Icons.search_rounded, size: 35),
       onSearch: Provider.of<EventProvider>(context, listen: false)
-          .loadEventsAsBoxContaining, // Man soll Provider nur im context aufrufen
+          .loadEventsAsPreviewBoxContaining, // Man soll Provider nur im context aufrufen
       searchBarStyle: SearchBarStyle(
           backgroundColor: ColorPalette.malibu.rgb,
           borderRadius: BorderRadius.all(Radius.circular(60.0)),

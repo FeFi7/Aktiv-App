@@ -10,7 +10,8 @@ class UserProvider extends ChangeNotifier {
   static ROLE _role;
   final SecureStorage storage = SecureStorage();
 
-  int userId, plz, hausnummer, bald, naehe;
+  static int userId = -1;
+  int plz, hausnummer, bald, naehe;
   String mail,
       vorname,
       nachname,

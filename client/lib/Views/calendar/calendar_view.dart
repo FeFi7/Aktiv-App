@@ -89,7 +89,7 @@ class _CalendarViewState extends State<CalendarView> {
                     _focusedDay = focusedDay;
 
                     Provider.of<EventProvider>(context, listen: false)
-                        .loadEventsOfMonth(DateTime(
+                        .loadEventsUntil(DateTime(
                             DateTime.now().year,
                             DateTime.now().month + futureMonthsLoaded++, //TODO: begrenzen
                             DateTime.now().day));

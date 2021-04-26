@@ -15,10 +15,6 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class EventProvider extends ChangeNotifier {
-  // List<Veranstaltung> events;
-
-  // TODO: Event liste auch wieder entlernen.
-
   static final Map<int, Veranstaltung> loaded = Map<int, Veranstaltung>();
   static Map<DateTime, List<int>> dated = Map<DateTime, List<int>>();
   static List<int> nearby = [];
@@ -26,88 +22,31 @@ class EventProvider extends ChangeNotifier {
   static List<int> favorites = [];
   static List<int> approved = [];
   static final int pageSize = 25;
-  static Map<String, int> loadedPages = Map<String, int>();
-
-  // TODO: Add loadled Months
-  // TODO: Clear Methode hinzufügen
-
-  // EventProvider() {
-  // loaded = HashMap<int, Veranstaltung>();
-
-  // _loadEvents().then((events) {
-  //   for (Veranstaltung event in events) loaded[event.id] = event;
-  // });
-  // }
-  //   notifyListeners();
+  static Map<String, int> nextPageToLoad = Map<String, int>();
 
   List<Veranstaltung> getLoadedEvents() {
     return loaded.values.toList();
   }
 
-  List<Veranstaltung> getLoadedAndLikedEventsOfDay(DateTime day) {
-    List<Veranstaltung> events = getLoadedEventsOfDay(day);
-    for (int index = 0; index < events.length; index++) {
-      Veranstaltung event = events[index];
-      if (!favorites.contains(event.id)) events.removeAt(index--);
-    }
-    return events;
-  }
-
-  List<Veranstaltung> getLoadedEventsOfMonth(DateTime month) {
-    int userId = 11;
-
-    int year = month.year;
-
-    DateTime start = DateTime.utc(year, month.month, 1);
-    DateTime end = DateTime.utc(year, month.month + 1, 0);
-
-    List<Veranstaltung> eventsOfMonth = [];
-
-    for (DateTime date in dated.keys)
-      if (start.isBefore(date) && date.isBefore(end))
-        for (int eventId in dated[date]) eventsOfMonth.add(loaded[eventId]);
-
-    return eventsOfMonth;
-  }
-
-  Future<List<Widget>> loadEventsAsBoxContaining(String text) async {
-    //
-    // await Future.delayed(Duration(seconds: text.length > 0 ? 10 : 1));
-    await Future.delayed(Duration(seconds: 1));
-    // if (isReplay) return [Post("Replaying !", "Replaying body")];
-    // if (text.length == 5) throw Error();
-    // if (text.length == 6) return [];
-    // List<EventPreviewBox> events = [];
-    //
-    //
+  Future<List<Widget>> loadEventsAsPreviewBoxContaining(String text) async {
     List<Widget> eventPreviews = [];
 
-    // So kann bei der suche differenziert werden, wie man
+    // So kann bei der suche differenziert werden, nach was gesucht wird
     switch (SearchBehaviorProvider.style) {
       case SearchStyle.FULLTEXT:
-        // TODO: Volltext Suche aus der Datenbank laden un zurück geben
+        List<EventPreviewBox> boxes = (await loadEventsContainingText(text))
+            .map((event) => EventPreviewBox.load(event))
+            .toList();
 
-        for (Veranstaltung event in getLoadedEvents()) {
-          if (event.titel.contains(text) ||
-              event.beschreibung.contains(text) ||
-              event.ortBeschr.contains(text))
-            eventPreviews.add(EventPreviewBox.load(event));
-        }
-
-        // if (eventPreviews.length == 0)
-        // eventPreviews.add(ErrorPreviewBox(
-        //     "Es konnten keine Veranstaltungen mit dem Inhalt \"" +
-        //         text +
-        //         "\" im Titel, im Names des Veranstalters, der Beschriebung, oder in den Tags gefunden werden. Versuche sie bitte mit einem anderen Schlüsselwort erneut."));
-
-        return eventPreviews;
+        return boxes;
       case SearchStyle.DATE:
         // TODO: Suche nach allen Events an dem Datum aus der Datenbank laden un zurück geben
 
         DateTime dateTime = isValidDate(text);
         if (dateTime != null) {
-          
-          return getLoadedEventsOfDay(dateTime).map((event) => EventPreviewBox.load(event)).toList();
+          return getLoadedEventsOfDay(dateTime)
+              .map((event) => EventPreviewBox.load(event))
+              .toList();
         } else {
           eventPreviews.add(ErrorPreviewBox(
               "Bei der von Ihnen getätigten Suchanfrage \"" +
@@ -125,10 +64,19 @@ class EventProvider extends ChangeNotifier {
       case SearchStyle.PERIOD:
         // TODO: Volltext Scuhe aus der Datenbank laden un zurück geben
 
-        //TODO:  WIDER ENTFERNEN
-        eventPreviews.addAll(getLoadedEvents()
-            .map((event) => EventPreviewBox.load(event))
-            .toList());
+        DateTime dateTime = isValidDate(text);
+        if (dateTime != null) {
+          List<EventPreviewBox> boxes = (await loadEventsUntil(dateTime))
+              .map((event) => EventPreviewBox.load(event))
+              .toList();
+
+          return boxes;
+        } else {
+          eventPreviews.add(ErrorPreviewBox(
+              "Bei der von Ihnen getätigten Suchanfrage \"" +
+                  text +
+                  "\" handelt es sich um kein gültiges Datum Format. Bitte Datum im Format Tag.Monat.Jahr angeben."));
+        }
 
         return eventPreviews;
       default:
@@ -136,11 +84,98 @@ class EventProvider extends ChangeNotifier {
     }
   }
 
+  Future<List<Veranstaltung>> loadEventsContainingText(String text) async {
+    String pageTitle = "attemptGetAllTextSearch:" + text;
+
+    List<Veranstaltung> foundEvents = [];
+
+    bool loadNextPage = true;
+    for (int page = nextPageToLoad[pageTitle] ?? 1; loadNextPage; page++) {
+      var response = await attemptGetAllVeranstaltungen(
+          "-1",
+          "1", // TODO: nur zugelssene Events zurück?
+          pageSize.toString(),
+          page.toString(),
+          "-1",
+          text);
+      if (response.statusCode == 200) {
+        var parsedJson = json.decode(response.body);
+
+        final List<dynamic> dynamicList =
+            await parsedJson.map((item) => getEventFromJson(item)).toList();
+
+        final List<Veranstaltung> responseList =
+            List<Veranstaltung>.from(dynamicList).toList();
+
+        foundEvents.addAll(responseList);
+
+        if (responseList.length <= 0 && (foundEvents.length > 0 || page > 6))
+          loadNextPage = false;
+
+        nextPageToLoad[pageTitle] = page + 1;
+      } else {
+        log("Fehler bei der Suche nach dem Schlüsselwort:" +
+            text +
+            " auf Seite: " +
+            page.toString());
+        // nextPage = false;
+      }
+    }
+
+    return foundEvents;
+  }
+
+  Future<List<Veranstaltung>> loadEventsUntil(DateTime date) async {
+    // String pageTitle = "attemptGetAllTextSearch:" + text;
+
+    List<Veranstaltung> foundEvents = [];
+
+    bool loadNextPage = true;
+    for (int page = 1; loadNextPage; page++) {
+      var response = await attemptGetAllVeranstaltungen(
+          date.toString(),
+          "1", // TODO: nur zugelassene Events?
+          pageSize.toString(),
+          page.toString(),
+          "-1");
+      if (response.statusCode == 200) {
+        var parsedJson = json.decode(response.body);
+
+        final List<dynamic> dynamicList =
+            await parsedJson.map((item) => getEventFromJson(item)).toList();
+
+        final List<Veranstaltung> responseList =
+            List<Veranstaltung>.from(dynamicList).toList();
+
+        foundEvents.addAll(responseList);
+
+        if (responseList.length <= 0 && (foundEvents.length > 0 || page > 6))
+          loadNextPage = false;
+      } else {
+        log("Fehler bei der Suche nach Veranstaltungen  bis zum " +
+            date.toString() +
+            " auf Seite: " +
+            page.toString());
+        // nextPage = false;
+      }
+    }
+
+    return foundEvents;
+  }
+
   DateTime isValidDate(String possiblyDate) {
     List<String> args = possiblyDate.split(".");
-    if (args.length > 2 && args[2].length == 4)
+    if (args.length > 2 &&
+        args[0].length == 2 &&
+        args[1].length == 2 &&
+        args[2].length == 4)
       return DateTime.parse(args[2] + '-' + args[1] + '-' + args[0]);
     return null;
+  }
+
+  Future<List<Veranstaltung>> loadFavoriteEvents(BuildContext context) {
+    // return upComing.map((id) => loaded[id]).toList();
+    String pageTitle = "favorites";
   }
 
   List<Veranstaltung> removeEventsOutsideMonth(
@@ -159,8 +194,6 @@ class EventProvider extends ChangeNotifier {
     return events;
   }
 
-  // List<Veranstaltung> get selectedDayEvents => _getLoadedEventsOfDay(_focusedDay);
-
   List<Veranstaltung> getLoadedEventsOfDay(DateTime day) {
     DateTime start = DateTime.utc(day.year, day.month, day.day);
     DateTime end = DateTime.utc(day.year, day.month, day.day + 1);
@@ -174,73 +207,48 @@ class EventProvider extends ChangeNotifier {
     return eventsOfMonth;
   }
 
-  Future<List<Veranstaltung>> loadEventsOfMonth(DateTime month) async {
-    int userId = 11; // TODO: Vom UserProvider holen
-
-    //erst mal alle events laden bis eins aus dem entsprechenden Monat drinne ist
-    //dann weiter schauen bis eins nimmer im Monat ist ODER es keine mehr gibt.
-    //DateTime until, bool approved, int limit, int page, int userId}) async {
-
-    List<Veranstaltung> returnList = [];
-
-    bool nextPage = true;
-    String pageTitle = "attemptGetAllVeranstaltungen";
-    // TODO: evtl muss die erste Page auch 1 sein
-    for (int page = loadedPages[pageTitle] ?? 1; nextPage; page++) {
-      DateTime end = DateTime.utc(
-          month.year, month.month + 1, 0); // TODO: Evtl 1. Tag wegen 00:00 Uhr
-      var response = await attemptGetAllVeranstaltungen(
-          end.toString(),
-          "1", // TODO: ungefähr so ausehen lassen (approved ? "1" : "0"), gübt aktuell so nur zugelssene Events zurpck
-          pageSize.toString(),
-          page.toString(),
-          userId.toString());
-      if (response.statusCode == 200) {
-        var parsedJson = json.decode(response.body);
-
-        final List<dynamic> list =
-            await parsedJson.map((item) => getEventFromJson(item)).toList();
-
-        final List<Veranstaltung> responseList =
-            List<Veranstaltung>.from(list).toList();
-        removeEventsOutsideMonth(
-            month, responseList); // TODO: Ich hoff mal auf C-b-R
-
-        if ((responseList.length <= 0 && returnList.length > 0) ||
-            page >
-                20) // TODO: || page > ..., ändxern, ist aktuell da falls es gar keine events in dem monat gibt, würde es unendlich weiter gegen
-          nextPage = false;
-        else
-          returnList.addAll(responseList);
-
-        loadedPages[pageTitle] = page; // Page als geladen vermerken.
-      } else {
-        log("Fehler beim laden von " +
-            pageTitle +
-            "auf Seite: " +
-            page.toString());
-        nextPage = false;
-      }
+  List<Veranstaltung> getLoadedAndLikedEventsOfDay(DateTime day) {
+    List<Veranstaltung> events = getLoadedEventsOfDay(day);
+    for (int index = 0; index < events.length; index++) {
+      Veranstaltung event = events[index];
+      if (!favorites.contains(event.id)) events.removeAt(index--);
     }
-    // notifyListeners(); // TODO: Sicherstellen dass das eine gute Idee ist...
+    return events;
   }
 
-  List<Veranstaltung> getFavoriteEvents() {
+  List<Veranstaltung> getLoadedEventsOfMonth(DateTime month) {
+    // int userId = 11;
+
+    int year = month.year;
+
+    DateTime start = DateTime.utc(year, month.month, 1);
+    DateTime end = DateTime.utc(year, month.month + 1, 0);
+
+    List<Veranstaltung> eventsOfMonth = [];
+
+    for (DateTime date in dated.keys)
+      if (start.isBefore(date) && date.isBefore(end))
+        for (int eventId in dated[date]) eventsOfMonth.add(loaded[eventId]);
+
+    return eventsOfMonth;
+  }
+
+  List<Veranstaltung> getLoadedFavoriteEvents() {
     return favorites.map((entry) => loaded[entry]).toList();
   }
 
-  void resetFavoriteEvents() {
-    nearby.clear();
-    loadedPages["upcoming"] = 1;
-    loadFavoriteEvents();
-  }
+  // void resetFavoriteEvents() {
+  //   nearby.clear();
+  //   nextPageToLoad["upcoming"] = 1;
+  //   loadFavoriteEvents();
+  // }
 
-  void loadFavoriteEvents() {
-    favorites.clear();
-    int page = loadedPages["favorites"] ?? 1;
-    //TODO: attemptsGetFavEvents(page);
-    loadedPages["favorites"] = ++page;
-  }
+  // void loadFavoriteEvents() {
+  //   favorites.clear();
+  //   int page = nextPageToLoad["favorites"] ?? 1;
+  //   //TODO: attemptsGetFavEvents(page);
+  //   nextPageToLoad["favorites"] = ++page;
+  // }
 
   List<Veranstaltung> getEventsNearBy() {
     // return nearby.map((entry) => loaded[entry]).toList();
@@ -250,7 +258,7 @@ class EventProvider extends ChangeNotifier {
 
   void resetEventsNearBy() {
     nearby.clear();
-    loadedPages["nearby"] = 1;
+    nextPageToLoad["nearby"] = 1;
     loadEventsNearBy();
   }
 
@@ -258,9 +266,9 @@ class EventProvider extends ChangeNotifier {
     // EventsNearBy aus Datenbank in nearby laden
     print("man sollte die events nearby weiter laden");
     // notifyListeners();
-    int page = loadedPages["nearby"] ?? 1;
-// TODO: attemptGetEventsNearB y(page)
-    loadedPages["nearby"] = ++page;
+    int page = nextPageToLoad["nearby"] ?? 1;
+    // TODO: attemptGetEventsNearB y(page)
+    nextPageToLoad["nearby"] = ++page;
   }
 
   List<Veranstaltung> getLoadedUpComingEvents() {
@@ -269,15 +277,15 @@ class EventProvider extends ChangeNotifier {
 
   void resetUpComingEvents() {
     nearby.clear();
-    loadedPages["upcoming"] = 1;
+    nextPageToLoad["upcoming"] = 1;
     loadUpComingEvents();
   }
 
   void loadUpComingEvents() {
-    int page = loadedPages["upcoming"] ?? 1;
+    int page = nextPageToLoad["upcoming"] ?? 1;
     // TODO: attemptGetUpComingEvents(page)
     //
-    loadedPages["upcoming"] = ++page;
+    nextPageToLoad["upcoming"] = ++page;
   }
 
   List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
@@ -306,22 +314,21 @@ class EventProvider extends ChangeNotifier {
 
   Future<Veranstaltung> createEvent(String titel, String beschreibung,
       String email, String start, String ende, String adresse) async {
-    int id = 0;
+    // int id = 0;
     Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
         start, ende, adresse, '89231', '1', '1', '1');
     // print(resp.body);
 
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
-      id = parsedJson['insertId'];
-      // Austauschen durch Event Provider sobald fertig
-      //
-      DateTime start_Ts = DateTime.parse(start);
-      DateTime ende_Ts = DateTime.parse(ende);
-      DateTime erstellt_Ts = DateTime.now();
+      int eventId = parsedJson['insertId'];
 
-      Veranstaltung veranstaltung = Veranstaltung.load(id, titel, beschreibung,
-          email, adresse, start_Ts, ende_Ts, erstellt_Ts, 0, 0);
+      DateTime startTs = DateTime.parse(start);
+      DateTime endeTs = DateTime.parse(ende);
+      DateTime erstelltTs = DateTime.now();
+
+      Veranstaltung veranstaltung = Veranstaltung.load(eventId, titel,
+          beschreibung, email, adresse, startTs, endeTs, erstelltTs, 0, 0);
 
       loadEvent(veranstaltung);
 
@@ -340,14 +347,14 @@ class EventProvider extends ChangeNotifier {
   void loadFirstPages() {
     DateTime nextMonth =
         DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
-    loadEventsOfMonth(nextMonth);
-    loadFavoriteEvents();
+    loadEventsUntil(nextMonth);
+    // loadFavoriteEvents(context); TODO: was mache ich jetzt? initstate hat keinen Context
     loadUpComingEvents();
     loadEventsNearBy();
   }
 
   void loadEvent(Veranstaltung event) {
-    if (event == null) return;
+    if (event == null || isEventLoaded(event.id)) return;
     loaded[event.id] = event;
     if (dated[event.beginnTs] != null)
       dated[event.beginnTs].add(event.id);
@@ -355,9 +362,13 @@ class EventProvider extends ChangeNotifier {
       dated[event.beginnTs] = [event.id];
 
     if (!upComing.contains(event.id)) upComing.add(event.id);
-    // }
 
     notifyListeners();
+  }
+
+  void deleteEvent(BuildContext context, event) {
+    String accessToken = Provider.of<UserProvider>(context).getAccessToken();
+    attemptDeleteVeranstaltung(event.id, accessToken);
   }
 
   bool isEventLoaded(int id) {
@@ -369,14 +380,19 @@ class EventProvider extends ChangeNotifier {
   }
 
   //TODO: Mit BackEnd verbinden, warte auf User Provider
-  bool toggleEventFavorite(int id) {
-    if (isEventFavorite(id)) {
-      favorites.remove(id);
+  bool toggleEventFavoriteState(BuildContext context, int eventId) {
+    int userId = UserProvider.userId;
+
+    String accessToken = Provider.of<UserProvider>(context).getAccessToken();
+    attemptFavor(userId.toString(), eventId.toString(), accessToken);
+
+    if (isEventFavorite(eventId)) {
+      favorites.remove(eventId);
     } else {
-      favorites.add(id);
+      favorites.add(eventId);
     }
 
-    return isEventFavorite(id);
+    return isEventFavorite(eventId);
   }
 
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
@@ -392,8 +408,7 @@ class EventProvider extends ChangeNotifier {
     String place = json['ortBeschreibung'];
 
     bool isApproved = json['istGenehmigt'] == '1';
-    // if (isApproved || UserProvider.getUserRole().) approved.add(id);
-    // TODO: if(!approved && user hat keine Rechte dazu) return;
+    if (isApproved) approved.add(id); //  || UserProvider.getUserRole().
 
     // TODO: if(ortBeschreibung < selbstDefinierter Radius entfernt) dann:
     // if (!upComing.contains(
