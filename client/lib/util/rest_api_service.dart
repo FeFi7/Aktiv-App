@@ -194,7 +194,8 @@ Future<http.Response> attemptCreateVeranstaltung(
     String institutionId,
     String userId,
     String istGenehmigt,
-    [List<String> fileids = const ["-1"]]) async {
+    [List<String> fileids = const ["-1"],
+    List<String> tags = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
   var coordinateList = await getCoordinatesFromAddress(plz);
@@ -218,6 +219,10 @@ Future<http.Response> attemptCreateVeranstaltung(
 
   if (fileids.toString() != "[-1]") {
     body.putIfAbsent('fileIds', () => fileids.toString());
+  }
+
+  if (tags.toString() != "[-1]") {
+    body.putIfAbsent('tags', () => tags.toString());
   }
 
   final response = await http.post(Uri.http(SERVER_IP, route),
