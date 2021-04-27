@@ -118,35 +118,35 @@ class _BodyState extends State<Body> {
                 //     ],
                 //   ),
                 // ),
-                Container(
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                          width:
-                              size.width * 0.1), //Abstand links von der Kante
-                      Theme(
-                        data: ThemeData(
-                            unselectedWidgetColor: ColorPalette.white.rgb),
-                        child: Checkbox(
-                          value: rememberMe,
-                          checkColor: ColorPalette.orange.rgb,
-                          activeColor: ColorPalette.white.rgb,
-                          onChanged: (value) {
-                            setState(
-                              () {
-                                rememberMe = value;
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      Text(
-                        "Eingeloggt bleiben?",
-                        style: TextStyle(color: ColorPalette.malibu.rgb),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   child: Row(
+                //     children: <Widget>[
+                //       SizedBox(
+                //           width:
+                //               size.width * 0.1), //Abstand links von der Kante
+                //       Theme(
+                //         data: ThemeData(
+                //             unselectedWidgetColor: ColorPalette.white.rgb),
+                //         child: Checkbox(
+                //           value: rememberMe,
+                //           checkColor: ColorPalette.orange.rgb,
+                //           activeColor: ColorPalette.white.rgb,
+                //           onChanged: (value) {
+                //             setState(
+                //               () {
+                //                 rememberMe = value;
+                //               },
+                //             );
+                //           },
+                //         ),
+                //       ),
+                //       Text(
+                //         "Eingeloggt bleiben?",
+                //         style: TextStyle(color: ColorPalette.malibu.rgb),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 SizedBox(
                     height: size.height * 0.02), //Abstand nach der Checkbox
                 AccountBereitsVorhandenCheck(
