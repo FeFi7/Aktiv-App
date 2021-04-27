@@ -43,10 +43,12 @@ class UserProvider extends ChangeNotifier {
       var parsedJson = json.decode(jwt.body);
       istEingeloggt = true;
 
+      var userId = parsedJson['id'];
       var accessToken = parsedJson['accessToken'];
       var refreshToken = parsedJson['refreshToken'];
 
       if (jwt != null) {
+        storage.deleteAll();
         storage.write("userId", userId.toString());
         storage.write("accessToken", accessToken);
         storage.write("refreshToken", refreshToken);
@@ -65,7 +67,9 @@ class UserProvider extends ChangeNotifier {
     var parsedUser = json.decode(detailedUserInfo.body);
 
     userId = parsedUser['id'];
-    plz = int.parse(parsedUser['plz']);
+    if (parsedUser['plz'] != null) {
+      plz = int.parse(parsedUser['plz']);
+    }
     //hausnummer = parsedUser['hausnummer'];
     tel = parsedUser['tel'];
     bald = parsedUser['baldEinstellung'];
@@ -104,13 +108,24 @@ class UserProvider extends ChangeNotifier {
     return await storage.read('accessToken');
   }
 
+  getUserIdFromStorage() async {
+    var _userId = await storage.read('userId');
+    if (_userId != null) {
+      getAccessToken();
+      return _userId;
+    }
+    return null;
+  }
+
   signInWithToken() async {
     var userId = await storage.read("userId");
     var accessToken = await getAccessToken();
+
     await collectUserInfo(int.parse(userId), accessToken);
   }
 
   signOff() async {
+    istEingeloggt = false;
     await storage.deleteAll();
   }
 
@@ -124,6 +139,7 @@ class UserProvider extends ChangeNotifier {
         tel.toString(),
         userId.toString(),
         await getAccessToken());
+    notifyListeners();
     return jwt;
   }
 

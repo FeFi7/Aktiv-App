@@ -137,7 +137,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
 
   autoSignIn() async {
     if (await Provider.of<UserProvider>(context, listen: false)
-            .getAccessToken() !=
+            .getUserIdFromStorage() !=
         null) {
       startTime();
     }

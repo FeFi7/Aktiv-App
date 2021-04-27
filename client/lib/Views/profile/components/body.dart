@@ -44,38 +44,74 @@ class _BodyState extends State<Body> {
             SizedBox(height: 40),
             avatarBild(),
             SizedBox(height: 40),
-            Text(
-              "LQ Burgrieden",
-              style: TextStyle(
-                  fontSize: 25.0,
-                  color: ColorPalette.congress_blue.rgb,
-                  letterSpacing: 2.0,
-                  fontWeight: FontWeight.w400),
-            ),
+            buildName(),
             SizedBox(height: 10),
-            Text(
-              "Burgrieden, Deutschland",
-              style: TextStyle(
-                  fontSize: 18.0,
-                  color: ColorPalette.torea_bay.rgb,
-                  letterSpacing: 2.0,
-                  fontWeight: FontWeight.w300),
-            ),
+            buildMail(),
             SizedBox(height: 10),
-            Text(
-              "Testaccount für die App-Entwicklung",
-              style: TextStyle(
-                  fontSize: 15.0,
-                  color: ColorPalette.torea_bay.rgb,
-                  letterSpacing: 2.0,
-                  fontWeight: FontWeight.w300),
-            ),
+            buildPlzOrt(),
             SizedBox(height: 25),
             buttons(context),
           ],
         ),
       ),
     );
+  }
+
+  Text buildName() {
+    if (Provider.of<UserProvider>(context, listen: false).vorname != null &&
+        Provider.of<UserProvider>(context, listen: false).nachname != null) {
+      return Text(
+        Provider.of<UserProvider>(context, listen: false).vorname +
+            " " +
+            Provider.of<UserProvider>(context, listen: false).nachname,
+        style: TextStyle(
+            fontSize: 18.0,
+            color: ColorPalette.torea_bay.rgb,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.w900),
+      );
+    }
+    return Text("");
+  }
+
+  Text buildMail() {
+    if (Provider.of<UserProvider>(context, listen: false).mail != null) {
+      return Text(
+        Provider.of<UserProvider>(context, listen: false).mail,
+        style: TextStyle(
+            fontSize: 18.0,
+            color: ColorPalette.torea_bay.rgb,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.w500),
+      );
+    }
+    return Text("");
+  }
+
+  Text buildPlzOrt() {
+    if (Provider.of<UserProvider>(context, listen: false).plz != null &&
+        Provider.of<UserProvider>(context, listen: false).ort != null) {
+      return Text(
+        Provider.of<UserProvider>(context, listen: false).plz.toString() +
+            ", " +
+            Provider.of<UserProvider>(context, listen: false).ort,
+        style: TextStyle(
+            fontSize: 18.0,
+            color: ColorPalette.torea_bay.rgb,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.w500),
+      );
+    } else if (Provider.of<UserProvider>(context, listen: false).plz != null) {
+      return Text(
+        Provider.of<UserProvider>(context, listen: false).plz.toString(),
+        style: TextStyle(
+            fontSize: 18.0,
+            color: ColorPalette.torea_bay.rgb,
+            letterSpacing: 2.0,
+            fontWeight: FontWeight.w500),
+      );
+    }
+    return Text("");
   }
 
   Column buttons(BuildContext context) {

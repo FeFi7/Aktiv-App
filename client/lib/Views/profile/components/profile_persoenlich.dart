@@ -1,7 +1,6 @@
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
-import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +24,30 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
 
   @override
   Widget build(BuildContext context) {
+    if (Provider.of<UserProvider>(context, listen: false).vorname != null) {
+      vorname = Provider.of<UserProvider>(context, listen: false).vorname;
+    }
+    if (Provider.of<UserProvider>(context, listen: false).nachname != null) {
+      nachname = Provider.of<UserProvider>(context, listen: false).nachname;
+    }
+    if (Provider.of<UserProvider>(context, listen: false).plz != null) {
+      plz = Provider.of<UserProvider>(context, listen: false).plz.toString();
+    }
+    if (Provider.of<UserProvider>(context, listen: false).tel != null) {
+      tel = Provider.of<UserProvider>(context, listen: false).tel;
+    }
+    if (Provider.of<UserProvider>(context, listen: false).ort != null) {
+      ort = Provider.of<UserProvider>(context, listen: false).ort;
+    }
+    if (Provider.of<UserProvider>(context, listen: false).hausnummer != null) {
+      hausnummer = Provider.of<UserProvider>(context, listen: false)
+          .hausnummer
+          .toString();
+    }
+    if (Provider.of<UserProvider>(context, listen: false).strasse != null) {
+      strasse = Provider.of<UserProvider>(context, listen: false).strasse;
+    }
+
     return Container(
       child: SingleChildScrollView(
         child: Column(
@@ -56,10 +79,6 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                       ],
                     ),
                   )
-
-                //ToDo: Wenn User Provider done, Daten ergänzen
-                // attemptUpdateUserInfo(
-                //     mail, vorname, nachname, plz, tel, userId, accessToken),
                 : Stepper(
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
@@ -121,19 +140,19 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       content: Column(
         children: <Widget>[
           RoundedInputField(
-            hintText: "Vorname",
+            hintText: hintVorname(vorname),
             onChanged: (value) {
               vorname = value;
             },
           ),
           RoundedInputField(
-            hintText: "Nachname",
+            hintText: hintNachname(nachname),
             onChanged: (value) {
               nachname = value;
             },
           ),
           RoundedInputFieldNumeric(
-            hintText: "Telefonnummer",
+            hintText: hintTel(tel),
             icon: Icons.phone,
             onChanged: (value) {
               tel = value;
@@ -147,28 +166,28 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       content: Column(
         children: <Widget>[
           RoundedInputField(
-            hintText: "Straße",
+            hintText: hintStrasse(strasse),
             icon: Icons.home,
             onChanged: (value) {
               strasse = value;
             },
           ),
           RoundedInputFieldNumeric(
-            hintText: "Hausnummer",
+            hintText: hintHausnummer(hausnummer),
             icon: Icons.home,
             onChanged: (value) {
               hausnummer = value;
             },
           ),
           RoundedInputFieldNumeric(
-            hintText: "PLZ",
+            hintText: hintPlz(plz),
             icon: Icons.gps_fixed_outlined,
             onChanged: (value) {
               plz = value;
             },
           ),
           RoundedInputField(
-            hintText: "Ort",
+            hintText: hintOrt(ort),
             icon: Icons.gps_fixed_outlined,
             onChanged: (value) {
               ort = value;
@@ -178,4 +197,53 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       ),
     ),
   ];
+}
+
+hintVorname<String>(vorname) {
+  if (vorname != null) {
+    return vorname;
+  } else
+    return "Vorname";
+}
+
+hintNachname<String>(nachname) {
+  if (nachname != null) {
+    return nachname;
+  } else
+    return "Nachname";
+}
+
+hintTel<String>(tel) {
+  if (tel != null) {
+    return tel;
+  } else
+    return "Telefonnummer";
+}
+
+hintStrasse<String>(strasse) {
+  if (strasse != null) {
+    return strasse;
+  } else
+    return "Straße";
+}
+
+hintHausnummer<String>(hausnummer) {
+  if (hausnummer != null) {
+    return hausnummer;
+  } else
+    return "Hausnummer";
+}
+
+hintPlz<String>(plz) {
+  if (plz != null) {
+    return plz;
+  } else
+    return "PLZ";
+}
+
+hintOrt<String>(ort) {
+  if (ort != null) {
+    return ort;
+  } else
+    return "Ort";
 }
