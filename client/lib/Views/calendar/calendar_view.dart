@@ -2,12 +2,14 @@ import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 
 class CalendarView extends StatefulWidget {
   const CalendarView();
@@ -41,7 +43,6 @@ class _CalendarViewState extends State<CalendarView> {
       children: [
         Stack(
           children: [
-            
             Container(
                 padding: const EdgeInsets.all(10.0),
                 child: TableCalendar(
@@ -91,14 +92,16 @@ class _CalendarViewState extends State<CalendarView> {
                     Provider.of<EventProvider>(context, listen: false)
                         .loadEventsUntil(DateTime(
                             DateTime.now().year,
-                            DateTime.now().month + futureMonthsLoaded++, //TODO: begrenzen
+                            DateTime.now().month +
+                                futureMonthsLoaded++, //TODO: begrenzen
                             DateTime.now().day));
 
                     /// TODO: Erkennen in welhc richtung gescrollt wird => aktuell laden auch seiten wenn man nach links wischt
                   },
-                )),Positioned(
+                )),
+            Positioned(
               right: 60,
-              child: Container(
+              child: UserProvider.getUserRole().allowedToFavEvents ? (Container(
                 margin: const EdgeInsets.all(10.0),
                 child: ToggleButtons(
                   children: [
@@ -143,7 +146,7 @@ class _CalendarViewState extends State<CalendarView> {
                   fillColor: ColorPalette.endeavour.rgb,
                   disabledBorderColor: ColorPalette.french_pass.rgb,
                 ),
-              ),
+              )) : Container(),
             )
           ],
         ),
@@ -158,7 +161,10 @@ class _CalendarViewState extends State<CalendarView> {
                       return EventPreviewBox.load(value[index]);
                     },
                   )
-                : Container(child: Text(_selectedDay != null ? "Keine Veranstaltungen eingetragen" : "Für eine generauer Übersicht Tag auswählen"));
+                : Container(
+                    child: Text(_selectedDay != null
+                        ? "Keine Veranstaltungen eingetragen"
+                        : "Für eine generauer Übersicht Tag auswählen"));
           },
         ))
       ],

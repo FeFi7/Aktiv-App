@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 
-enum ROLE { USER, GENEHMIGER, BETREIBER }
+enum ROLE { NOT_REGISTERED, USER, GENEHMIGER, BETREIBER }
+//weighting:0,              1,    2,          3;
 
+extension Permissions on ROLE {
 
-extension RolePermissions on ROLE {
-
-  bool get allowedToLoadNotApprovedEvents {
-    switch (this) {
-      case ROLE.USER:
-        return false;
-      case ROLE.GENEHMIGER:
-        return false;
-      case ROLE.BETREIBER:
-        return true;
-      default:
-        return false;
-    }
+  int getPermissionWeighting() {
+    return this.index;
   }
   
-  // void talk() {
-  //   print('meow');
-  // }
+  bool get allowedToFavEvents {
+    return getPermissionWeighting() > 0;
+  }
 }

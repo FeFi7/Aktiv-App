@@ -7,7 +7,7 @@ import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/cupertino.dart';
 
 class UserProvider extends ChangeNotifier {
-  static ROLE _role;
+  static ROLE _role = ROLE.NOT_REGISTERED; // Brauchte eine Standard Rolle, sorry wens dir was zerschießt, lg Niko
   final SecureStorage storage = SecureStorage();
 
   static int userId = -1;

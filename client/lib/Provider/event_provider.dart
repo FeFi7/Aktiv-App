@@ -381,15 +381,17 @@ class EventProvider extends ChangeNotifier {
 
   //TODO: Mit BackEnd verbinden, warte auf User Provider
   bool toggleEventFavoriteState(BuildContext context, int eventId) {
-    int userId = UserProvider.userId;
-
-    String accessToken = Provider.of<UserProvider>(context).getAccessToken();
-    attemptFavor(userId.toString(), eventId.toString(), accessToken);
-
     if (isEventFavorite(eventId)) {
       favorites.remove(eventId);
     } else {
       favorites.add(eventId);
+    }
+
+    if (UserProvider.userId != null && UserProvider.userId >= 0) {
+      String accessToken =
+          Provider.of<UserProvider>(context, listen: false).getAccessToken();
+      attemptFavor(
+          UserProvider.userId.toString(), eventId.toString(), accessToken);
     }
 
     return isEventFavorite(eventId);
@@ -398,6 +400,7 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
+    if (json['favorit'] == '1') favorites.add(id);
     if (isEventLoaded(id)) return loaded[id];
 
     String titel = json['titel'];
@@ -417,8 +420,6 @@ class EventProvider extends ChangeNotifier {
     // mit anderen attemptBefehlen die reihenfolge nicht mehr stimmt...
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
-
-    if (json['favorit'] == '1') favorites.add(id);
 
     // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(

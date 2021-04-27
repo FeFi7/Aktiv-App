@@ -44,18 +44,26 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
             event.titel,
             event.beschreibung,
             "Noch " +
-                (event.beginnTs.difference(DateTime.now()).inDays > 0
+                (event.beginnTs.difference(DateTime.now()).inDays > 1
                     ? event.beginnTs
                             .difference(DateTime.now())
                             .inDays
                             .toString() +
                         " Tage"
-                    : event.beginnTs
-                            .difference(DateTime.now())
-                            .inHours
-                            .toString() +
-                        " Stunden") +
-                ""))
+                    : (event.beginnTs.difference(DateTime.now()).inDays == 1
+                        ? "ein Tag"
+                        : ((event.beginnTs.difference(DateTime.now()).inHours >
+                                1)
+                            ? (event.beginnTs
+                                    .difference(DateTime.now())
+                                    .inHours
+                                    .toString() +
+                                " Stunden")
+                            : (event.beginnTs
+                                    .difference(DateTime.now())
+                                    .inMinutes
+                                    .toString() +
+                                " Minuten"))))))
         .toList();
 
     ///TODO: Anpassen, dass auch tatsächlich die entfernung angezeigt wird

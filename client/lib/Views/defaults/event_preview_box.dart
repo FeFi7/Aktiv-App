@@ -1,12 +1,14 @@
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 
 import '../Home.dart';
 
@@ -120,7 +122,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    IconButton(
+                    (UserProvider.getUserRole().allowedToFavEvents ? IconButton(
                         icon: Icon(
                           liked
                               ? Icons.favorite_rounded
@@ -133,12 +135,12 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                         onPressed: () {
                           setState(() {
                             
-
+                            
                             liked = Provider.of<EventProvider>(context,
                                     listen: false)
                                 .toggleEventFavoriteState(context, widget.id);
                           });
-                        }),
+                        }) : Container()),
                     IconButton(
                         icon: Icon(
                           Icons.chevron_right_rounded,
