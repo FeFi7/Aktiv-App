@@ -687,6 +687,21 @@ Future<http.Response> attemptDeleteVeranstaltung(
   return response;
 }
 
+// [GET] Bekomme tags (optional gefiltert)
+Future<http.Response> attemptGetTags(List<String> tag) async {
+  String route = "tags";
+
+  final response = await http.get(Uri.https(SERVER_IP, route));
+
+  if (response.statusCode == 200) {
+    print("Verbindung erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
 // [GET] Bekomme alle Institutionen
 Future<http.Response> attemptGetAllInstitutionen() async {}
 
