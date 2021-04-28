@@ -327,7 +327,9 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             )) {
               var user = await Provider.of<UserProvider>(context, listen: false)
                   .setRole(betreiberController.text, "betreiber");
-              if (user.statusCode != 200) {
+              if (user == null) {
+                errorToast("User nicht vorhanden");
+              } else if (user.statusCode != 200) {
                 errorToast("Fehler bei der Aktualisierung");
               } else {
                 errorToast("Betreiber hinzugefügt");

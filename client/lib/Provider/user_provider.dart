@@ -142,6 +142,7 @@ class UserProvider extends ChangeNotifier {
         await getAccessToken());
     var accessToken = await storage.read('accessToken');
     await collectUserInfo(userId, accessToken);
+
     notifyListeners();
     return jwt;
   }
@@ -171,9 +172,6 @@ class UserProvider extends ChangeNotifier {
   setRole(String mail, String rolle) async {
     switch (rolle) {
       case "user":
-        rolle = '0'; //verursacht error!!!
-        break;
-      case "user":
         rolle = "1";
         break;
       case "genehmiger":
@@ -188,26 +186,32 @@ class UserProvider extends ChangeNotifier {
     var user = await attemptGetUser(mail);
     var parsedUser = json.decode(user.body);
     var _map = parsedUser.values.toList();
-    var _verwalterId = _map[1]['id'].toString();
+    if (_map[0] != false) {
+      var _verwalterId = _map[1]['id'].toString();
 
-    var jwt =
-        await attemptUpdateRole(_verwalterId, rolle, await getAccessToken());
-    notifyListeners();
-    return jwt;
+      var jwt =
+          await attemptUpdateRole(_verwalterId, rolle, await getAccessToken());
+      notifyListeners();
+      return jwt;
+    }
+    return null;
   }
 
   setVerwalter(String mail, String institutionsId) async {
     var verwalter = await attemptGetUser(mail);
     var parsedVerwalter = json.decode(verwalter.body);
     var _map = parsedVerwalter.values.toList();
-    var _userId = _map[1]['id'].toString();
+    if (_map[0] != false) {
+      var _userId = _map[1]['id'].toString();
 
-    //## derzeit keine Institutionen vorhanden ##//
-    //TODO
-    // var jwt = await attemptSetVerwalter(
-    //     _userId, institutionsId, await getAccessToken());
-    // return jwt;
-    //###########################################//
+      //## derzeit keine Institutionen vorhanden ##//
+      //TODO
+      // var jwt = await attemptSetVerwalter(
+      //     _userId, institutionsId, await getAccessToken());
+      // return jwt;
+      //###########################################//
+    }
+    return null;
   }
 
   checkDataCompletion() {

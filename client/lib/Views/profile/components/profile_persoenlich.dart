@@ -25,43 +25,10 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   static String hausnummer;
   static String strasse;
 
+  List<Step> steps;
+
   @override
   Widget build(BuildContext context) {
-    // if (Provider.of<UserProvider>(context, listen: false).vorname != null) {
-    //   vorname = Provider.of<UserProvider>(context, listen: false).vorname;
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).nachname != null) {
-    //   nachname = Provider.of<UserProvider>(context, listen: false).nachname;
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).plz != null) {
-    //   plz = Provider.of<UserProvider>(context, listen: false).plz.toString();
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).tel != null) {
-    //   tel = Provider.of<UserProvider>(context, listen: false).tel;
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).ort != null) {
-    //   ort = Provider.of<UserProvider>(context, listen: false).ort;
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).hausnummer != null) {
-    //   hausnummer = Provider.of<UserProvider>(context, listen: false)
-    //       .hausnummer
-    //       .toString();
-    // }
-    // if (Provider.of<UserProvider>(context, listen: false).strasse != null) {
-    //   strasse = Provider.of<UserProvider>(context, listen: false).strasse;
-    // }
-
-    // Consumer<UserProvider>(
-    //   builder: (context, user, child) {
-    //     vorname = user.vorname;
-    //     nachname = user.nachname;
-    //     plz = user.plz.toString();
-    //     tel = user.tel.toString();
-    //     ort = user.ort;
-    //     hausnummer = user.hausnummer.toString();
-    //   },
-    // );
-
     return Container(
       child: SingleChildScrollView(
         child: Column(
@@ -128,7 +95,111 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         ],
                       );
                     },
-                    steps: steps,
+                    steps: steps = [
+                      Step(
+                        title: Text("Person"),
+                        content: Column(
+                          children: <Widget>[
+                            RoundedInputField(
+                              hintText: hintVorname(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .vorname
+                                  .toString()),
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  vorname = value;
+                                }
+                              },
+                            ),
+                            RoundedInputField(
+                              hintText: hintNachname(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .nachname
+                                  .toString()),
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  nachname = value;
+                                }
+                              },
+                            ),
+                            RoundedInputFieldNumeric(
+                              hintText: hintTel(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .tel
+                                  .toString()),
+                              icon: Icons.phone,
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  tel = value;
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Step(
+                        title: Text("Anschrift"),
+                        content: Column(
+                          children: <Widget>[
+                            RoundedInputField(
+                              hintText: hintStrasse(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .strasse
+                                  .toString()),
+                              icon: Icons.home,
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  strasse = value;
+                                }
+                              },
+                            ),
+                            RoundedInputFieldNumeric(
+                              hintText: hintHausnummer(
+                                  Provider.of<UserProvider>(context,
+                                          listen: false)
+                                      .hausnummer
+                                      .toString()),
+                              icon: Icons.home,
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  hausnummer = value;
+                                }
+                              },
+                            ),
+                            RoundedInputFieldNumeric(
+                              hintText: hintPlz(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .plz
+                                  .toString()),
+                              icon: Icons.gps_fixed_outlined,
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  plz = value;
+                                }
+                              },
+                            ),
+                            RoundedInputField(
+                              hintText: hintOrt(Provider.of<UserProvider>(
+                                      context,
+                                      listen: false)
+                                  .ort
+                                  .toString()),
+                              icon: Icons.gps_fixed_outlined,
+                              onChanged: (value) {
+                                if (value != null && value != "null") {
+                                  ort = value;
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     currentStep: currentStep,
                     onStepContinue: nextStep,
                     onStepCancel: cancelStep,
@@ -163,84 +234,6 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   goToStep(int step) {
     setState(() => currentStep = step);
   }
-
-  List<Step> steps = [
-    Step(
-      title: Text("Person"),
-      content: Column(
-        children: <Widget>[
-          RoundedInputField(
-            hintText: hintVorname(vorname),
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                vorname = value;
-              }
-            },
-          ),
-          RoundedInputField(
-            hintText: hintNachname(nachname),
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                nachname = value;
-              }
-            },
-          ),
-          RoundedInputFieldNumeric(
-            hintText: hintTel(tel),
-            icon: Icons.phone,
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                tel = value;
-              }
-            },
-          ),
-        ],
-      ),
-    ),
-    Step(
-      title: Text("Anschrift"),
-      content: Column(
-        children: <Widget>[
-          RoundedInputField(
-            hintText: hintStrasse(strasse),
-            icon: Icons.home,
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                strasse = value;
-              }
-            },
-          ),
-          RoundedInputFieldNumeric(
-            hintText: hintHausnummer(hausnummer),
-            icon: Icons.home,
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                hausnummer = value;
-              }
-            },
-          ),
-          RoundedInputFieldNumeric(
-            hintText: hintPlz(plz),
-            icon: Icons.gps_fixed_outlined,
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                plz = value;
-              }
-            },
-          ),
-          RoundedInputField(
-            hintText: hintOrt(ort),
-            icon: Icons.gps_fixed_outlined,
-            onChanged: (value) {
-              if (value != null && value != "null") {
-                ort = value;
-              }
-            },
-          ),
-        ],
-      ),
-    ),
-  ];
 }
 
 hintVorname<String>(vorname) {
