@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
+import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
@@ -14,38 +15,86 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-class EventProvider extends ChangeNotifier {
-  static final Map<int, Veranstaltung> loaded = Map<int, Veranstaltung>();
-  static Map<DateTime, List<int>> dated = Map<DateTime, List<int>>();
-  static List<int> nearby = [];
-  static List<int> upComing = [];
-  static List<int> favorites = [];
-  static List<int> approved = [];
-  static final int pageSize = 25;
-  static Map<String, int> nextPageToLoad = Map<String, int>();
+enum EventListType { UP_COMING, FAVORITES, NEAR_BY }
 
+class EventProvider extends ChangeNotifier {
+  /// Map aller Event Instanzen die zu ihrer ID hinterlegt sind
+  static final Map<int, Veranstaltung> loaded = Map<int, Veranstaltung>();
+
+  /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
+  static final Map<DateTime, List<int>> dated = Map<DateTime, List<int>>();
+
+  /// Liste aller Event ID's die in der nähe statt finden TODO: machen!!!!
+  static final List<int> nearby = [];
+
+  /// Liste aller Event ID's die als nächstes statt finden (sortiert)
+  static final List<int> upComing = [];
+
+  /// Liste aller Event ID's die als favorisiert markiert sind.
+  static final List<int> favorites = [];
+
+  /// Liste aller Event ID's die als genehmigt markiert sind.
+  static final List<int> approved = [];
+
+  /// Die Standard Menge an events, die von EINEM attempt Aufruf geladen werden sollen
+  static final int pageSize = 25;
+
+  /// Behinhaltet BIS zu welche SEITE die entsprechenden Events bereits geladen wurden
+  static final Map<EventListType, int> nextPageToLoad =
+      Map<EventListType, int>();
+
+  /// Behinhaltet WANN die entsprechenden Events zuletzt gespeichert wurden
+  static final Map<EventListType, DateTime> lastUpdate =
+      Map<EventListType, DateTime>();
+
+  /// Gibt eine Liste aller Events zurück die bereits geladen wurden
   List<Veranstaltung> getLoadedEvents() {
     return loaded.values.toList();
   }
 
+  /// Gibt eine Liste aller Events zurück die als favorisiert markiert sind
+  List<Veranstaltung> getLoadedFavoritesEvents() {
+    return favorites.map((id) => getLoadedEventById(id)).toList();
+  }
+
+  /// Gibt eine Liste aller Events zurück die als "nearby" markiert sind
+  List<Veranstaltung> getLoadedEventsNearBy() {
+    return nearby.map((id) => getLoadedEventById(id)).toList();
+  }
+
+  /// Gibt eine Liste aller Events zurück die als "upcoming" markiert sind
+  List<Veranstaltung> getLoadedUpComingEvents() {
+    return upComing.map((id) => getLoadedEventById(id)).toList();
+  }
+
+  /// Lädt eine Liste an Events aus der Datenbank. Abhängig vom im SearchBehaviorProvider
+  /// Suchverhalten wird nach anderen events in der DB gesucht. Bei FULLTEXT wir nach Events
+  /// gesucht, die in irgendeiner Art und eise den übergebenen Text beinhalten. (Titel,
+  /// Beschriebung, Tags,Veranstalter). Bei DATE wird nach Events an einem speziellen
+  /// Tag gesucht und bei PERIOD nach allen events BIS zu einem speziellen Tag
   Future<List<Widget>> loadEventsAsPreviewBoxContaining(String text) async {
     List<Widget> eventPreviews = [];
 
-    // So kann bei der suche differenziert werden, nach was gesucht wird
     switch (SearchBehaviorProvider.style) {
       case SearchStyle.FULLTEXT:
-        List<EventPreviewBox> boxes = (await loadEventsContainingText(text))
-            .map((event) => EventPreviewBox.load(event))
+        List<Veranstaltung> events = await loadEventsContainingText(text) ?? [];
+
+        List<EventPreviewBox> boxes = events
+            .map((event) =>
+                EventPreviewBox.load(event, AdditiveFormat.HOLE_DATETIME))
             .toList();
 
         return boxes;
       case SearchStyle.DATE:
+
+        /// Suche nach Events, die an dem Datum statt finden
         // TODO: Suche nach allen Events an dem Datum aus der Datenbank laden un zurück geben
 
         DateTime dateTime = isValidDate(text);
         if (dateTime != null) {
           return getLoadedEventsOfDay(dateTime)
-              .map((event) => EventPreviewBox.load(event))
+              .map((event) =>
+                  EventPreviewBox.load(event, AdditiveFormat.HOLE_DATETIME))
               .toList();
         } else {
           eventPreviews.add(ErrorPreviewBox(
@@ -62,12 +111,14 @@ class EventProvider extends ChangeNotifier {
 
         return eventPreviews;
       case SearchStyle.PERIOD:
-        // TODO: Volltext Scuhe aus der Datenbank laden un zurück geben
+
+        /// Suche nach Events, die bis zum Datum statt finden
 
         DateTime dateTime = isValidDate(text);
         if (dateTime != null) {
-          List<EventPreviewBox> boxes = (await loadEventsUntil(dateTime))
-              .map((event) => EventPreviewBox.load(event))
+          List<EventPreviewBox> boxes = (await loadAllEventsUntil(dateTime))
+              .map((event) =>
+                  EventPreviewBox.load(event, AdditiveFormat.HOLE_DATETIME))
               .toList();
 
           return boxes;
@@ -84,21 +135,22 @@ class EventProvider extends ChangeNotifier {
     }
   }
 
+  /// Lädt durch Fulltext suche Events aus der Datenbank
   Future<List<Veranstaltung>> loadEventsContainingText(String text) async {
-    String pageTitle = "attemptGetAllTextSearch:" + text;
-
     List<Veranstaltung> foundEvents = [];
 
-    bool loadNextPage = true;
-    for (int page = nextPageToLoad[pageTitle] ?? 1; loadNextPage; page++) {
+    /// Da in der Regel für jede Suche andere Ergebnisse zurück kommen
+    /// startet die Suche immer bei Seite 1 und Endet bei max Seite 4
+    for (int page = 1; page < 4; page++) {
       var response = await attemptGetAllVeranstaltungen(
           "-1",
-          "1", // TODO: nur zugelssene Events zurück?
+          "0", // nur zugelassene Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
           "-1",
           text);
       if (response.statusCode == 200) {
+        log("loadEventsContainingText: \n" + response.body);
         var parsedJson = json.decode(response.body);
 
         final List<dynamic> dynamicList =
@@ -109,32 +161,41 @@ class EventProvider extends ChangeNotifier {
 
         foundEvents.addAll(responseList);
 
-        if (responseList.length <= 0 && (foundEvents.length > 0 || page > 6))
-          loadNextPage = false;
-
-        nextPageToLoad[pageTitle] = page + 1;
+        /// Abbruch wenn keine neuen Events geladen wurden
+        if (responseList == null || responseList.length == 0) break;
       } else {
         log("Fehler bei der Suche nach dem Schlüsselwort:" +
             text +
             " auf Seite: " +
-            page.toString());
-        // nextPage = false;
+            page.toString() +
+            ", response.statusCode:" +
+            response.statusCode.toString());
+        break;
+
+        /// Abbruch weil fehler geworfen
       }
     }
 
     return foundEvents;
   }
 
-  Future<List<Veranstaltung>> loadEventsUntil(DateTime date) async {
-    // String pageTitle = "attemptGetAllTextSearch:" + text;
+  /// Lädt alle Events von neu bis zu einem gewissen Datum
+  Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
+    /// 16 pages begrenzt das Laden der Events auf max 400 Events
+    return loadEventsUntil(until, 1, 16);
+  }
 
+  /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
+  Future<List<Veranstaltung>> loadEventsUntil(
+      DateTime until, int startPage, int maxPages) async {
     List<Veranstaltung> foundEvents = [];
 
-    bool loadNextPage = true;
-    for (int page = 1; loadNextPage; page++) {
+    for (int page = startPage >= 1 ? startPage : 1;
+        page < (startPage + maxPages);
+        page++) {
       var response = await attemptGetAllVeranstaltungen(
-          date.toString(),
-          "1", // TODO: nur zugelassene Events?
+          until.toString(),
+          "1", // nur genehmigte Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
           "-1");
@@ -149,20 +210,81 @@ class EventProvider extends ChangeNotifier {
 
         foundEvents.addAll(responseList);
 
-        if (responseList.length <= 0 && (foundEvents.length > 0 || page > 6))
-          loadNextPage = false;
+        // nextPageToLoad[EventListType.UP_COMING] = page + 1;
+
+        /// Wenn durch aktuelle page keine neuen Events geladen wurden: break;
+        if (responseList == null || responseList.length == 0) break;
       } else {
         log("Fehler bei der Suche nach Veranstaltungen  bis zum " +
-            date.toString() +
+            until.toString() +
             " auf Seite: " +
-            page.toString());
-        // nextPage = false;
+            page.toString() +
+            ", response.statusCode:" +
+            response.statusCode.toString());
       }
     }
 
     return foundEvents;
   }
 
+  /// Methode ruft attemptGetAllVeranstaltungen auf uns sortiert die Rückgabe
+  /// in die, der übergebenen EventListType, entsprechend ein. Wenn das letzte
+  /// laden des Types über eine Stunde her ist lädt er Alle Events neu, ansonsten
+  /// fängt er da an, wo dass letzte mal aufgehört hat (nextPageToLoad)
+  Future<List<Veranstaltung>> loadEventListOfType(EventListType type) async {
+    // int startPage = nextPageToLoad[type] ?? 1;
+    int startPage = 1;
+    DateTime now = DateTime.now();
+    DateTime lastUpdated = lastUpdate[type] ?? now;
+
+    /// Wenn letztes Update über eine Stunde zurück liegt: fang von Vorne an
+    if (lastUpdated.difference(now).inHours > 1) startPage = 1;
+
+    /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
+    DateTime until = DateTime.utc(now.year + 69, now.month, now.day);
+
+    List<Veranstaltung> loaded = await loadEventsUntil(until, startPage, 1);
+
+    if (loaded == null) return [];
+
+    if (loaded.length > 0) nextPageToLoad[type] = startPage + 1;
+
+    lastUpdate[type] = now;
+
+    /// Geladene Events werden dem EventListType entsprechend einsortiert
+    switch (type) {
+      case EventListType.UP_COMING:
+
+        /// Wenn von Anfang an geladen (startPage=1) dann bisher geladenes upComing verwerfen
+        if (startPage == 1) upComing.clear();
+
+        for (Veranstaltung event in loaded) upComing.add(event.id);
+
+        return upComing.map((id) => getLoadedEventById(id)).toList();
+
+      case EventListType.FAVORITES:
+
+        /// Wenn von Anfang an geladen (Page=1) dann bisher geladene Favoriten verwerfen
+        if (startPage == 1) favorites.clear();
+
+        for (Veranstaltung event in loaded) favorites.add(event.id);
+
+        return favorites.map((id) => getLoadedEventById(id)).toList();
+      case EventListType.NEAR_BY:
+
+        /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
+        if (startPage == 1) nearby.clear();
+
+        for (Veranstaltung event in loaded) nearby.add(event.id);
+
+        return nearby.map((id) => getLoadedEventById(id)).toList();
+      default:
+        return [];
+    }
+  }
+
+  /// Überprüft ob dass angegebene Datum (im Suchfeld) im richtigen Format ist
+  /// Wenn ja, wird das Datum als Datetime Objekt zurückgegeben
   DateTime isValidDate(String possiblyDate) {
     List<String> args = possiblyDate.split(".");
     if (args.length > 2 &&
@@ -173,11 +295,9 @@ class EventProvider extends ChangeNotifier {
     return null;
   }
 
-  Future<List<Veranstaltung>> loadFavoriteEvents(BuildContext context) {
-    // return upComing.map((id) => loaded[id]).toList();
-    String pageTitle = "favorites";
-  }
-
+  /// Bekommt DateTime und eine Liste mit Veranstaltungen & löscht
+  /// alle Veranstaltungen aus der Liste, die nicht im selben Monat wie
+  /// Datetime stattfinden.
   List<Veranstaltung> removeEventsOutsideMonth(
       DateTime month, List<Veranstaltung> events) {
     int year = month.year;
@@ -194,6 +314,8 @@ class EventProvider extends ChangeNotifier {
     return events;
   }
 
+  /// Gibt eine Liste an Events zurück, die einerseits bereits geladen sind und die
+  /// an dem selben Tag wie die übergebene Datetime statt finden
   List<Veranstaltung> getLoadedEventsOfDay(DateTime day) {
     DateTime start = DateTime.utc(day.year, day.month, day.day);
     DateTime end = DateTime.utc(day.year, day.month, day.day + 1);
@@ -207,6 +329,9 @@ class EventProvider extends ChangeNotifier {
     return eventsOfMonth;
   }
 
+  /// Gibt eine Liste an Events zurück, die einerseits bereits geladen sind, die
+  /// an dem selben Tag wie die übergebene Datetime statt finden und die als
+  /// favorisiert markiert sind
   List<Veranstaltung> getLoadedAndLikedEventsOfDay(DateTime day) {
     List<Veranstaltung> events = getLoadedEventsOfDay(day);
     for (int index = 0; index < events.length; index++) {
@@ -216,9 +341,9 @@ class EventProvider extends ChangeNotifier {
     return events;
   }
 
+  /// Gibt eine Liste an Events zurück, die einerseits bereits geladen sind und die
+  /// im selben Monat wie die übergebene Datetime statt finden
   List<Veranstaltung> getLoadedEventsOfMonth(DateTime month) {
-    // int userId = 11;
-
     int year = month.year;
 
     DateTime start = DateTime.utc(year, month.month, 1);
@@ -231,66 +356,6 @@ class EventProvider extends ChangeNotifier {
         for (int eventId in dated[date]) eventsOfMonth.add(loaded[eventId]);
 
     return eventsOfMonth;
-  }
-
-  List<Veranstaltung> getLoadedFavoriteEvents() {
-    return favorites.map((entry) => loaded[entry]).toList();
-  }
-
-  // void resetFavoriteEvents() {
-  //   nearby.clear();
-  //   nextPageToLoad["upcoming"] = 1;
-  //   loadFavoriteEvents();
-  // }
-
-  // void loadFavoriteEvents() {
-  //   favorites.clear();
-  //   int page = nextPageToLoad["favorites"] ?? 1;
-  //   //TODO: attemptsGetFavEvents(page);
-  //   nextPageToLoad["favorites"] = ++page;
-  // }
-
-  List<Veranstaltung> getEventsNearBy() {
-    // return nearby.map((entry) => loaded[entry]).toList();
-    // TODO: Noch ändern, muss aber erstmal attemt methode geben
-    return getLoadedUpComingEvents();
-  }
-
-  void resetEventsNearBy() {
-    nearby.clear();
-    nextPageToLoad["nearby"] = 1;
-    loadEventsNearBy();
-  }
-
-  void loadEventsNearBy() async {
-    // EventsNearBy aus Datenbank in nearby laden
-    print("man sollte die events nearby weiter laden");
-    // notifyListeners();
-    int page = nextPageToLoad["nearby"] ?? 1;
-    // TODO: attemptGetEventsNearB y(page)
-    nextPageToLoad["nearby"] = ++page;
-  }
-
-  List<Veranstaltung> getLoadedUpComingEvents() {
-    return upComing.map((id) => loaded[id]).toList();
-  }
-
-  void resetUpComingEvents() {
-    nearby.clear();
-    nextPageToLoad["upcoming"] = 1;
-    loadUpComingEvents();
-  }
-
-  void loadUpComingEvents() {
-    int page = nextPageToLoad["upcoming"] ?? 1;
-    // TODO: attemptGetUpComingEvents(page)
-    //
-    nextPageToLoad["upcoming"] = ++page;
-  }
-
-  List<Veranstaltung> getLoadedEventsAt(DateTime day, int page) {
-    if (dated[day] != null) return dated[day].map((id) => loaded[id]).toList();
-    return null; // Alle Events an dem Tag aus laden und zurückgeben => loadEventsAt...
   }
 
   Veranstaltung getLoadedEventById(int id) {
@@ -315,9 +380,10 @@ class EventProvider extends ChangeNotifier {
   Future<Veranstaltung> createEvent(String titel, String beschreibung,
       String email, String start, String ende, String adresse) async {
     // int id = 0;
+
+    /// TODO: ACHTUNG NOCH KONSTANTE PARAM ÜBERGABE
     Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
         start, ende, adresse, '89231', '1', '1', '1');
-    // print(resp.body);
 
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
@@ -333,13 +399,10 @@ class EventProvider extends ChangeNotifier {
       loadEvent(veranstaltung);
 
       return veranstaltung;
-
-      // toastmsg = "Neue Veranstaltung angelegt";
     } else {
       var parsedJson = json.decode(resp.body);
       var error = parsedJson['error'];
       log(error);
-      // toastmsg = error;
     }
     return null;
   }
@@ -347,10 +410,11 @@ class EventProvider extends ChangeNotifier {
   void loadFirstPages() {
     DateTime nextMonth =
         DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
-    loadEventsUntil(nextMonth);
-    // loadFavoriteEvents(context); TODO: was mache ich jetzt? initstate hat keinen Context
-    loadUpComingEvents();
-    loadEventsNearBy();
+    loadAllEventsUntil(nextMonth);
+  
+    // loadFavoriteEvents(context);
+    // loadUpComingEvents();
+    // loadEventsNearBy();
   }
 
   void loadEvent(Veranstaltung event) {
@@ -379,7 +443,8 @@ class EventProvider extends ChangeNotifier {
     return favorites.contains(id);
   }
 
-  //TODO: Mit BackEnd verbinden, warte auf User Provider
+  /// Ändert (toggelt) den Favorisierungs Zustand eines events sowohl im EventProvider,
+  /// als auch in der Datenbank
   bool toggleEventFavoriteState(BuildContext context, int eventId) {
     if (isEventFavorite(eventId)) {
       favorites.remove(eventId);
@@ -387,7 +452,9 @@ class EventProvider extends ChangeNotifier {
       favorites.add(eventId);
     }
 
-    if (UserProvider.userId != null && UserProvider.userId >= 0) {
+    if (UserProvider.userId != null &&
+        UserProvider.userId >= 0 &&
+        UserProvider.getUserRole().allowedToFavEvents) {
       String accessToken =
           Provider.of<UserProvider>(context, listen: false).getAccessToken();
       attemptFavor(
@@ -400,7 +467,10 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'] == '1') favorites.add(id);
+    if (json['favorit'] == '1' && !favorites.contains(id)) favorites.add(id);
+
+    if (json['istGenehmigt'] == '1' && !approved.contains(id)) approved.add(id);
+
     if (isEventLoaded(id)) return loaded[id];
 
     String titel = json['titel'];
@@ -409,15 +479,7 @@ class EventProvider extends ChangeNotifier {
     DateTime start = DateTime.parse(json['beginn_ts']);
     DateTime end = DateTime.parse(json['ende_ts']);
     String place = json['ortBeschreibung'];
-
-    bool isApproved = json['istGenehmigt'] == '1';
-    if (isApproved) approved.add(id); //  || UserProvider.getUserRole().
-
-    // TODO: if(ortBeschreibung < selbstDefinierter Radius entfernt) dann:
-    // if (!upComing.contains(
-    //     id)) // idk. ob das überhaupt sein kann, aber sicher ist sicher
-    // TODO: So kann es noch passieren dass durch zwischen laden
-    // mit anderen attemptBefehlen die reihenfolge nicht mehr stimmt...
+    //
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 

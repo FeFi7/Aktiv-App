@@ -1,15 +1,13 @@
-import 'dart:async';
-
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
-import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
+import 'package:aktiv_app_flutter/Views/Home.dart';
+import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-// TODO: Evtl in _PlaceHolder Methode instazieiern auslagern, damit wiedr neu erstellt wird
-// class EnvironmentPlaceholder extends StatelessWidget {
 
 class EnvironmentPlaceholder extends StatefulWidget {
   @override
@@ -17,97 +15,98 @@ class EnvironmentPlaceholder extends StatefulWidget {
 }
 
 class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
-// List<Veranstaltung> upComing = Consumer<EventProvider>(builder: (context, value, child) {
-//            return value.getUpComingEvents().map((event) => EventPreviewBox.load(event));
-//         } as List<Veranstaltung>;
+  final TextStyle headingStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  List<EventPreviewBox> upComing = [];
-  List<EventPreviewBox> nearBy = [];
-
-  Timer timer;
+  Future<List<List<Veranstaltung>>> loadEventsFromProvider() async {
+    List<List<Veranstaltung>> lists = [];
+    lists.add(await Provider.of<EventProvider>(context, listen: false)
+        .loadEventListOfType(EventListType.UP_COMING));
+    lists.add(await Provider.of<EventProvider>(context, listen: false)
+        .loadEventListOfType(EventListType.NEAR_BY));
+    return lists;
+  }
 
   @override
   Widget build(BuildContext context) {
-    // List<Veranstaltung> upComing =
-    // Consumer<EventProvider>(builder: (context, value, child) {
-    //   return value.getUpComingEvents().map((e) => EventPreviewBox.load(e)).toList();
-    //   nearBy = value.getEventsNearBy().map((e) => EventPreviewBox.load(e));
-    // });
-    //
-    //
-    // TODO: Event Provider aktualisieren
 
-    upComing = Provider.of<EventProvider>(context, listen: false)
-        .getLoadedUpComingEvents()
-        .map((event) => EventPreviewBox(
-            event.id,
-            event.titel,
-            event.beschreibung,
-            "Noch " +
-                (event.beginnTs.difference(DateTime.now()).inDays > 1
-                    ? event.beginnTs
-                            .difference(DateTime.now())
-                            .inDays
-                            .toString() +
-                        " Tage"
-                    : (event.beginnTs.difference(DateTime.now()).inDays == 1
-                        ? "ein Tag"
-                        : ((event.beginnTs.difference(DateTime.now()).inHours >
-                                1)
-                            ? (event.beginnTs
-                                    .difference(DateTime.now())
-                                    .inHours
-                                    .toString() +
-                                " Stunden")
-                            : (event.beginnTs
-                                    .difference(DateTime.now())
-                                    .inMinutes
-                                    .toString() +
-                                " Minuten"))))))
-        .toList();
+    return FutureBuilder<List<List<Veranstaltung>>>(
+      future: loadEventsFromProvider(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-    ///TODO: Anpassen, dass auch tatsächlich die entfernung angezeigt wird
-    nearBy = Provider.of<EventProvider>(context, listen: false)
-        .getEventsNearBy()
-        .map((event) => EventPreviewBox(event.id, event.titel,
-            event.beschreibung, "i.d.k. km weit entfernt"))
-        .toList();
+        final events = snapshot.data;
 
-    // Falls leer, wird einfach in 0,5s neu geladen
-    if (upComing.length <= 0 || nearBy.length <= 0)
-      Future.delayed(const Duration(milliseconds: 500), () {
-        setState(() {
-          // Here you can write your code for open new view
-        });
-      });
+        List<Widget> environment = [];
 
-    print(Provider.of<EventProvider>(context, listen: false)
-        .getLoadedUpComingEvents()
-        .length);
+        environment.add(Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Text("Bald", style: headingStyle)));
 
-    List<Widget> widgetList = <Widget>[PreviewListHeading('Bald')];
-    widgetList
-        .addAll(upComing.sublist(0, upComing.length < 2 ? upComing.length : 2));
-    widgetList.add(PreviewListDots(
-        EventPreviewList(
-            upComing,
-            () => {
-                  // Provider.of<EventProvider>(context, listen: false)
-                  //     .loadUpComingEvents()
-                }),
-        'Bald'));
+        for (Veranstaltung event in getListPreview(events[0]))
+          environment
+              .add(EventPreviewBox.load(event, AdditiveFormat.TIME_TILL_START));
 
-    widgetList.add(PreviewListHeading('In der Nähe'));
-    widgetList.addAll(nearBy.sublist(0, nearBy.length < 2 ? nearBy.length : 2));
-    widgetList.add(PreviewListDots(
-        EventPreviewList(
-            nearBy,
-            () => {
-                  // Provider.of<EventProvider>(context, listen: false)
-                  //     .loadEventsNearBy()
-                }),
-        'In der Nähe'));
+        environment.add(PreviewDots(EventPreviewList(
+            EventListType.UP_COMING, AdditiveFormat.TIME_TILL_START), "Bald"));
 
-    return EventPreviewList(widgetList, () {});
+        environment.add(Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Text("In der Nähe", style: headingStyle)));
+
+        for (Veranstaltung event in getListPreview(events[1]))
+          environment.add(EventPreviewBox.load(event, AdditiveFormat.DISTANCE));
+
+        environment.add(PreviewDots(
+            EventPreviewList(EventListType.NEAR_BY, AdditiveFormat.DISTANCE), "In der Nähe"));
+
+        return Container(
+            child: ListView.builder(
+                itemCount: environment.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return environment[index];
+                }));
+      },
+    );
+  }
+
+  List<Veranstaltung> getListPreview(List<Veranstaltung> events) {
+    List<Veranstaltung> listPreview = [];
+    for (int i = 0; (i < 2 && i < events.length); i++)
+      listPreview.add(events[i]);
+    return listPreview;
+  }
+}
+
+class PreviewDots extends StatefulWidget {
+  final EventPreviewList list;
+  final String appBarTitle;
+
+  PreviewDots(this.list, this.appBarTitle);
+
+  @override
+  _PreviewDotsState createState() => _PreviewDotsState();
+}
+
+class _PreviewDotsState extends State<PreviewDots> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 45),
+      child: IconButton(
+          icon: Icon(
+            Icons.more_horiz,
+            color: ColorPalette.congress_blue.rgb,
+            size: 64,
+          ),
+          onPressed: () {
+            Provider.of<BodyProvider>(context, listen: false)
+                .setBody(widget.list);
+            Provider.of<AppBarTitleProvider>(context, listen: false)
+                .setTitle(widget.appBarTitle);
+          }),
+    );
   }
 }

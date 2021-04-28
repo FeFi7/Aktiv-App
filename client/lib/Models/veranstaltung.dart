@@ -40,6 +40,6 @@ class Veranstaltung {
   );
 
   EventPreviewBox getPreviewBox() {
-    return EventPreviewBox.load(this);
+    return EventPreviewBox.load(this, AdditiveFormat.HOLE_DATETIME);
   }
 }

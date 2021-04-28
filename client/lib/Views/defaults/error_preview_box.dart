@@ -12,8 +12,6 @@ class ErrorPreviewBox extends StatefulWidget {
   _ErrorPreviewBoxState createState() => _ErrorPreviewBoxState();
 }
 
-// TODO: Box Höhe muss noch fix weden, passt sich momentan noch der Höhe an
-
 class _ErrorPreviewBoxState extends State<ErrorPreviewBox> {
   @override
   Widget build(BuildContext context) {
@@ -31,11 +29,8 @@ class _ErrorPreviewBoxState extends State<ErrorPreviewBox> {
                 color: ColorPalette.orange.rgb),
             padding: const EdgeInsets.all(10.0),
             margin: EdgeInsets.all(10),
-            
-            // margin: EdgeInsets.only(bottom: size.b*0.175),
             child: Column(
-              
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
               children: <Widget>[
                 SizedBox(
                     child: Align(

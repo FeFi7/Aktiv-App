@@ -12,12 +12,15 @@ import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 
 import '../Home.dart';
 
+enum AdditiveFormat { HOLE_DATETIME, TIME_TILL_START, DISTANCE }
+
 // ignore: must_be_immutable
 class EventPreviewBox extends StatefulWidget {
   int id;
   String titel;
   String description;
   String additive;
+  AdditiveFormat additiveFormat;
 
   // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
 
@@ -25,15 +28,40 @@ class EventPreviewBox extends StatefulWidget {
   // sondern aus einer singleton Klasse durch die id entnommen werdem
   EventPreviewBox(this.id, this.titel, this.description, this.additive);
 
-  EventPreviewBox.load(Veranstaltung event) {
+  EventPreviewBox.load(Veranstaltung event, this.additiveFormat) {
     this.id = event.id;
     this.titel = event.titel;
     this.description = event.beschreibung;
-    this.additive = _FormatAdditiveDate(event.beginnTs);
+    this.additive = _FormatAdditive(event.beginnTs);
   }
 
-  String _FormatAdditiveDate(DateTime dateTime) {
-    return  DateFormat('dd.MM.yyyy – kk:mm').format(dateTime)+ " Uhr";
+  String _FormatAdditive(DateTime dateTime) {
+    switch (additiveFormat) {
+      case AdditiveFormat.HOLE_DATETIME:
+        return DateFormat('dd.MM.yyyy – kk:mm').format(dateTime) + " Uhr";
+      case AdditiveFormat.TIME_TILL_START:
+        return "Beginnt in " +
+            (dateTime.difference(DateTime.now()).inDays > 1
+                ? dateTime.difference(DateTime.now()).inDays.toString() +
+                    " Tagen"
+                : (dateTime.difference(DateTime.now()).inDays == 1
+                    ? "einem Tag"
+                    : ((dateTime.difference(DateTime.now()).inHours > 1)
+                        ? (dateTime
+                                .difference(DateTime.now())
+                                .inHours
+                                .toString() +
+                            " Stunden")
+                        : (dateTime
+                                .difference(DateTime.now())
+                                .inMinutes
+                                .toString() +
+                            " Minuten"))));
+      case AdditiveFormat.DISTANCE:
+        return "-1 km weit entfernt";
+      default:
+        return null;
+    }
   }
 
   @override
@@ -122,25 +150,26 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    (UserProvider.getUserRole().allowedToFavEvents ? IconButton(
-                        icon: Icon(
-                          liked
-                              ? Icons.favorite_rounded
-                              : Icons.favorite_border,
-                          color: liked
-                              ? ColorPalette.orange.rgb
-                              : ColorPalette.black.rgb,
-                          size: 32,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            
-                            
-                            liked = Provider.of<EventProvider>(context,
-                                    listen: false)
-                                .toggleEventFavoriteState(context, widget.id);
-                          });
-                        }) : Container()),
+                    (UserProvider.getUserRole().allowedToFavEvents
+                        ? IconButton(
+                            icon: Icon(
+                              liked
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border,
+                              color: liked
+                                  ? ColorPalette.orange.rgb
+                                  : ColorPalette.black.rgb,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                liked = Provider.of<EventProvider>(context,
+                                        listen: false)
+                                    .toggleEventFavoriteState(
+                                        context, widget.id);
+                              });
+                            })
+                        : Container()),
                     IconButton(
                         icon: Icon(
                           Icons.chevron_right_rounded,
@@ -164,4 +193,3 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
     );
   }
 }
-

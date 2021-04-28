@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:flutter/material.dart';
 
 enum ROLE { NOT_REGISTERED, USER, GENEHMIGER, BETREIBER }
@@ -10,6 +11,7 @@ extension Permissions on ROLE {
   }
   
   bool get allowedToFavEvents {
-    return getPermissionWeighting() > 0;
+    // return getPermissionWeighting() >= ROLE.USER.getPermissionWeighting();
+    return UserProvider.istEingeloggt;
   }
 }

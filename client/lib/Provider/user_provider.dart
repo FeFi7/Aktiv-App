@@ -23,7 +23,7 @@ class UserProvider extends ChangeNotifier {
       institutionen,
       rolle,
       profilBild;
-  bool istEingeloggt = false, datenVollstaendig = false;
+  static bool istEingeloggt = false, datenVollstaendig = false;
 
   // TODO: Evtl die Rolle über den
 

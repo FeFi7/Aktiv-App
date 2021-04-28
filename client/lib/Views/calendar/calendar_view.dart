@@ -90,7 +90,7 @@ class _CalendarViewState extends State<CalendarView> {
                     _focusedDay = focusedDay;
 
                     Provider.of<EventProvider>(context, listen: false)
-                        .loadEventsUntil(DateTime(
+                        .loadAllEventsUntil(DateTime(
                             DateTime.now().year,
                             DateTime.now().month +
                                 futureMonthsLoaded++, //TODO: begrenzen
@@ -115,7 +115,6 @@ class _CalendarViewState extends State<CalendarView> {
                   isSelected: isSelected,
                   onPressed: (int index) async {
                     setState(() {
-                      // TODO: Persnlicher Kalender soll nur ausgeführt werden können, wenn man registrierter user ist
 
                       for (int buttonIndex = 0;
                           buttonIndex < isSelected.length;
@@ -128,16 +127,7 @@ class _CalendarViewState extends State<CalendarView> {
                       }
 
                       _selectedDay = null;
-                      //
                       _selectedEvents.value = [];
-
-                      // List<Veranstaltung> events;
-                      // Provider.of<EventProvider>(context, listen: false)
-                      //     .loadAllEvents();
-
-                      // log(events.length.toString());
-
-                      //
                     });
                   },
                   borderRadius: BorderRadius.circular(30),
@@ -146,7 +136,7 @@ class _CalendarViewState extends State<CalendarView> {
                   fillColor: ColorPalette.endeavour.rgb,
                   disabledBorderColor: ColorPalette.french_pass.rgb,
                 ),
-              )) : Container(),
+              )) : Container(), /// Leerer Container, falls User nicht eingeloggt ist
             )
           ],
         ),
@@ -158,7 +148,7 @@ class _CalendarViewState extends State<CalendarView> {
                 ? ListView.builder(
                     itemCount: value.length,
                     itemBuilder: (context, index) {
-                      return EventPreviewBox.load(value[index]);
+                      return EventPreviewBox.load(value[index], AdditiveFormat.HOLE_DATETIME);
                     },
                   )
                 : Container(
