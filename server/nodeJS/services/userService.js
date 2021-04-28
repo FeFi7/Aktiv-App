@@ -72,8 +72,8 @@ async function getUserInfo(id, mail) {
   if (mail) {
     const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, u.vorname, u.nachname, u.tel, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
     FROM User u
-    INNER JOIN Rolle r ON u.rolleId = r.id
-    INNER JOIN PLZ p ON u.plzId = p.id
+    INNER JOIN Rolle r ON u.rolleId = r.id 
+    LEFT OUTER JOIN PLZ p ON u.plzId = p.id 
     LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
     WHERE u.id = ? and u.mail = ? limit 1`;
 
@@ -89,8 +89,8 @@ async function getUserInfo(id, mail) {
   } else {
     const query = `SELECT u.id, u.mail, u.erstellt_ts, p.plz, r.name AS rolle, f.pfad AS profilbild, u.umkreisEinstellung, u.baldEinstellung  
     FROM User u
-    INNER JOIN Rolle r ON u.rolleId = r.id
-    INNER JOIN PLZ p ON u.plzId = p.id
+    INNER JOIN Rolle r ON u.rolleId = r.id 
+    LEFT OUTER JOIN PLZ p ON u.plzId = p.id 
     LEFT OUTER JOIN File f ON u.pofilbildId = f.id 
     WHERE u.id = ? limit 1`;
 
