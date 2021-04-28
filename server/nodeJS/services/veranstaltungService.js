@@ -245,8 +245,38 @@ async function addTagsToVeranstaltung(veranstaltungId, tags) {
       return { error: "Fehler bei Db" };
     });
   });
-  
+
   return true;
+}
+
+async function getTagsFiltered(tag) {
+  // für sql wildcard anpassen
+  if(tag){
+    tag = "%" + tag + "%";
+  }
+  else{
+    tag = "%%"
+  }
+    
+  
+  const queryVerknuepfung = `SELECT t.name, COUNT(t.name) beliebtheit FROM Tag t
+  INNER JOIN TagZuweisung tz ON t.id = tz.tagId
+  WHERE t.name LIKE ?
+  GROUP BY t.name
+  ORDER BY beliebtheit desc`;
+
+  const result = await conn.query(queryVerknuepfung, [tag]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler bei Db" };
+  });
+
+  console.log("Anzahl tags für "+ tag +": "+ result[0].length)
+
+  if (result) {
+    return result[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
 }
 
 async function isUserVeranstaltungErsteller(veranstaltungId, userId) {
@@ -279,5 +309,6 @@ module.exports = {
   genehmigeVeranstaltung: genehmigeVeranstaltung,
   isUserVeranstaltungErsteller: isUserVeranstaltungErsteller,
   deleteVeranstaltung: deleteVeranstaltung,
-  addTagsToVeranstaltung: addTagsToVeranstaltung
+  addTagsToVeranstaltung: addTagsToVeranstaltung,
+  getTagsFiltered: getTagsFiltered
 };
