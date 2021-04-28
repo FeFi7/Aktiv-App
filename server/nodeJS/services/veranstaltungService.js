@@ -263,7 +263,7 @@ async function getTagsFiltered(tag) {
   INNER JOIN TagZuweisung tz ON t.id = tz.tagId
   WHERE t.name LIKE ?
   GROUP BY t.name
-  ORDER BY beliebtheit desc`;
+  ORDER BY beliebtheit desc LIMIT 10`;
 
   const result = await conn.query(queryVerknuepfung, [tag]).catch((error) => {
     console.log(error);
