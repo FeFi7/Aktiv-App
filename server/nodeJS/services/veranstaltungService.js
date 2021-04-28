@@ -20,6 +20,24 @@ async function getVeranstaltungById(veranstaltungId) {
   }
 }
 
+async function getVeranstaltungFilesById(veranstaltungId) {
+  const query = `SELECT id, pfad, typ FROM VeranstaltungFile vf 
+  INNER JOIN File f ON vf.fileId = f.id
+  WHERE vf.veranstaltungId = ?`;
+
+  let result = await conn
+    .query(query, [Number(veranstaltungId)])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler bei Db" };
+    });
+  if (result) {
+    return result[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function genehmigeVeranstaltung(veranstaltungId) {
   const query = `UPDATE Veranstaltung v SET v.istGenehmigt = 1 WHERE v.id = ?`;
 
@@ -251,14 +269,12 @@ async function addTagsToVeranstaltung(veranstaltungId, tags) {
 
 async function getTagsFiltered(tag) {
   // für sql wildcard anpassen
-  if(tag){
+  if (tag) {
     tag = "%" + tag + "%";
+  } else {
+    tag = "%%";
   }
-  else{
-    tag = "%%"
-  }
-    
-  
+
   const queryVerknuepfung = `SELECT t.name, COUNT(t.name) beliebtheit FROM Tag t
   INNER JOIN TagZuweisung tz ON t.id = tz.tagId
   WHERE t.name LIKE ?
@@ -270,7 +286,7 @@ async function getTagsFiltered(tag) {
     return { error: "Fehler bei Db" };
   });
 
-  console.log("Anzahl tags für "+ tag +": "+ result[0].length)
+  console.log("Anzahl tags für " + tag + ": " + result[0].length);
 
   if (result) {
     return result[0];
@@ -310,5 +326,6 @@ module.exports = {
   isUserVeranstaltungErsteller: isUserVeranstaltungErsteller,
   deleteVeranstaltung: deleteVeranstaltung,
   addTagsToVeranstaltung: addTagsToVeranstaltung,
-  getTagsFiltered: getTagsFiltered
+  getTagsFiltered: getTagsFiltered,
+  getVeranstaltungFilesById: getVeranstaltungFilesById,
 };

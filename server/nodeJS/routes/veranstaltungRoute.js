@@ -4,7 +4,6 @@ var express = require("express");
 var router = express.Router();
 const passport = require("passport");
 
-
 // [GET] bekomme tags (optional gefiltert)
 router.get("/tags", async function (req, res) {
   const tag = req.query.tag;
@@ -26,17 +25,30 @@ router.get("/:veranstaltungId", async function (req, res) {
     return res.status(400).send("Id keine Zahl");
   }
 
-  const veranstaltung = await veranstaltungService.getVeranstaltungById(
+  let veranstaltung = await veranstaltungService.getVeranstaltungById(
     req.params.veranstaltungId
   );
-  if (veranstaltung) {
-    return res.json(veranstaltung);
-  } else {
-    return res.status(404).send("Veranstaltung nicht vorhanden");
+
+  if (veranstaltung.error) {
+    return res.status(400).json(veranstaltung);
   }
+  if (veranstaltung.length === 0) {
+    return res.status(404).json(veranstaltung);
+  } else {
+    veranstaltung = veranstaltung[0];
+  }
+
+  const veranstaltungFiles = await veranstaltungService.getVeranstaltungFilesById(
+    req.params.veranstaltungId
+  );
+
+  if (veranstaltungFiles.error) {
+    return res.status(400).json(veranstaltungFiles);
+  }
+
+  veranstaltung.files = veranstaltungFiles;
+  return res.status(200).json(veranstaltung)
 });
-
-
 
 // [DELETE] lösche einzelne Veranstaltung
 router.delete(

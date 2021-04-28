@@ -76,10 +76,11 @@ router.post(
   "/:userId/institutionen/:institutionId",
   passport.authenticate("jwt", { session: false }),
   async function (req, res) {
-    const userId = req.params.userId;
+    const userId = req.user._id;
+    const userIdAdd = req.params.userId;
     const institutionId = req.params.institutionId;
 
-    if (!/^\d+$/.test(userId)) {
+    if (!/^\d+$/.test(userIdAdd)) {
       return res.status(400).send("userId keine Zahl");
     }
     if (!/^\d+$/.test(institutionId)) {
@@ -97,7 +98,50 @@ router.post(
       });
     }
 
-    const result = await userService.addUserToInstitut(userId, institutionId);
+    const result = await userService.addUserToInstitut(
+      userIdAdd,
+      institutionId
+    );
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [DELETE] Lösche Verknüpfung von User mit Institution als Verwalter
+router.delete(
+  "/:userId/institutionen/:institutionId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const userIdDelete = req.params.userId;
+    const institutionId = req.params.institutionId;
+
+    if (!/^\d+$/.test(userIdDelete)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+    if (!/^\d+$/.test(institutionId)) {
+      return res.status(400).send("institutionId keine Zahl");
+    }
+
+    const resultIsUserInInstitution = await institutionService.isUserInInstitution(
+      userId,
+      institutionId
+    );
+
+    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+      return res.status(400).json({
+        error: "User ist nicht als Verwalter in Institution registriert",
+      });
+    }
+
+    const result = await userService.deleteUserToInstitut(
+      userIdDelete,
+      institutionId
+    );
 
     if (result.error) {
       return res.status(400).json(result);
@@ -170,8 +214,6 @@ router.post("/signup", async function (req, res) {
   }
 });
 
-
-
 // [POST] login User
 router.post("/login", async (req, res, next) => {
   passport.authenticate("login", async (err, user, info) => {
@@ -196,7 +238,7 @@ router.post("/login", async (req, res, next) => {
         if (saveRefreshResult.error) {
           return res.status(400).json({ error: "Fehler bei Db" });
         } else {
-          return res.json({ accessToken, refreshToken, "id": user.id });
+          return res.json({ accessToken, refreshToken, id: user.id });
         }
       });
     } catch (error) {
@@ -293,9 +335,37 @@ router.get(
     console.log("mail: " + req.user.mail);
     const result = await userService.getUserInfo(userId, req.user.mail);
     if (result.error) {
-      res.status(400).json(result);
+      return res.status(400).json(result);
     } else {
-      res.status(200).json(result);
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [DELETE] Lösche User (Nur als Betreiber möglich)
+router.delete(
+  "/:userId",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res, next) {
+    const userId = req.user._id;
+    const userZuEntfernenId = req.params.userId;
+    if (!/^\d+$/.test(userZuEntfernenId)) {
+      return res.status(400).send("Id keine Zahl");
+    }
+
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+      return res.status(400).json({
+        error: "Nur Betreiber können User löschen",
+      });
+    }
+
+    const result = await userService.deleteUser(userZuEntfernenId);
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
     }
   }
 );
@@ -316,13 +386,15 @@ router.put(
       body.vorname,
       body.nachname,
       body.plz,
-      body.tel
+      body.tel,
+      body.strasse,
+      body.hausnummer
     );
 
     if (result.error) {
-      res.status(400).json(result);
+      return res.status(400).json(result);
     } else {
-      res.status(200).json(result);
+      return res.status(200).json(result);
     }
   }
 );
@@ -349,6 +421,60 @@ router.post(
       userId,
       veranstaltungId
     );
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [POST] Generiere Verbindung von Genehmiger zu PLZs
+router.post(
+  "/:userId/genehmigung",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const userIdGenehmiger = req.params.userId;
+    let plz = req.body.plz;
+    if (!/^\d+$/.test(userIdGenehmiger)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+
+    if (plz) {
+      try {
+        plz = JSON.parse(plz);
+      } catch (e) {
+        console.log("Fehler bei Parsung plz");
+        return res
+          .status(400)
+          .json({ error: "plz werden nicht als Array übergeben" });
+      }
+      if (!Array.isArray(plz)) {
+        return res
+          .status(400)
+          .json({ error: "plz werden nicht als Array übergeben" });
+      }
+    }
+
+    // Ist anfragender User Betreiber und Ziel Genehmiger?
+    const resultIsUserGenehmiger = await userService.isUserGenehmiger(
+      userIdGenehmiger
+    );
+    if (resultIsUserGenehmiger.error || !resultIsUserGenehmiger) {
+      return res.status(400).json({
+        error: "ZielUser besitzt keine Genehmigerrolle",
+      });
+    }
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+      return res.status(400).json({
+        error: "Nur Betreiber können PLZ zuweisen",
+      });
+    }
+
+    const result = await userService.setGenehmigerPLZs(userIdGenehmiger, plz);
 
     if (result.error) {
       return res.status(400).json(result);
