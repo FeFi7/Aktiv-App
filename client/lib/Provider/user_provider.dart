@@ -7,7 +7,8 @@ import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/cupertino.dart';
 
 class UserProvider extends ChangeNotifier {
-  static ROLE _role = ROLE.NOT_REGISTERED; // Brauchte eine Standard Rolle, sorry wens dir was zerschießt, lg Niko
+  static ROLE _role = ROLE
+      .NOT_REGISTERED; // Brauchte eine Standard Rolle, sorry wens dir was zerschießt, lg Niko
   final SecureStorage storage = SecureStorage();
 
   static int userId = -1;
@@ -67,7 +68,7 @@ class UserProvider extends ChangeNotifier {
     var parsedUser = json.decode(detailedUserInfo.body);
 
     userId = parsedUser['id'];
-    if (parsedUser['plz'] != null) {
+    if (parsedUser['plz'] != null && parsedUser['plz'] != "null") {
       plz = int.parse(parsedUser['plz']);
     }
     //hausnummer = parsedUser['hausnummer'];
@@ -129,7 +130,7 @@ class UserProvider extends ChangeNotifier {
     await storage.deleteAll();
   }
 
-  updateUserInfo(
+  updateUserInfo<Response>(
       String vorname, String nachname, String plz, String tel) async {
     var jwt = await attemptUpdateUserInfo(
         mail.toString(),
@@ -139,6 +140,8 @@ class UserProvider extends ChangeNotifier {
         tel.toString(),
         userId.toString(),
         await getAccessToken());
+    var accessToken = await storage.read('accessToken');
+    await collectUserInfo(userId, accessToken);
     notifyListeners();
     return jwt;
   }
@@ -146,6 +149,8 @@ class UserProvider extends ChangeNotifier {
   updateUserSettings(String naehe, String bald) async {
     var jwt = await attemptUpdateSettings(
         userId.toString(), await getAccessToken(), naehe, bald);
+    collectUserInfo(userId.toString(), await getAccessToken());
+    notifyListeners();
     return jwt;
   }
 
@@ -161,6 +166,48 @@ class UserProvider extends ChangeNotifier {
     var jwt = await attemptGetFile(profilBild);
     notifyListeners();
     return jwt;
+  }
+
+  setRole(String mail, String rolle) async {
+    switch (rolle) {
+      case "user":
+        rolle = '0'; //verursacht error!!!
+        break;
+      case "user":
+        rolle = "1";
+        break;
+      case "genehmiger":
+        rolle = "2";
+        break;
+      case "betreiber":
+        rolle = "3";
+        break;
+      default:
+        rolle = "1";
+    }
+    var user = await attemptGetUser(mail);
+    var parsedUser = json.decode(user.body);
+    var _map = parsedUser.values.toList();
+    var _verwalterId = _map[1]['id'].toString();
+
+    var jwt =
+        await attemptUpdateRole(_verwalterId, rolle, await getAccessToken());
+    notifyListeners();
+    return jwt;
+  }
+
+  setVerwalter(String mail, String institutionsId) async {
+    var verwalter = await attemptGetUser(mail);
+    var parsedVerwalter = json.decode(verwalter.body);
+    var _map = parsedVerwalter.values.toList();
+    var _userId = _map[1]['id'].toString();
+
+    //## derzeit keine Institutionen vorhanden ##//
+    //TODO
+    // var jwt = await attemptSetVerwalter(
+    //     _userId, institutionsId, await getAccessToken());
+    // return jwt;
+    //###########################################//
   }
 
   checkDataCompletion() {

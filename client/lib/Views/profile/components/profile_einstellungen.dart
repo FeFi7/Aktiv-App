@@ -13,14 +13,16 @@ class ProfileEinstellungen extends StatefulWidget {
 }
 
 class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
-  var sliderValueNaehe = 0.0;
-  var sliderValueBald = 1.0;
+  var sliderValueNaehe = 10.0;
+  var sliderValueBald = 7.0;
+  bool init = true;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Column(
       children: [
+        if (init) getSliderValues(),
         SizedBox(height: 40),
         baldSlider(size),
         SizedBox(height: 25),
@@ -35,7 +37,11 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
             var jwt = await Provider.of<UserProvider>(context, listen: false)
                 .updateUserSettings(sliderValueNaehe.toInt().toString(),
                     sliderValueBald.toInt().toString());
-            if (jwt.statusCode != 200) errorToast("Fehler bei Aktualisierung");
+            if (jwt.statusCode != 200) {
+              errorToast("Fehler bei Aktualisierung");
+            } else {
+              errorToast("Aktualisierung erfolgreich");
+            }
           },
         ),
       ],
@@ -178,6 +184,23 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
         ),
       ),
     );
+  }
+
+  getSliderValues() {
+    init = false;
+    if (Provider.of<UserProvider>(context, listen: false).bald != null &&
+        Provider.of<UserProvider>(context, listen: false).bald.toString() !=
+            "null") {
+      sliderValueBald =
+          Provider.of<UserProvider>(context, listen: false).bald.toDouble();
+    }
+    if (Provider.of<UserProvider>(context, listen: false).naehe != null &&
+        Provider.of<UserProvider>(context, listen: false).naehe.toString() !=
+            "null") {
+      sliderValueNaehe =
+          Provider.of<UserProvider>(context, listen: false).naehe.toDouble();
+    }
+    return SizedBox(height: 2.0);
   }
 
   errorToast(String errorMessage) {

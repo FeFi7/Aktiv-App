@@ -7,11 +7,13 @@ class RoundedInputEmailField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final ValueChanged<String> onChanged;
+  final TextEditingController controller;
   const RoundedInputEmailField({
     Key key,
     this.hintText,
     this.icon = Icons.person,
     this.onChanged,
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -33,6 +35,7 @@ class RoundedInputEmailField extends StatelessWidget {
             hintText: hintText,
             border: InputBorder.none,
           ),
+          controller: controller,
         ),
       ),
     );

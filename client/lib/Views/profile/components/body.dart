@@ -7,7 +7,6 @@ import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen
 import 'package:aktiv_app_flutter/Views/profile/components/profile_verwalten.dart';
 import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
-import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -31,8 +30,6 @@ class _BodyState extends State<Body> {
 
   final List<bool> userGruppe = [true, false, false];
   int userGruppeIndex = 0;
-
-  final SecureStorage storage = SecureStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +56,9 @@ class _BodyState extends State<Body> {
 
   Text buildName() {
     if (Provider.of<UserProvider>(context, listen: false).vorname != null &&
-        Provider.of<UserProvider>(context, listen: false).nachname != null) {
+        Provider.of<UserProvider>(context, listen: false).vorname != "null" &&
+        Provider.of<UserProvider>(context, listen: false).nachname != null &&
+        Provider.of<UserProvider>(context, listen: false).nachname != "null") {
       return Text(
         Provider.of<UserProvider>(context, listen: false).vorname +
             " " +
@@ -75,7 +74,8 @@ class _BodyState extends State<Body> {
   }
 
   Text buildMail() {
-    if (Provider.of<UserProvider>(context, listen: false).mail != null) {
+    if (Provider.of<UserProvider>(context, listen: false).mail != null &&
+        Provider.of<UserProvider>(context, listen: false).mail != "null") {
       return Text(
         Provider.of<UserProvider>(context, listen: false).mail,
         style: TextStyle(

@@ -1,11 +1,16 @@
+import 'package:aktiv_app_flutter/Models/role_permissions.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/card_dropdown.dart';
 import 'package:aktiv_app_flutter/components/card_dropdown_with_image.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field_numeric_komma.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class ProfileVerwalten extends StatefulWidget {
   var userGruppe;
@@ -18,6 +23,10 @@ class ProfileVerwalten extends StatefulWidget {
 
 class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   int userGruppe;
+  final verwalterController = TextEditingController();
+  final genehmigerController = TextEditingController();
+  final betreiberController = TextEditingController();
+  final benutzerController = TextEditingController();
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
 
@@ -150,6 +159,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
           children: <Widget>[
             verwalterVerwaltenCard(),
             genehmigerVerwaltenCard(),
+            betreiberVerwaltenCard(),
             benutzerLoschenCard(),
           ],
         );
@@ -171,12 +181,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
           size: 40.0,
         ),
         SizedBox(width: 20.0),
-        Text("Verwalter hinzufügen"),
+        Text("Verwalter verwalten"),
       ],
       bodyChildren: [
         Text("Email-Adresse des neuen Verwalters eingeben"),
         RoundedInputEmailField(
           hintText: "Email",
+          controller: verwalterController,
         ),
         SizedBox(height: 10.0),
         Container(
@@ -214,7 +225,143 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         RoundedButton(
           text: "Verwalter hinzufügen",
           color: ColorPalette.endeavour.rgb,
-          press: () {},
+          press: () async {
+            var institutionsId = "1";
+            // var verwalter =
+            //     await Provider.of<UserProvider>(context, listen: false)
+            //         .setRole(verwalterController.text, "verwalter");
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie den Verwalter hinzufügen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              var verwalter =
+                  await Provider.of<UserProvider>(context, listen: false)
+                      .setVerwalter(verwalterController.text, institutionsId);
+              if (verwalter.statusCode != 200) {
+                errorToast("Fehler bei der Aktualisierung");
+              } else {
+                errorToast("Verwalter hinzugefügt");
+              }
+            }
+          },
+        ),
+        RoundedButton(
+          text: "Verwalter entfernen",
+          color: ColorPalette.grey.rgb,
+          press: () async {
+            var institutionsId = "1";
+            // var verwalter =
+            //     await Provider.of<UserProvider>(context, listen: false)
+            //         .setRole(verwalterController.text, "verwalter");
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie den Verwalter entfernen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO verwalter entfernen
+              // var verwalter =
+              //     await Provider.of<UserProvider>(context, listen: false)
+              //         .setVerwalter(verwalterController.text, institutionsId);
+              // if (verwalter.statusCode != 200) {
+              //   errorToast("Fehler bei der Aktualisierung");
+              // } else {
+              //   errorToast("Verwalter entfernt");
+              // }
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  betreiberVerwaltenCard() {
+    return CardDropDown(
+      headerChildren: [
+        Icon(
+          Icons.person_add_alt_1,
+          size: 40.0,
+        ),
+        SizedBox(width: 20.0),
+        Text("Betreiber verwalten"),
+      ],
+      bodyChildren: [
+        Text("Email-Adresse des Betreibers eingeben"),
+        RoundedInputEmailField(
+          hintText: "Email",
+          controller: betreiberController,
+        ),
+        SizedBox(height: 10.0),
+        RoundedButton(
+          text: "Betreiber hinzufügen",
+          color: ColorPalette.endeavour.rgb,
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie den Betreiber hinzufügen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              var user = await Provider.of<UserProvider>(context, listen: false)
+                  .setRole(betreiberController.text, "betreiber");
+              if (user.statusCode != 200) {
+                errorToast("Fehler bei der Aktualisierung");
+              } else {
+                errorToast("Betreiber hinzugefügt");
+              }
+            }
+          },
+        ),
+        SizedBox(height: 10.0),
+        RoundedButton(
+          text: "Betreiber entfernen",
+          color: ColorPalette.grey.rgb,
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie den Betreiber wirklich entfernen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              var user = await Provider.of<UserProvider>(context, listen: false)
+                  .setRole(betreiberController.text, "user");
+              if (user.statusCode != 200) {
+                errorToast("Fehler bei der Aktualisierung");
+              } else {
+                errorToast("Betreiber entfernt");
+              }
+            }
+          },
         ),
       ],
     );
@@ -230,12 +377,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         SizedBox(
           width: 20.0,
         ),
-        Text("Genehmiger hinzufügen/bearbeiten"),
+        Text("Genehmiger verwalten"),
       ],
       bodyChildren: [
         Text("Email-Adresse des Genehmigers eingeben"),
         RoundedInputEmailField(
           hintText: "Email",
+          controller: genehmigerController,
         ),
         SizedBox(height: 10.0),
         Text("Postleizahl(en) des Genehmigers eingeben"),
@@ -246,12 +394,46 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         RoundedButton(
           text: "Postleizahl hinzufügen",
           color: ColorPalette.endeavour.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text(
+                  "Möchten Sie dem Genehmiger, die genannten PLZ-Angaben hinzufügen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Genehmiger hinzufügen von PLZs
+            }
+          },
         ),
         RoundedButton(
           text: "Postleizahl entfernen",
           color: ColorPalette.grey.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text(
+                  "Möchten Sie dem Genehmiger, die genannten PLZ-Angaben entfernen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Genehmiger entfernen von PLZs
+            }
+          },
         ),
       ],
     );
@@ -259,17 +441,18 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
 
   Card genehmigerCard() {
     return Card(
-        clipBehavior: Clip.antiAlias,
-        child: Container(
-          child: Text(
-            "Keine Berechtigung zur Benutzererwaltung vorhanden.\nBitte wenden Sie sich an den Betreiber.",
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.grey,
-            ),
-            textAlign: TextAlign.center,
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        child: Text(
+          "Keine Berechtigung zur Benutzererwaltung vorhanden.\nBitte wenden Sie sich an den Betreiber.",
+          style: TextStyle(
+            fontSize: 20.0,
+            color: Colors.grey,
           ),
-        ));
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   benutzerLoschenCard() {
@@ -288,12 +471,29 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         Text("Email-Adresse des Benutzers eingeben"),
         RoundedInputEmailField(
           hintText: "Email",
+          controller: benutzerController,
         ),
         SizedBox(height: 10.0),
         RoundedButton(
           text: "Benutzer löschen",
           color: ColorPalette.grey.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie diesen Benutzer wirklich löschen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Benutzer löschen
+            }
+          },
         ),
       ],
     );
@@ -358,12 +558,44 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         RoundedButton(
           text: "Veranstaltung genehmigen",
           color: ColorPalette.endeavour.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie diese Veranstaltung genehmigen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Veranstaltung genehmigen
+            }
+          },
         ),
         RoundedButton(
           text: "Veranstaltung ablehnen",
           color: ColorPalette.grey.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie diese Veranstaltung ablehnen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Veranstaltung ablehnen
+            }
+          },
         ),
       ],
     );
@@ -430,15 +662,60 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         RoundedButton(
           text: "Verwalter hinzufügen",
           color: ColorPalette.endeavour.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text(
+                  "Möchten Sie dieser Institution den angegebenen Verwalter hinzufügen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Verwalter hinzufügen
+            }
+          },
         ),
         SizedBox(height: 20.0),
         RoundedButton(
           text: "Institution löschen",
           color: ColorPalette.grey.rgb,
-          press: () {},
+          press: () async {
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie diese Institution löschen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO Institution löschen
+            }
+          },
         ),
       ],
     );
+  }
+
+  errorToast(String errorMessage) {
+    Fluttertoast.showToast(
+      msg: errorMessage,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: ColorPalette.orange.rgb,
+      textColor: ColorPalette.white.rgb,
+    );
+    FocusManager.instance.primaryFocus.unfocus();
   }
 }
