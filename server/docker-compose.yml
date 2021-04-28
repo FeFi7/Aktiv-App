@@ -62,7 +62,7 @@ services:
         volumes: 
             - /data/uploads/:/uploads
             - /etc/letsencrypt/archive/app.lebensqualitaet-burgrieden.de/:/etc/nginx/certs
-            - /data/logs/:/var/log/nginx
+            - /data/logs/nginx/:/var/log/nginx
         depends_on:
             - node1
             - node2
