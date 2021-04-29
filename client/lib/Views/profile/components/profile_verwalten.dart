@@ -22,7 +22,7 @@ class ProfileVerwalten extends StatefulWidget {
 }
 
 class _ProfileVerwaltenState extends State<ProfileVerwalten> {
-  int userGruppe;
+  var _userGruppe;
   final verwalterController = TextEditingController();
   final genehmigerController = TextEditingController();
   final betreiberController = TextEditingController();
@@ -37,7 +37,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     "Institution C"
   ];
 
-  _ProfileVerwaltenState(this.userGruppe);
+  _ProfileVerwaltenState(this._userGruppe);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -109,22 +109,22 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
 
   //Veranstaltungs-/Institutionsbezogener Tab
   Column buildFirstTab() {
-    switch (userGruppe) {
-      case 0:
+    switch (_userGruppe.toLowerCase()) {
+      case "verwalter":
         return Column(
           children: <Widget>[
             institutionenVerwalten(),
           ],
         );
         break;
-      case 1:
+      case "genehmiger":
         return Column(
           children: <Widget>[
             zuGenehmigen(),
             //institutionenVerwalten(),
           ],
         );
-      case 2:
+      case "betreiber":
         return Column(
           children: <Widget>[
             zuGenehmigen(),
@@ -140,21 +140,21 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
 
 //Benutzerbezogener Tab
   Column buildSecondTab() {
-    switch (userGruppe) {
-      case 0:
+    switch (_userGruppe.toLowerCase()) {
+      case "verwalter":
         return Column(
           children: <Widget>[
             verwalterVerwaltenCard(),
           ],
         );
         break;
-      case 1:
+      case "genehmiger":
         return Column(
           children: <Widget>[
             genehmigerCard(),
           ],
         );
-      case 2:
+      case "betreiber":
         return Column(
           children: <Widget>[
             verwalterVerwaltenCard(),
@@ -165,9 +165,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         );
       default:
         return Column(
-          children: <Widget>[
-            verwalterVerwaltenCard(),
-          ],
+          children: <Widget>[],
         );
     }
   }

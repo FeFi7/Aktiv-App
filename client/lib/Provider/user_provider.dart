@@ -113,6 +113,7 @@ class UserProvider extends ChangeNotifier {
     var _userId = await storage.read('userId');
     if (_userId != null) {
       getAccessToken();
+      istEingeloggt = true;
       return _userId;
     }
     return null;
@@ -170,7 +171,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   setRole(String mail, String rolle) async {
-    switch (rolle) {
+    switch (rolle.toLowerCase()) {
       case "user":
         rolle = "1";
         break;
@@ -187,10 +188,9 @@ class UserProvider extends ChangeNotifier {
     var parsedUser = json.decode(user.body);
     var _map = parsedUser.values.toList();
     if (_map[0] != false) {
-      var _verwalterId = _map[1]['id'].toString();
+      var _userId = _map[1]['id'].toString();
 
-      var jwt =
-          await attemptUpdateRole(_verwalterId, rolle, await getAccessToken());
+      var jwt = await attemptUpdateRole(_userId, rolle, await getAccessToken());
       notifyListeners();
       return jwt;
     }

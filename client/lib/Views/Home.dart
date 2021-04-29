@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
 import 'package:aktiv_app_flutter/Views/discover/discover_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
@@ -49,11 +50,19 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
 
-      Provider.of<AppBarTitleProvider>(context, listen: false)
-          .resetTitle(_widgetTitles[index]);
+      if (UserProvider.istEingeloggt) {
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .resetTitle(_widgetTitles[index]);
 
-      Provider.of<BodyProvider>(context, listen: false)
-          .resetBody(_widgetOptions.elementAt(index));
+        Provider.of<BodyProvider>(context, listen: false)
+            .resetBody(_widgetOptions.elementAt(index));
+      } else if (index != 2) {
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .resetTitle(_widgetTitles[index]);
+
+        Provider.of<BodyProvider>(context, listen: false)
+            .resetBody(_widgetOptions.elementAt(index));
+      }
     });
   }
 

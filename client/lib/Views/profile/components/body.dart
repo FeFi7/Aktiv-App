@@ -7,6 +7,7 @@ import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen
 import 'package:aktiv_app_flutter/Views/profile/components/profile_verwalten.dart';
 import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class _BodyState extends State<Body> {
   var sliderValueBald = 2.0;
 
   final List<bool> userGruppe = [true, false, false];
-  int userGruppeIndex = 0;
+  //int userGruppeIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,8 @@ class _BodyState extends State<Body> {
     if (Provider.of<UserProvider>(context, listen: false).vorname != null &&
         Provider.of<UserProvider>(context, listen: false).vorname != "null" &&
         Provider.of<UserProvider>(context, listen: false).nachname != null &&
-        Provider.of<UserProvider>(context, listen: false).nachname != "null") {
+        Provider.of<UserProvider>(context, listen: false).nachname != "null" &&
+        UserProvider.istEingeloggt) {
       return Text(
         Provider.of<UserProvider>(context, listen: false).vorname +
             " " +
@@ -69,13 +71,19 @@ class _BodyState extends State<Body> {
             letterSpacing: 2.0,
             fontWeight: FontWeight.w900),
       );
+    } else if (!UserProvider.istEingeloggt) {
+      return Text(
+        "nicht registrierter Benutzer\n\n(Funktionen eingeschränkt)",
+        style: TextStyle(color: ColorPalette.grey.rgb),
+      );
     }
     return Text("");
   }
 
   Text buildMail() {
     if (Provider.of<UserProvider>(context, listen: false).mail != null &&
-        Provider.of<UserProvider>(context, listen: false).mail != "null") {
+        Provider.of<UserProvider>(context, listen: false).mail != "null" &&
+        UserProvider.istEingeloggt) {
       return Text(
         Provider.of<UserProvider>(context, listen: false).mail,
         style: TextStyle(
@@ -90,7 +98,9 @@ class _BodyState extends State<Body> {
 
   Text buildPlzOrt() {
     if (Provider.of<UserProvider>(context, listen: false).plz != null &&
-        Provider.of<UserProvider>(context, listen: false).ort != null) {
+        Provider.of<UserProvider>(context, listen: false).ort != null &&
+        Provider.of<UserProvider>(context, listen: false).ort != "null" &&
+        UserProvider.istEingeloggt) {
       return Text(
         Provider.of<UserProvider>(context, listen: false).plz.toString() +
             ", " +
@@ -101,7 +111,8 @@ class _BodyState extends State<Body> {
             letterSpacing: 2.0,
             fontWeight: FontWeight.w500),
       );
-    } else if (Provider.of<UserProvider>(context, listen: false).plz != null) {
+    } else if (Provider.of<UserProvider>(context, listen: false).plz != null &&
+        UserProvider.istEingeloggt) {
       return Text(
         Provider.of<UserProvider>(context, listen: false).plz.toString(),
         style: TextStyle(
@@ -116,115 +127,194 @@ class _BodyState extends State<Body> {
 
   Column buttons(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          height: 60.0,
-          //Temporäre ToggleButtons zum wählen der Rolle
-          child: ToggleButtons(
-            children: [
-              Container(
-                  alignment: Alignment.center,
-                  width: size.width * 0.8 / userGruppe.length,
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Verwalter')),
-              Container(
-                  alignment: Alignment.center,
-                  width: size.width * 0.8 / userGruppe.length,
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('Genehmiger')),
-              Container(
-                  alignment: Alignment.center,
-                  width: size.width * 0.8 / userGruppe.length,
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('LQ')),
-            ],
-            isSelected: userGruppe,
-            onPressed: (int index) {
-              setState(
-                () {
-                  for (int buttonIndex = 0;
-                      buttonIndex < userGruppe.length;
-                      buttonIndex++) {
-                    if (buttonIndex == index) {
-                      userGruppe[buttonIndex] = true;
-                    } else {
-                      userGruppe[buttonIndex] = false;
-                    }
-                  }
-                  userGruppeIndex = index;
-                },
+    if (UserProvider.istEingeloggt) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Container(
+          //   height: 60.0,
+          //   //Temporäre ToggleButtons zum wählen der Rolle
+          //   child: ToggleButtons(
+          //     children: [
+          //       Container(
+          //           alignment: Alignment.center,
+          //           width: size.width * 0.8 / userGruppe.length,
+          //           padding: const EdgeInsets.all(10.0),
+          //           child: Text('Verwalter')),
+          //       Container(
+          //           alignment: Alignment.center,
+          //           width: size.width * 0.8 / userGruppe.length,
+          //           padding: const EdgeInsets.all(10.0),
+          //           child: Text('Genehmiger')),
+          //       Container(
+          //           alignment: Alignment.center,
+          //           width: size.width * 0.8 / userGruppe.length,
+          //           padding: const EdgeInsets.all(10.0),
+          //           child: Text('LQ')),
+          //     ],
+          //     isSelected: userGruppe,
+          //     onPressed: (int index) {
+          //       setState(
+          //         () {
+          //           for (int buttonIndex = 0;
+          //               buttonIndex < userGruppe.length;
+          //               buttonIndex++) {
+          //             if (buttonIndex == index) {
+          //               userGruppe[buttonIndex] = true;
+          //             } else {
+          //               userGruppe[buttonIndex] = false;
+          //             }
+          //           }
+          //           userGruppeIndex = index;
+          //         },
+          //       );
+          //     },
+          //     borderRadius: BorderRadius.circular(30),
+          //     borderWidth: 1,
+          //     selectedColor: ColorPalette.white.rgb,
+          //     fillColor: ColorPalette.endeavour.rgb,
+          //     disabledBorderColor: ColorPalette.french_pass.rgb,
+          //   ),
+          // ),
+          SizedBox(height: 10),
+          verwaltenButton(context),
+          persoenlichButton(context),
+          einstellungenButton(context),
+          RoundedButton(
+            text: "Hilfe",
+            color: Colors.grey[400],
+            press: () async {
+              final url =
+                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
+              await launch(
+                url,
+                forceSafariVC: false,
+                forceWebView: false,
               );
             },
-            borderRadius: BorderRadius.circular(30),
-            borderWidth: 1,
-            selectedColor: ColorPalette.white.rgb,
-            fillColor: ColorPalette.endeavour.rgb,
-            disabledBorderColor: ColorPalette.french_pass.rgb,
           ),
-        ),
-        SizedBox(height: 10),
-        RoundedButton(
-          text: "Verwalten",
-          color: ColorPalette.endeavour.rgb,
-          press: () {
-            Provider.of<BodyProvider>(context, listen: false)
-                .setBody(ProfileVerwalten(userGruppe: userGruppeIndex));
-            Provider.of<AppBarTitleProvider>(context, listen: false)
-                .setTitle('Verwalten');
-          },
-        ),
-        RoundedButton(
-          text: "Persönliche Angaben",
-          color: ColorPalette.endeavour.rgb,
-          press: () {
-            Provider.of<BodyProvider>(context, listen: false)
-                .setBody(ProfilePersoenlich());
-            Provider.of<AppBarTitleProvider>(context, listen: false)
-                .setTitle('Persönliche Angaben');
-          },
-        ),
-        RoundedButton(
-          text: "Einstellungen",
-          color: ColorPalette.endeavour.rgb,
-          press: () {
-            Provider.of<BodyProvider>(context, listen: false)
-                .setBody(ProfileEinstellungen());
-            Provider.of<AppBarTitleProvider>(context, listen: false)
-                .setTitle('Einstellungen');
-          },
-        ),
-        RoundedButton(
-          text: "Hilfe",
-          color: Colors.grey[400],
-          press: () async {
-            final url =
-                "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
-            await launch(
-              url,
-              forceSafariVC: false,
-              forceWebView: false,
-            );
-          },
-        ),
-        RoundedButton(
-          text: "Abmelden",
-          color: Colors.grey[400],
-          press: () async {
-            await Provider.of<UserProvider>(context, listen: false).signOff();
+          RoundedButton(
+            text: "Abmelden",
+            color: Colors.grey[400],
+            press: () async {
+              if (UserProvider.istEingeloggt) {
+                if (await confirm(
+                  context,
+                  title: Text("Bestätigung"),
+                  content: Text("Möchten Sie sich abmelden?"),
+                  textOK: Text(
+                    "Bestätigen",
+                    style: TextStyle(color: ColorPalette.grey.rgb),
+                  ),
+                  textCancel: Text(
+                    "Abbrechen",
+                    style: TextStyle(color: ColorPalette.endeavour.rgb),
+                  ),
+                )) {
+                  await Provider.of<UserProvider>(context, listen: false)
+                      .signOff();
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return WelcomeScreen();
-                },
-              ),
-            );
-          },
-        ),
-      ],
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return WelcomeScreen();
+                      },
+                    ),
+                  );
+                }
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return WelcomeScreen();
+                    },
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(height: 10),
+          RoundedButton(
+            text: "Hilfe",
+            color: Colors.grey[400],
+            press: () async {
+              final url =
+                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
+              await launch(
+                url,
+                forceSafariVC: false,
+                forceWebView: false,
+              );
+            },
+          ),
+          RoundedButton(
+            text: "Abmelden",
+            color: Colors.grey[400],
+            press: () async {
+              await Provider.of<UserProvider>(context, listen: false).signOff();
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return WelcomeScreen();
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  RoundedButton einstellungenButton(BuildContext context) {
+    return RoundedButton(
+      text: "Einstellungen",
+      color: ColorPalette.endeavour.rgb,
+      press: () {
+        Provider.of<BodyProvider>(context, listen: false)
+            .setBody(ProfileEinstellungen());
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .setTitle('Einstellungen');
+      },
+    );
+  }
+
+  RoundedButton persoenlichButton(BuildContext context) {
+    return RoundedButton(
+      text: "Persönliche Angaben",
+      color: ColorPalette.endeavour.rgb,
+      press: () {
+        Provider.of<BodyProvider>(context, listen: false)
+            .setBody(ProfilePersoenlich());
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .setTitle('Persönliche Angaben');
+      },
+    );
+  }
+
+  RoundedButton verwaltenButton(BuildContext context) {
+    return RoundedButton(
+      text: "Verwalten",
+      color: ColorPalette.endeavour.rgb,
+      press: () {
+        Provider.of<BodyProvider>(context, listen: false).setBody(
+            ProfileVerwalten(
+                userGruppe: Provider.of<UserProvider>(context, listen: false)
+                    .rolle
+                    .toString()));
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .setTitle('Verwalten');
+      },
     );
   }
 
@@ -299,14 +389,22 @@ class _BodyState extends State<Body> {
           children: [
             Consumer<UserProvider>(
               builder: (context, user, child) {
-                return CircleAvatar(
-                  backgroundImage: (user.profilBild != null)
-                      ? NetworkImage(
-                          "https://app.lebensqualitaet-burgrieden.de/" +
-                              user.profilBild)
-                      : Image.asset("assets/images/profilePic_default.png")
-                          .image,
-                );
+                if (UserProvider.istEingeloggt) {
+                  return CircleAvatar(
+                    backgroundImage: (user.profilBild != null)
+                        ? NetworkImage(
+                            "https://app.lebensqualitaet-burgrieden.de/" +
+                                user.profilBild)
+                        : Image.asset("assets/images/profilePic_default.png")
+                            .image,
+                  );
+                } else {
+                  return CircleAvatar(
+                    backgroundImage:
+                        Image.asset("assets/images/profilePic_default.png")
+                            .image,
+                  );
+                }
               },
             ),
             Positioned(
@@ -343,15 +441,17 @@ class _BodyState extends State<Body> {
   }
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(
-      () {
-        if (pickedFile != null) {
-          profileImage = File(pickedFile.path);
-          Provider.of<UserProvider>(context, listen: false)
-              .changeProfileImage(profileImage);
-        }
-      },
-    );
+    if (UserProvider.istEingeloggt) {
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      setState(
+        () {
+          if (pickedFile != null) {
+            profileImage = File(pickedFile.path);
+            Provider.of<UserProvider>(context, listen: false)
+                .changeProfileImage(profileImage);
+          }
+        },
+      );
+    }
   }
 }
