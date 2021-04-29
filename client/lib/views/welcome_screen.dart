@@ -23,6 +23,10 @@ class _WelcomeScreen extends State<WelcomeScreen> {
     autoSignIn();
   }
 
+  // TODO: muss eigentlich standard mäßig auf true sein, wird aber wenn man sich 
+  // nicht automatisc einloggt, nie false & idk why 
+  bool loadOverlay = false;
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -53,7 +57,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        "powered by\nLEBENSQUALITÄT\nBURGRIEDEN",
+                        "powered by\nLEBENSQUALITÄT\nBURGRIEDEN E.V.",
                         textAlign: TextAlign.end,
                         style: TextStyle(
                           color: ColorPalette.endeavour.rgb,
@@ -82,7 +86,8 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
                 CircleAvatar(
                   radius: 180.0,
-                  backgroundImage: AssetImage("assets/images/wir_logo.png"),
+                  foregroundImage: AssetImage("assets/images/wir_hier_logo_transparent.png"),
+                  backgroundColor: Color.fromARGB(0, 0, 0, 0),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
                 RoundedButton(
@@ -119,6 +124,24 @@ class _WelcomeScreen extends State<WelcomeScreen> {
               ],
             ),
           ),
+          Visibility(
+              visible: loadOverlay,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      ColorPalette.endeavour.rgb,
+                      ColorPalette.torea_bay.rgb,
+                      ColorPalette.torea_bay.rgb
+                    ],
+                  ),
+                ),
+                width: double.infinity,
+                height: size.height,
+                child: Center(child: CircularProgressIndicator()),
+              ))
         ],
       ),
     );
@@ -141,5 +164,6 @@ class _WelcomeScreen extends State<WelcomeScreen> {
         null) {
       startTime();
     }
+    loadOverlay = false;
   }
 }

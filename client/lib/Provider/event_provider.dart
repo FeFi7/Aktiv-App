@@ -245,6 +245,9 @@ class EventProvider extends ChangeNotifier {
       case EventListType.NEAR_BY:
         nearby.clear();
         return;
+      case EventListType.FAVORITES:
+        // NIX RESETTEN! Favorites regelt sich durch getEventFromJson
+        break;
     }
   }
 
@@ -262,7 +265,8 @@ class EventProvider extends ChangeNotifier {
     if (lastUpdated.difference(now).inHours > 1) startPage = 1;
 
     /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
-    DateTime until = DateTime.utc(now.year + 69, now.month, now.day);
+    /// 
+    DateTime until = DateTime.utc(now.year + 1, now.month, now.day);
 
     //TODO: Wieder auskommentieren, müsste eig. gehen
     /// Favoriten müssen vorher geleerten werden, da dieser Zustand in der
@@ -278,36 +282,32 @@ class EventProvider extends ChangeNotifier {
 
     /// Geladene Events werden dem EventListType entsprechend einsortiert
     switch (type) {
+      case EventListType.FAVORITES:
+        return getLoadedFavoritesEvents();
+      case EventListType.NEAR_BY:
+
+        /// Denkfehler, weil near by nicht auf GetAll zurück greift
+        /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
+        // if (startPage == 1) nearby.clear();
+
+        // for (Veranstaltung event in loaded)
+        //   if (!pendingApproval.contains(event.id) && !nearby.contains(event.id))
+        //     nearby.add(event.id);
+        
+        /// TODO: Wenn nearby dann nicht get all sondern dafpr noch austehende api route aufrufen
+
+        return nearby.map((id) => getLoadedEventById(id)).toList();
       case EventListType.UP_COMING:
 
         /// Wenn von Anfang an geladen (startPage=1) dann bisher geladenes upComing verwerfen
         if (startPage == 1) upComing.clear();
 
         for (Veranstaltung event in loaded)
-          if (!pendingApproval.contains(event.id)) upComing.add(event.id);
+          if (!pendingApproval.contains(event.id) &&
+              !upComing.contains(event.id)) upComing.add(event.id);
 
         return upComing.map((id) => getLoadedEventById(id)).toList();
 
-      case EventListType.FAVORITES:
-
-        /// Wenn von Anfang an geladen (Page=1) dann bisher geladene Favoriten verwerfen
-        // if (startPage == 1) {
-        //   favorites.clear();
-
-        //   for (Veranstaltung event in loaded) favorites.add(event.id);
-        // }
-
-        // return favorites.map((id) => getLoadedEventById(id)).toList();
-        return getLoadedFavoritesEvents();
-      case EventListType.NEAR_BY:
-
-        /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
-        if (startPage == 1) nearby.clear();
-
-        for (Veranstaltung event in loaded)
-          if (!pendingApproval.contains(event.id)) nearby.add(event.id);
-
-        return nearby.map((id) => getLoadedEventById(id)).toList();
       default:
         return [];
     }
@@ -497,10 +497,9 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'].toString() == "1" && !favorites.contains(id)) {
+    if (json['favorit'].toString() == "1" && !favorites.contains(id))
       favorites.add(id);
-      log("favorisiertes event gefunden");
-    } else if (json['favorit'].toString() == "0" && favorites.contains(id))
+    else if (json['favorit'].toString() == "0" && favorites.contains(id))
       favorites.remove(id);
 
     if (json['istGenehmigt'].toString() == "0" && !pendingApproval.contains(id))
@@ -516,7 +515,6 @@ class EventProvider extends ChangeNotifier {
     DateTime start = DateTime.parse(json['beginn_ts']);
     DateTime end = DateTime.parse(json['ende_ts']);
     String place = json['ortBeschreibung'];
-    //
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 

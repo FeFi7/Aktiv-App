@@ -29,18 +29,33 @@ class _DiscoverViewState extends State<DiscoverView> {
     return EnvironmentPlaceholder();
   }
 
-  var toogleButtons =
+  var toggleButtons =
       Consumer<SearchBehaviorProvider>(builder: (context, value, child) {
     return value.getToggleButtons();
   });
+
+  FocusNode _focus = new FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    debugPrint("Focus: " + _focus.hasFocus.toString());
+  }
+
+  //TODO: tooglen wenn Searchbar fokus wechselt
+  bool _showSearchBehaviorProviderButtons = true;
 
   @override
   Widget build(BuildContext context) {
     final SearchBarController<Widget> _searchBarController =
         SearchBarController();
-    // bool isReplay = false;
 
     return Container(
+    
         child: SearchBar<Widget>(
       searchBarPadding: EdgeInsets.only(left: 15, right: 15, top: 15),
 
@@ -59,6 +74,9 @@ class _DiscoverViewState extends State<DiscoverView> {
           padding: EdgeInsets.all(10.0)),
       searchBarController: _searchBarController,
       placeHolder: _getPlaceHolder(),
+      // iconActiveColor: ,
+      // suggestions: [toggleButtons],
+
       cancellationWidget: Container(
           padding: const EdgeInsets.all(17.0),
           height: 70,
@@ -69,11 +87,16 @@ class _DiscoverViewState extends State<DiscoverView> {
       emptyWidget: ErrorPreviewBox(
           "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden."),
       indexedScaledTileBuilder: (int index) => ScaledTile.count(1, 0.475),
-      header: Center(child: toogleButtons), //TODO: switch when on search
+      header: Center(
+        child: Visibility(
+            visible: _showSearchBehaviorProviderButtons, child: toggleButtons),
+      ), //TODO: switch when on search
+      // suggestions: [toogleButtons],
+      minimumChars: 1,
 
       onCancelled: () {
         print("Cancelled triggered");
-        
+
         FocusScope.of(context)
             .requestFocus(new FocusNode()); // Schließt Tastatur
       },

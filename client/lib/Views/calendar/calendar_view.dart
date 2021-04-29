@@ -39,6 +39,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
+     DateTime now = DateTime.now();
     return Column(
       children: [
         Stack(
@@ -50,7 +51,7 @@ class _CalendarViewState extends State<CalendarView> {
                   firstDay: DateTime.now(),
                   // firstDay: DateTime.utc(200),
                   focusedDay: _focusedDay,
-                  lastDay: DateTime(9999),
+                  lastDay: DateTime.utc(now.year + 1, now.month, now.day),
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   calendarFormat: _calendarFormat,
                   headerStyle: HeaderStyle(
