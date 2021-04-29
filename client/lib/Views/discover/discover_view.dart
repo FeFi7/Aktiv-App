@@ -44,7 +44,6 @@ class _DiscoverViewState extends State<DiscoverView> {
         child: SearchBar<Widget>(
       searchBarPadding: EdgeInsets.only(left: 15, right: 15, top: 15),
 
-      ///symmetric(horizontal: 10), ///EdgeInsets.all(15),
       listPadding: EdgeInsets.symmetric(horizontal: 10),
       textStyle: TextStyle(
         decoration: TextDecoration.none,
@@ -53,21 +52,19 @@ class _DiscoverViewState extends State<DiscoverView> {
       ),
       icon: Icon(Icons.search_rounded, size: 35),
       onSearch: Provider.of<EventProvider>(context, listen: false)
-          .loadEventsAsPreviewBoxContaining, // Man soll Provider nur im context aufrufen
+          .loadEventsAsPreviewBoxContaining,
       searchBarStyle: SearchBarStyle(
           backgroundColor: ColorPalette.malibu.rgb,
           borderRadius: BorderRadius.all(Radius.circular(60.0)),
           padding: EdgeInsets.all(10.0)),
       searchBarController: _searchBarController,
       placeHolder: _getPlaceHolder(),
-      // placeHolder: EnvironmentPlaceholder(),
       cancellationWidget: Container(
           padding: const EdgeInsets.all(17.0),
           height: 70,
           decoration: BoxDecoration(
               color: ColorPalette.french_pass.rgb,
               borderRadius: BorderRadius.all(Radius.circular(36.0))),
-          // child: Center(child: Text("Zurück"))),
           child: Icon(Icons.close_rounded, size: 35)),
       emptyWidget: ErrorPreviewBox(
           "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden."),

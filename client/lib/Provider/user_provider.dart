@@ -139,6 +139,8 @@ class UserProvider extends ChangeNotifier {
         nachname.toString(),
         plz.toString(),
         tel.toString(),
+        "straße",
+        "hausnummer",
         userId.toString(),
         await getAccessToken());
     var accessToken = await storage.read('accessToken');

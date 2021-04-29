@@ -21,6 +21,7 @@ class EventPreviewBox extends StatefulWidget {
   String description;
   String additive;
   AdditiveFormat additiveFormat;
+  bool liked;
 
   // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
 
@@ -70,11 +71,15 @@ class EventPreviewBox extends StatefulWidget {
 
 class _EventPreviewBoxState extends State<EventPreviewBox> {
   @override
+  void initState() {
+    super.initState();
+    widget.liked = Provider.of<EventProvider>(context, listen: false)
+        .isEventFavorite(widget.id);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
-    bool liked = Provider.of<EventProvider>(context, listen: false)
-        .isEventFavorite(widget.id);
 
     return FractionallySizedBox(
       widthFactor: 1,
@@ -153,21 +158,24 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                     (UserProvider.getUserRole().allowedToFavEvents
                         ? IconButton(
                             icon: Icon(
-                              liked
+                              widget.liked
                                   ? Icons.favorite_rounded
                                   : Icons.favorite_border,
-                              color: liked
+                              color: widget.liked
                                   ? ColorPalette.orange.rgb
                                   : ColorPalette.black.rgb,
                               size: 32,
                             ),
                             onPressed: () {
                               setState(() {
-                                liked = Provider.of<EventProvider>(context,
+
+                                widget.liked = !widget.liked;
+                                                                
+                              });
+                              Provider.of<EventProvider>(context,
                                         listen: false)
                                     .toggleEventFavoriteState(
                                         context, widget.id);
-                              });
                             })
                         : Container()),
                     IconButton(

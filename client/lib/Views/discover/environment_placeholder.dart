@@ -29,7 +29,6 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<List<List<Veranstaltung>>>(
       future: loadEventsFromProvider(),
       builder: (context, snapshot) {
@@ -49,8 +48,10 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
           environment
               .add(EventPreviewBox.load(event, AdditiveFormat.TIME_TILL_START));
 
-        environment.add(PreviewDots(EventPreviewList(
-            EventListType.UP_COMING, AdditiveFormat.TIME_TILL_START), "Bald"));
+        environment.add(PreviewDots(
+            EventPreviewList(
+                EventListType.UP_COMING, AdditiveFormat.TIME_TILL_START),
+            "Bald"));
 
         environment.add(Container(
             padding: const EdgeInsets.all(10.0),
@@ -60,7 +61,8 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
           environment.add(EventPreviewBox.load(event, AdditiveFormat.DISTANCE));
 
         environment.add(PreviewDots(
-            EventPreviewList(EventListType.NEAR_BY, AdditiveFormat.DISTANCE), "In der Nähe"));
+            EventPreviewList(EventListType.NEAR_BY, AdditiveFormat.DISTANCE),
+            "In der Nähe"));
 
         return Container(
             child: ListView.builder(

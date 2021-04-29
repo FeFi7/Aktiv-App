@@ -147,11 +147,13 @@ class EventProvider extends ChangeNotifier {
           "0", // nur zugelassene Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
-          "-1",
+          UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1",
           text);
       if (response.statusCode == 200) {
         log("loadEventsContainingText: \n" + response.body);
         var parsedJson = json.decode(response.body);
+
+        log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -198,9 +200,11 @@ class EventProvider extends ChangeNotifier {
           "1", // nur genehmigte Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
-          "-1");
+          UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1");
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
+
+        log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -243,6 +247,10 @@ class EventProvider extends ChangeNotifier {
     /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
     DateTime until = DateTime.utc(now.year + 69, now.month, now.day);
 
+    /// Favoriten müssen vorher geleerten werden, da dieser Zustand in der
+    /// getEventFromJson Methode definiert wird
+    // if (startPage == 1 && type == EventListType.FAVORITES) favorites.clear();
+
     List<Veranstaltung> loaded = await loadEventsUntil(until, startPage, 1);
 
     if (loaded == null) return [];
@@ -265,11 +273,14 @@ class EventProvider extends ChangeNotifier {
       case EventListType.FAVORITES:
 
         /// Wenn von Anfang an geladen (Page=1) dann bisher geladene Favoriten verwerfen
-        if (startPage == 1) favorites.clear();
+        // if (startPage == 1) {
+        //   favorites.clear();
 
-        for (Veranstaltung event in loaded) favorites.add(event.id);
+        //   for (Veranstaltung event in loaded) favorites.add(event.id);
+        // }
 
-        return favorites.map((id) => getLoadedEventById(id)).toList();
+        // return favorites.map((id) => getLoadedEventById(id)).toList();
+        return getLoadedFavoritesEvents();
       case EventListType.NEAR_BY:
 
         /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
@@ -411,7 +422,7 @@ class EventProvider extends ChangeNotifier {
     DateTime nextMonth =
         DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
     loadAllEventsUntil(nextMonth);
-  
+
     // loadFavoriteEvents(context);
     // loadUpComingEvents();
     // loadEventsNearBy();
@@ -445,18 +456,18 @@ class EventProvider extends ChangeNotifier {
 
   /// Ändert (toggelt) den Favorisierungs Zustand eines events sowohl im EventProvider,
   /// als auch in der Datenbank
-  bool toggleEventFavoriteState(BuildContext context, int eventId) {
+  Future<bool> toggleEventFavoriteState(
+      BuildContext context, int eventId) async {
     if (isEventFavorite(eventId)) {
       favorites.remove(eventId);
     } else {
       favorites.add(eventId);
     }
 
-    if (UserProvider.userId != null &&
-        UserProvider.userId >= 0 &&
-        UserProvider.getUserRole().allowedToFavEvents) {
+    if (UserProvider.getUserRole().allowedToFavEvents) {
       String accessToken =
-          Provider.of<UserProvider>(context, listen: false).getAccessToken();
+          await Provider.of<UserProvider>(context, listen: false)
+              .getAccessToken();
       attemptFavor(
           UserProvider.userId.toString(), eventId.toString(), accessToken);
     }
@@ -467,7 +478,10 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'] == '1' && !favorites.contains(id)) favorites.add(id);
+    if (json['favorit'] == '1' && !favorites.contains(id))
+      favorites.add(id);
+    else if (json['favorit'] == '0' && favorites.contains(id))
+      favorites.remove(id);
 
     if (json['istGenehmigt'] == '1' && !approved.contains(id)) approved.add(id);
 
