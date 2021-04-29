@@ -375,7 +375,7 @@ Future<http.Response> attemptUpdateUserInfo(
   return response;
 }
 
-// [GET] User favorisiert Veranstaltung (Beachte TOGGLE Funktion!!)
+// [POST] User favorisiert Veranstaltung (Beachte TOGGLE Funktion!!)
 Future<http.Response> attemptFavor(
     String userId, String veranstaltungId, String accessToken) async {
   String route = "api/user/" + userId + "/favorit/";
