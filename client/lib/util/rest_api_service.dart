@@ -343,6 +343,8 @@ Future<http.Response> attemptUpdateUserInfo(
     String nachname,
     String plz,
     String tel,
+    String strasse,
+    String hausnummer,
     String userId,
     String accessToken) async {
   String route = "api/user/" + userId + "/";
@@ -352,7 +354,9 @@ Future<http.Response> attemptUpdateUserInfo(
     'vorname': vorname,
     'nachname': nachname,
     'plz': plz,
-    'tel': tel
+    'tel': tel,
+    'strasse': strasse,
+    'hausnummer': hausnummer
   };
 
   final response = await http.put(Uri.https(SERVER_IP, route, qParams),
@@ -692,6 +696,76 @@ Future<http.Response> attemptGetTags(List<String> tag) async {
   String route = "tags";
 
   final response = await http.get(Uri.https(SERVER_IP, route));
+
+  if (response.statusCode == 200) {
+    print("Verbindung erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [DELETE] Lösche Verknüpfung von User mit Institution als Verwalter
+Future<http.Response> attemptDeleteVerwalter(
+    String userId, String institutionId, String accessToken) async {
+  String route = "api/user/" + userId + "/institutionen/" + institutionId;
+
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Verbindung erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [DELETE] Lösche User (nur als Betreiber möglich)
+Future<http.Response> attemptDeleteUser(
+    String userId, String accessToken) async {
+  String route = "api/" + userId;
+
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: {},
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Verbindung erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [POST] Generiere Verbindung von Genehmiger zu PLZs
+Future<http.Response> attemptSetGenehmiger(
+    String userId, String plz, String accessToken) async {
+  String route = "api/" + userId + "/genehmigung";
+
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {'plz': plz};
+
+  final response = await http.post(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
     print("Verbindung erfolgreich");
