@@ -20,6 +20,31 @@ async function getVeranstaltungById(veranstaltungId) {
   }
 }
 
+async function getFavoritVeranstaltungenByUser(userId, limit, page) {
+  const queryWithUserFavorites = `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, IF(f.valide=1, 1, 0) as favorit FROM Veranstaltung v
+    LEFT JOIN Institution i ON v.institutionId = i.id
+    INNER JOIN Favorit f ON v.id = f.veranstaltungId AND f.valide = 1 AND f.userId = ?
+    WHERE v.istGenehmigt = 1 AND v.beginn_ts >= NOW()
+    ORDER BY v.beginn_ts asc
+    LIMIT ?,?`;
+
+  let result = await conn
+    .query(queryWithUserFavorites, [
+      Number(userId),
+      Number(limit) * Number(page) - Number(limit),
+      Number(limit),
+    ])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler bei Db" };
+    });
+  if (result) {
+    return result[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function getVeranstaltungFilesById(veranstaltungId) {
   const query = `SELECT id, pfad, typ FROM VeranstaltungFile vf 
   INNER JOIN File f ON vf.fileId = f.id
@@ -76,7 +101,8 @@ async function getVeranstaltungen(
   bis,
   userId = 0,
   page = 1,
-  vollText
+  vollText,
+  datum
 ) {
   // Falls nichts angegeben bis 1 Monat in der Zukunft
   if (!bis) {
@@ -328,4 +354,5 @@ module.exports = {
   addTagsToVeranstaltung: addTagsToVeranstaltung,
   getTagsFiltered: getTagsFiltered,
   getVeranstaltungFilesById: getVeranstaltungFilesById,
+  getFavoritVeranstaltungenByUser: getFavoritVeranstaltungenByUser,
 };

@@ -7,6 +7,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const config = require("config");
+const veranstaltungService = require("../services/veranstaltungService");
 const jwtConfig = config.get("Customer.jwtConfig");
 const SECRET_TOKEN = jwtConfig.secret;
 const SECRET_TOKEN_REFRESH = jwtConfig.refreshSecret;
@@ -430,6 +431,47 @@ router.post(
   }
 );
 
+// [GET] Bekomme alle favorisierten Veranstaltungen
+router.get(
+  "/:userId/favorit",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.params.userId;
+    let limit = req.query.limit;
+    let page = req.query.page;
+    if (!/^\d+$/.test(userId)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+
+    if (limit) {
+      if (!/^\d+$/.test(limit)) {
+        return res.status(400).send("limit keine Zahl");
+      }
+    } else {
+      limit = 20;
+    }
+    if (page) {
+      if (!/^\d+$/.test(page)) {
+        return res.status(400).send("page keine Zahl");
+      }
+    } else {
+      page = 1;
+    }
+
+    const result = await veranstaltungService.getFavoritVeranstaltungenByUser(
+      userId,
+      limit,
+      page
+    );
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
 // [POST] Generiere Verbindung von Genehmiger zu PLZs
 router.post(
   "/:userId/genehmigung",
@@ -501,7 +543,7 @@ router.get("/:userId/genehmigung", async function (req, res) {
   if (result.error) {
     return res.status(400).json(result);
   } else {
-    let resultAsArray = result.map((x)=> x.plz)
+    let resultAsArray = result.map((x) => x.plz);
     return res.status(200).json(resultAsArray);
   }
 });
