@@ -73,6 +73,7 @@ class _DiscoverViewState extends State<DiscoverView> {
 
       onCancelled: () {
         print("Cancelled triggered");
+        
         FocusScope.of(context)
             .requestFocus(new FocusNode()); // Schließt Tastatur
       },

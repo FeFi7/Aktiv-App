@@ -39,8 +39,9 @@ class _EventPreviewListState extends State<EventPreviewList> {
   @override
   void initState() {
     _controller = ScrollController(keepScrollOffset: true);
-    // controller. = true;
     _controller.addListener(_scrollListener);
+    // Provider.of<EventProvider>(context, listen: false)
+    //       .resetEventListType(widget.type);
     super.initState();
   }
 
@@ -55,8 +56,6 @@ class _EventPreviewListState extends State<EventPreviewList> {
         future: getEventsFromProvider(),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            // return ErrorPreviewBox(
-            //     "Bitte haben Sie einen Moment gedult. Die Veranstaltungen werden im Hintergrund geladen...");
             return Center(child: CircularProgressIndicator());
           }
 
@@ -76,7 +75,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
                                 events[index], widget.additiveFormat);
                           }),
                       onRefresh: _refreshData)
-                  : ErrorPreviewBox("Fehler 404, wäre"));
+                  : ErrorPreviewBox("Es konnten keine passenden Veranstaltungen aus der Datenbank geladen werden."));
         });
   }
 

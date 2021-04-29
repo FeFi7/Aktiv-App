@@ -34,7 +34,7 @@ class EventProvider extends ChangeNotifier {
   static final List<int> favorites = [];
 
   /// Liste aller Event ID's die als genehmigt markiert sind.
-  static final List<int> approved = [];
+  static final List<int> pendingApproval = [];
 
   /// Die Standard Menge an events, die von EINEM attempt Aufruf geladen werden sollen
   static final int pageSize = 25;
@@ -50,6 +50,11 @@ class EventProvider extends ChangeNotifier {
   /// Gibt eine Liste aller Events zurück die bereits geladen wurden
   List<Veranstaltung> getLoadedEvents() {
     return loaded.values.toList();
+  }
+
+  /// Gibt eine Liste aller Events mit ausstehender genehmigung zurück
+  List<Veranstaltung> getEventWithPendingApproval() {
+    return pendingApproval.map((id) => getLoadedEventById(id)).toList();
   }
 
   /// Gibt eine Liste aller Events zurück die als favorisiert markiert sind
@@ -192,8 +197,6 @@ class EventProvider extends ChangeNotifier {
       DateTime until, int startPage, int maxPages, EventListType type) async {
     List<Veranstaltung> foundEvents = [];
 
-    log("loadevents with startPage: " + startPage.toString());
-
     for (int page = startPage; page < (startPage + maxPages); page++) {
       var response = await attemptGetAllVeranstaltungen(
           until.toString(),
@@ -239,9 +242,6 @@ class EventProvider extends ChangeNotifier {
       case EventListType.UP_COMING:
         upComing.clear();
         return;
-      case EventListType.FAVORITES:
-        favorites.clear();
-        return;
       case EventListType.NEAR_BY:
         nearby.clear();
         return;
@@ -274,9 +274,6 @@ class EventProvider extends ChangeNotifier {
 
     if (loaded == null) return [];
 
-    log("loaded events length: " + loaded.length.toString());
-    // if (loaded.length > 0) nextPageToLoad[type] = startPage + 1;
-
     lastUpdate[type] = now;
 
     /// Geladene Events werden dem EventListType entsprechend einsortiert
@@ -286,7 +283,8 @@ class EventProvider extends ChangeNotifier {
         /// Wenn von Anfang an geladen (startPage=1) dann bisher geladenes upComing verwerfen
         if (startPage == 1) upComing.clear();
 
-        for (Veranstaltung event in loaded) upComing.add(event.id);
+        for (Veranstaltung event in loaded)
+          if (!pendingApproval.contains(event.id)) upComing.add(event.id);
 
         return upComing.map((id) => getLoadedEventById(id)).toList();
 
@@ -306,7 +304,8 @@ class EventProvider extends ChangeNotifier {
         /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
         if (startPage == 1) nearby.clear();
 
-        for (Veranstaltung event in loaded) nearby.add(event.id);
+        for (Veranstaltung event in loaded)
+          if (!pendingApproval.contains(event.id)) nearby.add(event.id);
 
         return nearby.map((id) => getLoadedEventById(id)).toList();
       default:
@@ -498,13 +497,16 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'] == '1' && !favorites.contains(id)) {
+    if (json['favorit'].toString() == "1" && !favorites.contains(id)) {
       favorites.add(id);
       log("favorisiertes event gefunden");
-    } else if (json['favorit'] == '0' && favorites.contains(id))
+    } else if (json['favorit'].toString() == "0" && favorites.contains(id))
       favorites.remove(id);
 
-    if (json['istGenehmigt'] == '1' && !approved.contains(id)) approved.add(id);
+    if (json['istGenehmigt'].toString() == "0" && !pendingApproval.contains(id))
+      pendingApproval.add(id);
+    else if (json['istGenehmigt'].toString() == "1" &&
+        pendingApproval.contains(id)) pendingApproval.remove(id);
 
     if (isEventLoaded(id)) return loaded[id];
 
