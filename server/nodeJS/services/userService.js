@@ -291,6 +291,25 @@ async function getInstitutionenFromUser(userId) {
   }
 }
 
+async function getPLZsFromGenehmiger(userId) {
+  const query = `SELECT p.plz FROM VerwaltungPlzUser v 
+  INNER JOIN PLZ p ON v.plzId = p.id
+  WHERE v.userId = ?`;
+
+  let results = await conn
+    .query(query, [userId])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler in Db" };
+    });
+
+  if (results) {
+    return results[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function isUserBetreiber(userId) {
   const query = `SELECT * FROM User u 
   INNER JOIN Rolle r ON u.rolleId = r.id AND r.id = 3
@@ -502,5 +521,6 @@ module.exports = {
   mailExists: mailExists,
   deleteUser: deleteUser,
   deleteUserToInstitut: deleteUserToInstitut,
-  setGenehmigerPLZs: setGenehmigerPLZs
+  setGenehmigerPLZs: setGenehmigerPLZs,
+  getPLZsFromGenehmiger: getPLZsFromGenehmiger
 };

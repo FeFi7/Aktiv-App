@@ -484,6 +484,28 @@ router.post(
   }
 );
 
+// [GET] Bekomme verwaltende PLZs von Genehmiger
+router.get("/:userId/genehmigung", async function (req, res) {
+  const userIdGenehmiger = req.params.userId;
+  if (!/^\d+$/.test(userIdGenehmiger)) {
+    return res.status(400).send("userId keine Zahl");
+  }
+
+  const resultIsUserGenehmiger = userService.isUserGenehmiger(userIdGenehmiger);
+
+  if (!resultIsUserGenehmiger || resultIsUserGenehmiger.error) {
+    return res.status(400).json({ error: "user ist kein Genehmiger" });
+  }
+
+  const result = await userService.getPLZsFromGenehmiger(userIdGenehmiger);
+  if (result.error) {
+    return res.status(400).json(result);
+  } else {
+    let resultAsArray = result.map((x)=> x.plz)
+    return res.status(200).json(resultAsArray);
+  }
+});
+
 // [GET] bekomme einzelne user
 router.get("/*", async function (req, res) {
   let query = req.query;
