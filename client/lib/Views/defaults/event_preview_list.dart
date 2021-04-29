@@ -29,6 +29,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
+      //
       setState(() {
         /// Wenn aufgerufen sollte Liste durch Provider automatisch erweitert werden, tut aber nicht ¯\_(ツ)_/¯
       });
@@ -37,7 +38,8 @@ class _EventPreviewListState extends State<EventPreviewList> {
 
   @override
   void initState() {
-    _controller = ScrollController();
+    _controller = ScrollController(keepScrollOffset: true);
+    // controller. = true;
     _controller.addListener(_scrollListener);
     super.initState();
   }
@@ -62,18 +64,26 @@ class _EventPreviewListState extends State<EventPreviewList> {
 
           return Container(
               child: events.length > 0
-                  ? ListView.builder(
-                      // key: ValueKey<int>(
-                      //     Random(DateTime.now().millisecondsSinceEpoch)
-                      //         .nextInt(4294967296)),
-                      controller: _controller,
-                      padding: const EdgeInsets.all(8),
-                      itemCount: events.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return EventPreviewBox.load(
-                            events[index], widget.additiveFormat);
-                      })
-                  : ErrorPreviewBox("Fehler 404"));
+                  ? RefreshIndicator(
+                      child: ListView.builder(
+                          key: new PageStorageKey(widget.type.toString()),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: _controller,
+                          padding: const EdgeInsets.all(8),
+                          itemCount: events.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return EventPreviewBox.load(
+                                events[index], widget.additiveFormat);
+                          }),
+                      onRefresh: _refreshData)
+                  : ErrorPreviewBox("Fehler 404, wäre"));
         });
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      Provider.of<EventProvider>(context, listen: false)
+          .resetEventListType(widget.type);
+    });
   }
 }

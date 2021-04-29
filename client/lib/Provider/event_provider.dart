@@ -144,16 +144,16 @@ class EventProvider extends ChangeNotifier {
     for (int page = 1; page < 4; page++) {
       var response = await attemptGetAllVeranstaltungen(
           "-1",
-          "0", // nur zugelassene Events == 0, alle == 1
+          "1", // nur zugelassene Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
           UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1",
           text);
       if (response.statusCode == 200) {
-        log("loadEventsContainingText: \n" + response.body);
+        // log("loadEventsContainingText("+text+"): \n" + response.body);
         var parsedJson = json.decode(response.body);
 
-        log(response.body); // TODO: remove this line
+        // log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -184,17 +184,17 @@ class EventProvider extends ChangeNotifier {
   /// Lädt alle Events von neu bis zu einem gewissen Datum
   Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
     /// 16 pages begrenzt das Laden der Events auf max 400 Events
-    return loadEventsUntil(until, 1, 16);
+    return loadEventsUntil(until, 1, 16, null);
   }
 
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
-      DateTime until, int startPage, int maxPages) async {
+      DateTime until, int startPage, int maxPages, EventListType type) async {
     List<Veranstaltung> foundEvents = [];
 
-    for (int page = startPage >= 1 ? startPage : 1;
-        page < (startPage + maxPages);
-        page++) {
+    log("loadevents with startPage: " + startPage.toString());
+
+    for (int page = startPage; page < (startPage + maxPages); page++) {
       var response = await attemptGetAllVeranstaltungen(
           until.toString(),
           "1", // nur genehmigte Events == 0, alle == 1
@@ -204,7 +204,7 @@ class EventProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 
-        log(response.body); // TODO: remove this line
+        // log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -214,7 +214,9 @@ class EventProvider extends ChangeNotifier {
 
         foundEvents.addAll(responseList);
 
-        // nextPageToLoad[EventListType.UP_COMING] = page + 1;
+        // Markiere welche seite als nächstes geladen werden muss
+        if (type != null && responseList.length > 0)
+          nextPageToLoad[type] = page + 1;
 
         /// Wenn durch aktuelle page keine neuen Events geladen wurden: break;
         if (responseList == null || responseList.length == 0) break;
@@ -231,13 +233,28 @@ class EventProvider extends ChangeNotifier {
     return foundEvents;
   }
 
+  void resetEventListType(EventListType type) {
+    nextPageToLoad[type] = 1;
+    switch (type) {
+      case EventListType.UP_COMING:
+        upComing.clear();
+        return;
+      case EventListType.FAVORITES:
+        favorites.clear();
+        return;
+      case EventListType.NEAR_BY:
+        nearby.clear();
+        return;
+    }
+  }
+
   /// Methode ruft attemptGetAllVeranstaltungen auf uns sortiert die Rückgabe
   /// in die, der übergebenen EventListType, entsprechend ein. Wenn das letzte
   /// laden des Types über eine Stunde her ist lädt er Alle Events neu, ansonsten
   /// fängt er da an, wo dass letzte mal aufgehört hat (nextPageToLoad)
   Future<List<Veranstaltung>> loadEventListOfType(EventListType type) async {
-    // int startPage = nextPageToLoad[type] ?? 1;
-    int startPage = 1;
+    int startPage = nextPageToLoad[type] ?? 1;
+    // int startPage = 1;
     DateTime now = DateTime.now();
     DateTime lastUpdated = lastUpdate[type] ?? now;
 
@@ -247,15 +264,18 @@ class EventProvider extends ChangeNotifier {
     /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
     DateTime until = DateTime.utc(now.year + 69, now.month, now.day);
 
+    //TODO: Wieder auskommentieren, müsste eig. gehen
     /// Favoriten müssen vorher geleerten werden, da dieser Zustand in der
     /// getEventFromJson Methode definiert wird
     // if (startPage == 1 && type == EventListType.FAVORITES) favorites.clear();
 
-    List<Veranstaltung> loaded = await loadEventsUntil(until, startPage, 1);
+    List<Veranstaltung> loaded =
+        await loadEventsUntil(until, startPage, 1, type);
 
     if (loaded == null) return [];
 
-    if (loaded.length > 0) nextPageToLoad[type] = startPage + 1;
+    log("loaded events length: " + loaded.length.toString());
+    // if (loaded.length > 0) nextPageToLoad[type] = startPage + 1;
 
     lastUpdate[type] = now;
 
@@ -478,9 +498,10 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'] == '1' && !favorites.contains(id))
+    if (json['favorit'] == '1' && !favorites.contains(id)) {
       favorites.add(id);
-    else if (json['favorit'] == '0' && favorites.contains(id))
+      log("favorisiertes event gefunden");
+    } else if (json['favorit'] == '0' && favorites.contains(id))
       favorites.remove(id);
 
     if (json['istGenehmigt'] == '1' && !approved.contains(id)) approved.add(id);
