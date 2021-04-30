@@ -5,6 +5,30 @@ var router = express.Router();
 const passport = require("passport");
 const fileUploadService = require("../services/fileUploadService");
 
+// [GET] bekomme alle ungenehmigten institution
+router.get(
+  "/ungenehmigt",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+      return res.status(400).json({
+        error: "Nur Betreiber können ungenehmigte Institutionen abrufen",
+      });
+    }
+
+    const result = await institutionService.getUngenehmigteVeranstaltungen();
+    if (result.error) {
+      res.status(400).json(result);
+    } else {
+      res.status(200).json(result);
+    }
+  }
+);
+
 // [GET] bekomme einzelne institution
 router.get("/:institutionId", async function (req, res) {
   let institutionId = req.params.institutionId;

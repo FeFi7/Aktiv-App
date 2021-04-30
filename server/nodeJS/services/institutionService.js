@@ -114,6 +114,22 @@ async function genehmigeInstitution(institutionId) {
   }
 }
 
+async function getUngenehmigteVeranstaltungen() {
+  const query = `SELECT i.id, i.name, i.beschreibung, u.mail, u.tel from Institution i
+  INNER JOIN User u ON i.ersteller = u.id 
+  WHERE i.istGenehmigt = 0 `;
+
+  let result = await conn.query(query).catch((error) => {
+    console.log(error);
+    return { error: "Fehler bei Db" };
+  });
+  if (result) {
+    return result[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function isUserInInstitution(userId, institutionId) {
   const query = `SELECT * FROM MitgliedUserInstitution m WHERE m.userId = ? AND m.institutionId = ?`;
 
@@ -152,8 +168,6 @@ async function saveProfilbildIdToInstitution(institutionId, pofilbildId) {
   }
 }
 
-
-
 module.exports = {
   getInstitutionById: getInstitutionById,
   erstelleInstitution: erstelleInstitution,
@@ -162,4 +176,5 @@ module.exports = {
   genehmigeInstitution: genehmigeInstitution,
   saveProfilbildIdToInstitution: saveProfilbildIdToInstitution,
   deleteInstitutionById: deleteInstitutionById,
+  getUngenehmigteVeranstaltungen: getUngenehmigteVeranstaltungen,
 };

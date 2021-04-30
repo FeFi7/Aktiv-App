@@ -356,9 +356,9 @@ router.delete(
 
     const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
 
-    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+    if ((Number(userId) !== Number(userZuEntfernenId)) && (resultIsUserBetreiber.error || !resultIsUserBetreiber)) {
       return res.status(400).json({
-        error: "Nur Betreiber können User löschen",
+        error: "Nur Betreiber oder selbst können User löschen",
       });
     }
 
@@ -436,11 +436,15 @@ router.get(
   "/:userId/favorit",
   passport.authenticate("jwt", { session: false }),
   async function (req, res) {
+    const userIdByToken = req.user._id;
     const userId = req.params.userId;
     let limit = req.query.limit;
     let page = req.query.page;
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("userId keine Zahl");
+    }
+    if(Number(userIdByToken)!==Number(userId)){
+      return res.status(400).send("Fremde userId");
     }
 
     if (limit) {
