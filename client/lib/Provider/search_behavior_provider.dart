@@ -30,7 +30,7 @@ class SearchBehaviorProvider extends ChangeNotifier {
             } else {
               isSelected[buttonIndex] = false;
             }
-           _style = SearchStyle.values[index];
+            _style = SearchStyle.values[index];
           }
           notifyListeners();
         },

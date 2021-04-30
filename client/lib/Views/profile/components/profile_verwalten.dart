@@ -144,7 +144,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "verwalter":
         return Column(
           children: <Widget>[
-            verwalterVerwaltenCard(),
+            //verwalterVerwaltenCard(),
           ],
         );
         break;
@@ -157,7 +157,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "betreiber":
         return Column(
           children: <Widget>[
-            verwalterVerwaltenCard(),
+            //verwalterVerwaltenCard(),
             genehmigerVerwaltenCard(),
             betreiberVerwaltenCard(),
             benutzerLoschenCard(),
@@ -175,7 +175,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     return CardDropDown(
       headerChildren: [
         Icon(
-          Icons.person_add_alt_1,
+          Icons.person_search,
           size: 40.0,
         ),
         SizedBox(width: 20.0),
@@ -293,7 +293,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     return CardDropDown(
       headerChildren: [
         Icon(
-          Icons.person_add_alt_1,
+          Icons.person_search,
           size: 40.0,
         ),
         SizedBox(width: 20.0),
@@ -371,7 +371,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     return CardDropDown(
       headerChildren: [
         Icon(
-          Icons.person_add_alt_1,
+          Icons.person_search,
           size: 40.0,
         ),
         SizedBox(
@@ -392,14 +392,14 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         ),
         SizedBox(height: 10.0),
         RoundedButton(
-          text: "Postleizahl hinzufügen",
+          text: "Postleizahlen aktualisieren",
           color: ColorPalette.endeavour.rgb,
           press: () async {
             if (await confirm(
               context,
               title: Text("Bestätigung"),
-              content: Text(
-                  "Möchten Sie dem Genehmiger, die genannten PLZ-Angaben hinzufügen?"),
+              content:
+                  Text("Möchten Sie die genannten PLZ-Angaben aktualisieren?"),
               textOK: Text(
                 "Bestätigen",
                 style: TextStyle(color: ColorPalette.grey.rgb),
@@ -410,28 +410,6 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             )) {
               //TODO Genehmiger hinzufügen von PLZs
-            }
-          },
-        ),
-        RoundedButton(
-          text: "Postleizahl entfernen",
-          color: ColorPalette.grey.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text(
-                  "Möchten Sie dem Genehmiger, die genannten PLZ-Angaben entfernen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Genehmiger entfernen von PLZs
             }
           },
         ),
@@ -491,7 +469,15 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                 style: TextStyle(color: ColorPalette.endeavour.rgb),
               ),
             )) {
-              //TODO Benutzer löschen
+              var user = await Provider.of<UserProvider>(context, listen: false)
+                  .deleteUser(benutzerController.text);
+              if (user == null) {
+                errorToast("User nicht vorhanden");
+              } else if (user.statusCode != 200) {
+                errorToast("Fehler beim Löschen");
+              } else {
+                errorToast("User gelöscht");
+              }
             }
           },
         ),
@@ -678,6 +664,39 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             )) {
               //TODO Verwalter hinzufügen
+            }
+          },
+        ),
+        RoundedButton(
+          text: "Verwalter entfernen",
+          color: ColorPalette.grey.rgb,
+          press: () async {
+            var institutionsId = "1";
+            // var verwalter =
+            //     await Provider.of<UserProvider>(context, listen: false)
+            //         .setRole(verwalterController.text, "verwalter");
+            if (await confirm(
+              context,
+              title: Text("Bestätigung"),
+              content: Text("Möchten Sie den Verwalter entfernen?"),
+              textOK: Text(
+                "Bestätigen",
+                style: TextStyle(color: ColorPalette.grey.rgb),
+              ),
+              textCancel: Text(
+                "Abbrechen",
+                style: TextStyle(color: ColorPalette.endeavour.rgb),
+              ),
+            )) {
+              //TODO verwalter entfernen
+              // var verwalter =
+              //     await Provider.of<UserProvider>(context, listen: false)
+              //         .setVerwalter(verwalterController.text, institutionsId);
+              // if (verwalter.statusCode != 200) {
+              //   errorToast("Fehler bei der Aktualisierung");
+              // } else {
+              //   errorToast("Verwalter entfernt");
+              // }
             }
           },
         ),

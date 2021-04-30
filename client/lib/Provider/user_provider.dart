@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:aktiv_app_flutter/Models/role_permissions.dart';
+import 'package:aktiv_app_flutter/Views/profile/components/profile_persoenlich.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,9 +11,10 @@ class UserProvider extends ChangeNotifier {
   static ROLE _role = ROLE
       .NOT_REGISTERED; // Brauchte eine Standard Rolle, sorry wens dir was zerschießt, lg Niko
   final SecureStorage storage = SecureStorage();
-
+  bool _signInWithToken = false;
+  bool get isSignInWithToken => _signInWithToken;
   static int userId = -1;
-  int plz, hausnummer, bald, naehe;
+  int bald, naehe;
   String mail,
       vorname,
       nachname,
@@ -23,8 +25,12 @@ class UserProvider extends ChangeNotifier {
       refreshToken,
       institutionen,
       rolle,
-      profilBild;
-  static bool istEingeloggt = false, datenVollstaendig = false;
+      profilBild,
+      hausnummer,
+      plz;
+  static bool istEingeloggt = false;
+  bool datenVollstaendig = false;
+  bool get getDatenVollstaendig => datenVollstaendig;
 
   // TODO: Evtl die Rolle über den
 
@@ -69,9 +75,9 @@ class UserProvider extends ChangeNotifier {
 
     userId = parsedUser['id'];
     if (parsedUser['plz'] != null && parsedUser['plz'] != "null") {
-      plz = int.parse(parsedUser['plz']);
+      plz = parsedUser['plz'];
     }
-    //hausnummer = parsedUser['hausnummer'];
+    hausnummer = parsedUser['hausnummer'];
     tel = parsedUser['tel'];
     bald = parsedUser['baldEinstellung'];
     naehe = parsedUser['umkreisEinstellung'];
@@ -79,7 +85,7 @@ class UserProvider extends ChangeNotifier {
     mail = parsedUser['mail'];
     vorname = parsedUser['vorname'];
     nachname = parsedUser['nachname'];
-    //strasse = parsedUser['strasse'];
+    strasse = parsedUser['strasse'];
     ort = parsedUser['ort'];
     //institutionen = parsedUser['institutionen'];
     rolle = parsedUser['rolle'];
@@ -93,17 +99,26 @@ class UserProvider extends ChangeNotifier {
       DateTime accessTokenTs =
           DateTime.parse(await storage.read('accessTokenTs'));
       if (DateTime.now().difference(accessTokenTs).inMinutes >= 30) {
-        var jwt =
-            await attemptNewAccessToken(await storage.read('refreshToken'));
-        var parsedToken = json.decode(jwt.body);
-        accessToken = parsedToken['accessToken'];
-        refreshToken = parsedToken['refreshToken'];
+        var _jwt = await storage.read('refreshToken');
+        if (_jwt != null) {
+          var jwt =
+              await attemptNewAccessToken(await storage.read('refreshToken'));
+          if (jwt.statusCode == 502) {
+            errorToast("Keine Verbindung zum Server");
+            return null;
+          } else {
+            var parsedToken = json.decode(jwt.body);
+            accessToken = parsedToken['accessToken'];
+            refreshToken = parsedToken['refreshTokenNeu'];
 
-        storage.write("accessToken", accessToken);
-        storage.write("refreshToken", refreshToken);
-        storage.write("accessTokenTs", DateTime.now().toString());
+            storage.write("accessToken", accessToken);
+            storage.write("refreshToken", refreshToken);
+            storage.write("accessTokenTs", DateTime.now().toString());
 
-        return accessToken;
+            return accessToken;
+          }
+        }
+        return null;
       }
     }
     return await storage.read('accessToken');
@@ -123,7 +138,12 @@ class UserProvider extends ChangeNotifier {
     var userId = await storage.read("userId");
     var accessToken = await getAccessToken();
 
-    await collectUserInfo(int.parse(userId), accessToken);
+    if (accessToken != null) {
+      await collectUserInfo(int.parse(userId), accessToken);
+      _signInWithToken = true;
+    } else {
+      return null;
+    }
   }
 
   signOff() async {
@@ -131,16 +151,16 @@ class UserProvider extends ChangeNotifier {
     await storage.deleteAll();
   }
 
-  updateUserInfo<Response>(
-      String vorname, String nachname, String plz, String tel) async {
+  updateUserInfo<Response>(String vorname, String nachname, String plz,
+      String tel, String strasse, String hausnummer) async {
     var jwt = await attemptUpdateUserInfo(
         mail.toString(),
         vorname.toString(),
         nachname.toString(),
         plz.toString(),
         tel.toString(),
-        "straße",
-        "hausnummer",
+        strasse,
+        hausnummer,
         userId.toString(),
         await getAccessToken());
     var accessToken = await storage.read('accessToken');
@@ -216,16 +236,36 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  deleteUser(String mail) async {
+    var userToDelete = await attemptGetUser(mail);
+    var parsedUser = json.decode(userToDelete.body);
+    var _map = parsedUser.values.toList();
+    if (_map[0] != false) {
+      var _userId = _map[1]['id'].toString();
+      var jwt = await attemptDeleteUser(_userId, await getAccessToken());
+      return jwt;
+    }
+    return null;
+  }
+
   checkDataCompletion() {
     if (vorname != null &&
+        vorname != "null" &&
         nachname != null &&
+        nachname != "null" &&
         tel != null &&
+        tel != "null" &&
         strasse != null &&
+        strasse != "null" &&
         hausnummer != null &&
+        hausnummer != "null" &&
         plz != null &&
-        ort != null)
+        plz != "null") {
       datenVollstaendig = true;
-    else
+      return true;
+    } else {
       datenVollstaendig = false;
+      return false;
+    }
   }
 }

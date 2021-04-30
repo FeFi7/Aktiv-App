@@ -9,6 +9,7 @@ import 'Views/welcome_screen.dart';
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -32,6 +33,15 @@ class AktivApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        supportedLocales: [
+          const Locale('en', ''), // English, no country code
+          const Locale('de', ''), // Deutsch, no country code
+        ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         title: 'wir:hier',
         theme: ThemeData(
           primarySwatch: Colors.blue,

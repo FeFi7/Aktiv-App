@@ -719,7 +719,7 @@ Future<http.Response> attemptDeleteVerwalter(
 // [DELETE] Lösche User (nur als Betreiber möglich)
 Future<http.Response> attemptDeleteUser(
     String userId, String accessToken) async {
-  String route = "api/" + userId;
+  String route = "api/user/" + userId;
 
   Map<String, dynamic> qParams = {'secret_token': accessToken};
 
@@ -800,7 +800,7 @@ Future<http.Response> attemptGetFavorite(
 }
 
 // [GET] Bekomme alle Institutionen
-Future<http.Response> attemptGetAllInstitutionen() async {}
+Future<http.Response> attemptGetUngenehmigteInstitutionen() async {}
 
 // [DELETE] Lösche einzelnes File
 Future<http.Response> attemptDeleteFile() async {}

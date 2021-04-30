@@ -39,7 +39,7 @@ class _CalendarViewState extends State<CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-     DateTime now = DateTime.now();
+    DateTime now = DateTime.now();
     return Column(
       children: [
         Stack(
@@ -47,7 +47,7 @@ class _CalendarViewState extends State<CalendarView> {
             Container(
                 padding: const EdgeInsets.all(10.0),
                 child: TableCalendar(
-                  // locale: 'de_DE',
+                  locale: 'de_DE',
                   firstDay: DateTime.now(),
                   // firstDay: DateTime.utc(200),
                   focusedDay: _focusedDay,
@@ -102,42 +102,45 @@ class _CalendarViewState extends State<CalendarView> {
                 )),
             Positioned(
               right: 60,
-              child: UserProvider.getUserRole().allowedToFavEvents ? (Container(
-                margin: const EdgeInsets.all(10.0),
-                child: ToggleButtons(
-                  children: [
-                    Container(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('Allgemein')),
-                    Container(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text('Persönlich')),
-                  ],
-                  isSelected: isSelected,
-                  onPressed: (int index) async {
-                    setState(() {
+              child: UserProvider.getUserRole().allowedToFavEvents
+                  ? (Container(
+                      margin: const EdgeInsets.all(10.0),
+                      child: ToggleButtons(
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text('Allgemein')),
+                          Container(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text('Persönlich')),
+                        ],
+                        isSelected: isSelected,
+                        onPressed: (int index) async {
+                          setState(() {
+                            for (int buttonIndex = 0;
+                                buttonIndex < isSelected.length;
+                                buttonIndex++) {
+                              if (buttonIndex == index) {
+                                isSelected[buttonIndex] = true;
+                              } else {
+                                isSelected[buttonIndex] = false;
+                              }
+                            }
 
-                      for (int buttonIndex = 0;
-                          buttonIndex < isSelected.length;
-                          buttonIndex++) {
-                        if (buttonIndex == index) {
-                          isSelected[buttonIndex] = true;
-                        } else {
-                          isSelected[buttonIndex] = false;
-                        }
-                      }
+                            _selectedDay = null;
+                            _selectedEvents.value = [];
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(30),
+                        borderWidth: 1,
+                        selectedColor: ColorPalette.white.rgb,
+                        fillColor: ColorPalette.endeavour.rgb,
+                        disabledBorderColor: ColorPalette.french_pass.rgb,
+                      ),
+                    ))
+                  : Container(),
 
-                      _selectedDay = null;
-                      _selectedEvents.value = [];
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(30),
-                  borderWidth: 1,
-                  selectedColor: ColorPalette.white.rgb,
-                  fillColor: ColorPalette.endeavour.rgb,
-                  disabledBorderColor: ColorPalette.french_pass.rgb,
-                ),
-              )) : Container(), /// Leerer Container, falls User nicht eingeloggt ist
+              /// Leerer Container, falls User nicht eingeloggt ist
             )
           ],
         ),
@@ -149,7 +152,8 @@ class _CalendarViewState extends State<CalendarView> {
                 ? ListView.builder(
                     itemCount: value.length,
                     itemBuilder: (context, index) {
-                      return EventPreviewBox.load(value[index], AdditiveFormat.HOLE_DATETIME);
+                      return EventPreviewBox.load(
+                          value[index], AdditiveFormat.HOLE_DATETIME);
                     },
                   )
                 : Container(
