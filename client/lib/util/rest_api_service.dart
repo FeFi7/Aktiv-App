@@ -122,32 +122,13 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   return response;
 }
 
-/* // [DELETE] Lösche einzelne Veranstaltung mithilfe von VeranstaltungsId
-Future<http.Response> attemptDeleteVeranstaltung(int veranstaltungsId) async {
-  String route = "api/veranstaltungen" + veranstaltungsId.toString();
-
-  final response = await http.delete(Uri.https(SERVER_IP, route),
-      headers: <String, String>{
-        'Content-Type': "application/x-www-form-urlencoded"
-      },
-      encoding: Encoding.getByName("utf-8"));
-
-  if (response.statusCode == 200) {
-    print("Veranstaltung erfolgreich gelöscht");
-  } else {
-    print(response.statusCode);
-  }
-
-  return response;
-} */
-
 //TODO bis muss + 1 tag sein
 ////Jahr-Monat-Tag // Ein Tag draufrechnen, da dieser nicht von mysql berechtigt wird
 //datetime.utc draufrechnen
 //
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
-Future<http.Response> attemptGetAllVeranstaltungen(
+Future<http.Response> attemptGetAllVeranstaltungen(String datum,
     [String bis = "-1",
     String istGenehmigt = "1",
     String limit = "25",
@@ -157,7 +138,8 @@ Future<http.Response> attemptGetAllVeranstaltungen(
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
-    'page': page
+    'page': page,
+    'datum': datum
   };
 
   if (bis != "-1") {
@@ -698,7 +680,7 @@ Future<http.Response> attemptGetTags(List<String> tag) async {
   final response = await http.get(Uri.https(SERVER_IP, route));
 
   if (response.statusCode == 200) {
-    print("Verbindung erfolgreich");
+    print("Bekomme tags erfolgreich");
   } else {
     print(response.statusCode);
   }
@@ -721,7 +703,8 @@ Future<http.Response> attemptDeleteVerwalter(
       encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
-    print("Verbindung erfolgreich");
+    print(
+        "Verbindung zwischen User als Verwalter und Institution erfolgreich gelöscht");
   } else {
     print(response.statusCode);
   }
@@ -744,7 +727,7 @@ Future<http.Response> attemptDeleteUser(
       encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
-    print("Verbindung erfolgreich");
+    print("User erfolgreich gelöscht");
   } else {
     print(response.statusCode);
   }
@@ -766,6 +749,42 @@ Future<http.Response> attemptSetGenehmiger(
       },
       body: body,
       encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Genehmiger erfolgreich gesetzt für" + plz);
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] Bekomme verwaltene PLZs von Genehmiger
+Future<http.Response> attemptGetPLZs(String userId) async {
+  String route = "api/user/" + userId + "/genehmigung";
+
+  final response = await http.get(Uri.https(SERVER_IP, route));
+
+  if (response.statusCode == 200) {
+    print("Bekomme verwaltene PLZs erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [GET] Bekomme alle favorisierten Veranstaltungen
+Future<http.Response> attemptGetFavorite(
+    String userId, String accessToken, String limit, String page) async {
+  String route = "api/user/" + userId + "/favorit";
+  Map<String, dynamic> qParams = {
+    'secret_token': accessToken,
+    'limit': limit,
+    'page': page
+  };
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams));
 
   if (response.statusCode == 200) {
     print("Verbindung erfolgreich");
