@@ -128,7 +128,7 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
 //
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
-Future<http.Response> attemptGetAllVeranstaltungen(String datum,
+Future<http.Response> attemptGetAllVeranstaltungen(
     [String bis = "-1",
     String istGenehmigt = "1",
     String limit = "25",
@@ -138,8 +138,7 @@ Future<http.Response> attemptGetAllVeranstaltungen(String datum,
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
-    'page': page,
-    'datum': datum
+    'page': page
   };
 
   if (bis != "-1") {
