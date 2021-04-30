@@ -673,10 +673,15 @@ Future<http.Response> attemptDeleteVeranstaltung(
 }
 
 // [GET] Bekomme tags (optional gefiltert)
-Future<http.Response> attemptGetTags(List<String> tag) async {
+Future<http.Response> attemptGetTags([String tag = "[-1]"]) async {
   String route = "tags";
+  Map<String, dynamic> qParams;
 
-  final response = await http.get(Uri.https(SERVER_IP, route));
+  if (tag != "[-1]") {
+    qParams.putIfAbsent('tag', () => tag);
+  }
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams));
 
   if (response.statusCode == 200) {
     print("Bekomme tags erfolgreich");
