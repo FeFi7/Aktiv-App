@@ -27,6 +27,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   final genehmigerController = TextEditingController();
   final betreiberController = TextEditingController();
   final benutzerController = TextEditingController();
+  final plzController = TextEditingController();
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
 
@@ -355,7 +356,9 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             )) {
               var user = await Provider.of<UserProvider>(context, listen: false)
                   .setRole(betreiberController.text, "user");
-              if (user.statusCode != 200) {
+              if (user == null) {
+                errorToast("User nicht vorhanden");
+              } else if (user.statusCode != 200) {
                 errorToast("Fehler bei der Aktualisierung");
               } else {
                 errorToast("Betreiber entfernt");
@@ -389,6 +392,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         Text("Postleizahl(en) des Genehmigers eingeben"),
         RoundedInputFieldNumericKomma(
           hintText: "88483, 80331, 20095, ...",
+          controller: plzController,
         ),
         SizedBox(height: 10.0),
         RoundedButton(

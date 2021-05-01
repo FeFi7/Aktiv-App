@@ -74,9 +74,9 @@ class UserProvider extends ChangeNotifier {
     var parsedUser = json.decode(detailedUserInfo.body);
 
     userId = parsedUser['id'];
-    if (parsedUser['plz'] != null && parsedUser['plz'] != "null") {
-      plz = parsedUser['plz'];
-    }
+    // if (parsedUser['plz'] != null && parsedUser['plz'] != "null") {
+    plz = parsedUser['plz'];
+    // }
     hausnummer = parsedUser['hausnummer'];
     tel = parsedUser['tel'];
     bald = parsedUser['baldEinstellung'];
@@ -87,7 +87,6 @@ class UserProvider extends ChangeNotifier {
     nachname = parsedUser['nachname'];
     strasse = parsedUser['strasse'];
     ort = parsedUser['ort'];
-    //institutionen = parsedUser['institutionen'];
     rolle = parsedUser['rolle'];
     profilBild = parsedUser['profilbild'];
     datenVollstaendig = checkDataCompletion();
@@ -159,8 +158,8 @@ class UserProvider extends ChangeNotifier {
         nachname.toString(),
         plz.toString(),
         tel.toString(),
-        strasse,
-        hausnummer,
+        strasse.toString(),
+        hausnummer.toString(),
         userId.toString(),
         await getAccessToken());
     var accessToken = await storage.read('accessToken');

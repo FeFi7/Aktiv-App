@@ -122,7 +122,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   vorname = value;
-                                  vornameController.text = value;
+                                  vorname = vornameController.text;
                                 } else {
                                   vorname = vornameController.text;
                                 }
@@ -138,7 +138,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                 onChanged: (value) {
                                   if (value != null && value != "null") {
                                     nachname = value;
-                                    nachnameController.text = value;
+                                    nachname = nachnameController.text;
                                   } else {
                                     nachnameController.text = value;
                                   }
