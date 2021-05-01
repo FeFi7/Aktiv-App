@@ -102,7 +102,11 @@ async function getVeranstaltungen(
   userId = 0,
   page = 1,
   vollText,
-  datum
+  datum,
+  latitude,
+  longitude,
+  entfernung,
+  sorting
 ) {
   // Falls nichts angegeben bis 1 Monat in der Zukunft
   if (!bis) {
@@ -125,24 +129,26 @@ async function getVeranstaltungen(
   if (vollText) {
     vollText = "%" + vollText + "%";
   }
-
+  console.log("sortiert nach: " + sorting)
   const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
   const query =
-    `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung FROM Veranstaltung v
+    `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
+    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung FROM Veranstaltung v
     LEFT JOIN Institution i ON v.institutionId = i.id
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
-    `
-    ORDER BY v.beginn_ts asc
+    ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
+    ORDER BY `+ sorting +` asc
     LIMIT ?,?`;
   const queryWithUserFavorites =
-    `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, IF(f.valide=1, 1, 0) as favorit FROM Veranstaltung v
+    `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
+    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, IF(f.valide=1, 1, 0) as favorit FROM Veranstaltung v
     LEFT JOIN Institution i ON v.institutionId = i.id
     LEFT JOIN Favorit f ON v.id = f.veranstaltungId AND f.valide = 1 AND f.userId = ?
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
-    `
-    ORDER BY v.beginn_ts asc
+    ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
+    ORDER BY `+ sorting +` asc
     LIMIT ?,?`;
 
   let results = {};
@@ -153,19 +159,29 @@ async function getVeranstaltungen(
         queryWithUserFavorites,
         vollText
           ? [
+              latitude,
+              longitude,
               Number(userId),
               Number(istGenehmigt),
               bis,
               vollText,
               vollText,
               vollText,
+              latitude,
+              longitude,
+              entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
           : [
+              latitude,
+              longitude,
               Number(userId),
               Number(istGenehmigt),
               bis,
+              latitude,
+              longitude,
+              entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
@@ -180,17 +196,27 @@ async function getVeranstaltungen(
         query,
         vollText
           ? [
+              latitude,
+              longitude,
               Number(istGenehmigt),
               bis,
               vollText,
               vollText,
               vollText,
+              latitude,
+              longitude,
+              entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
           : [
+              latitude,
+              longitude,
               Number(istGenehmigt),
               bis,
+              latitude,
+              longitude,
+              entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
