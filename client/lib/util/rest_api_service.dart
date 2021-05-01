@@ -741,11 +741,13 @@ Future<http.Response> attemptDeleteUser(
 
 // [POST] Generiere Verbindung von Genehmiger zu PLZs
 Future<http.Response> attemptSetGenehmiger(
-    String userId, String plz, String accessToken) async {
-  String route = "api/" + userId + "/genehmigung";
+    String userId, List<String> plz, String accessToken) async {
+  String route = "api/user/" + userId + "/genehmigung";
 
   Map<String, dynamic> qParams = {'secret_token': accessToken};
-  Map<String, dynamic> body = {'plz': plz};
+  Map<String, dynamic> body = {};
+
+  body.putIfAbsent('plz', () => plz.toString());
 
   final response = await http.post(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
@@ -755,7 +757,33 @@ Future<http.Response> attemptSetGenehmiger(
       encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
-    print("Genehmiger erfolgreich gesetzt für" + plz);
+    print("Genehmiger erfolgreich gesetzt für " + body.toString());
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [DELETE] Generiere Verbindung von Genehmiger zu PLZs
+Future<http.Response> attemptRemoveGenehmiger(
+    String userId, List<String> plz, String accessToken) async {
+  String route = "api/user/" + userId + "/genehmigung";
+
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {};
+
+  body.putIfAbsent('plz', () => plz.toString());
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Genehmiger erfolgreich entfernt " + body.toString());
   } else {
     print(response.statusCode);
   }
@@ -799,8 +827,27 @@ Future<http.Response> attemptGetFavorite(
   return response;
 }
 
-// [GET] Bekomme alle Institutionen
-Future<http.Response> attemptGetUngenehmigteInstitutionen() async {}
+// [GET] Bekomme alle ungenehmigten Institutionen
+Future<http.Response> attemptGetUngenehmigteInstitutionen(
+    String accessToken) async {
+  Map<String, dynamic> qParams = {
+    'secret_token': accessToken,
+  };
+  String route = "api/institutionen/ungenehmigt";
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      });
+
+  if (response.statusCode == 200) {
+    print("GET All Institutionen erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
 
 // [DELETE] Lösche einzelnes File
 Future<http.Response> attemptDeleteFile() async {}

@@ -31,6 +31,7 @@ class UserProvider extends ChangeNotifier {
   static bool istEingeloggt = false;
   bool datenVollstaendig = false;
   bool get getDatenVollstaendig => datenVollstaendig;
+  List<String> genehmigerPLZs;
 
   // TODO: Evtl die Rolle über den
 
@@ -90,6 +91,7 @@ class UserProvider extends ChangeNotifier {
     rolle = parsedUser['rolle'];
     profilBild = parsedUser['profilbild'];
     datenVollstaendig = checkDataCompletion();
+    //genehmigerPLZs = getGenehmigerPLZs(userId);
   }
 
   getAccessToken() async {
@@ -233,6 +235,78 @@ class UserProvider extends ChangeNotifier {
       //###########################################//
     }
     return null;
+  }
+
+  removeVerwalter(String mail, String institutionsId) async {
+    var verwalter = await attemptGetUser(mail);
+    var parsedVerwalter = json.decode(verwalter.body);
+    var _map = parsedVerwalter.values.toList();
+    if (_map[0] != false) {
+      var _userId = _map[1]['id'].toString();
+
+      //## derzeit keine Institutionen vorhanden ##//
+      //TODO
+      // var jwt = await attemptSetVerwalter(
+      //     _userId, institutionsId, await getAccessToken());
+      // return jwt;
+      //###########################################//
+    }
+    return null;
+  }
+
+  getUngenehmigteInstitutionen() async {
+    var institutionen =
+        await attemptGetUngenehmigteInstitutionen(await getAccessToken());
+    var parsedInstitutionen = json.decode(institutionen.body);
+
+    print(parsedInstitutionen);
+  }
+
+  setGenehmiger(String mail, List<String> plz) async {
+    if (await setRole(mail, "genehmiger") != null) {
+      var genehmiger = await attemptGetUser(mail);
+      var parsedgenehmiger = json.decode(genehmiger.body);
+      var _map = parsedgenehmiger.values.toList();
+      if (_map[0] != false) {
+        var _userId = _map[1]['id'].toString();
+
+        var _accessToken = await getAccessToken();
+
+        var jwt = await attemptSetGenehmiger(_userId, plz, _accessToken);
+        notifyListeners();
+        return jwt;
+      }
+    }
+    return null;
+  }
+
+  removeGenehmiger(String mail, List<String> plz) async {
+    if (await setRole(mail, "genehmiger") != null) {
+      var genehmiger = await attemptGetUser(mail);
+      var parsedgenehmiger = json.decode(genehmiger.body);
+      var _map = parsedgenehmiger.values.toList();
+      if (_map[0] != false) {
+        var _userId = _map[1]['id'].toString();
+
+        var _accessToken = await getAccessToken();
+
+        var jwt = await attemptRemoveGenehmiger(_userId, plz, _accessToken);
+        notifyListeners();
+        return jwt;
+      }
+    }
+    return null;
+  }
+
+  getGenehmigerPLZs(String userId) async {
+    var jwt = await attemptGetPLZs(userId);
+    if (jwt != null) {
+      var _gene = await getGenehmigerPLZs(userId);
+      genehmigerPLZs = _gene.join(",");
+      print(genehmigerPLZs);
+    } else {
+      return null;
+    }
   }
 
   deleteUser(String mail) async {

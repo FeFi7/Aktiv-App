@@ -258,23 +258,48 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   }
 
   void checkValues() {
-    vornameController.text =
-        Provider.of<UserProvider>(context, listen: false).vorname.toString();
+    (Provider.of<UserProvider>(context, listen: false).vorname.toString() !=
+            "null")
+        ? vornameController.text =
+            Provider.of<UserProvider>(context, listen: false).vorname.toString()
+        : vornameController.text = hintVorname(vorname);
     vorname = vornameController.text;
-    nachnameController.text =
-        Provider.of<UserProvider>(context, listen: false).nachname.toString();
+
+    (Provider.of<UserProvider>(context, listen: false).nachname.toString() !=
+            "null")
+        ? nachnameController.text =
+            Provider.of<UserProvider>(context, listen: false)
+                .nachname
+                .toString()
+        : nachnameController.text = hintNachname(nachname);
     nachname = nachnameController.text;
-    plzController.text =
-        Provider.of<UserProvider>(context, listen: false).plz.toString();
+
+    (Provider.of<UserProvider>(context, listen: false).plz.toString() != "null")
+        ? plzController.text =
+            Provider.of<UserProvider>(context, listen: false).plz.toString()
+        : plzController.text = hintPlz(plz);
     plz = plzController.text;
-    telController.text =
-        Provider.of<UserProvider>(context, listen: false).tel.toString();
+
+    (Provider.of<UserProvider>(context, listen: false).tel.toString() != "null")
+        ? telController.text =
+            Provider.of<UserProvider>(context, listen: false).tel.toString()
+        : telController.text = hintTel(tel);
     tel = telController.text;
-    hausnummerController.text =
-        Provider.of<UserProvider>(context, listen: false).hausnummer.toString();
+
+    (Provider.of<UserProvider>(context, listen: false).hausnummer.toString() !=
+            "null")
+        ? hausnummerController.text =
+            Provider.of<UserProvider>(context, listen: false)
+                .hausnummer
+                .toString()
+        : hausnummerController.text = hintHausnummer(hausnummer);
     hausnummer = hausnummerController.text;
-    strasseController.text =
-        Provider.of<UserProvider>(context, listen: false).strasse.toString();
+
+    (Provider.of<UserProvider>(context, listen: false).strasse.toString() !=
+            "null")
+        ? strasseController.text =
+            Provider.of<UserProvider>(context, listen: false).strasse.toString()
+        : strasseController.text = hintStrasse(strasse);
     strasse = strasseController.text;
   }
 }
@@ -282,50 +307,49 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
 hintVorname<String>(vorname) {
   if (vorname != null && vorname != "null") {
     return vorname;
-  } else
+  } else {
     return "Vorname";
+  }
 }
 
 hintNachname<String>(nachname) {
   if (nachname != null && nachname != "null") {
     return nachname;
-  } else
+  } else {
     return "Nachname";
+  }
 }
 
 hintTel<String>(tel) {
   if (tel != null && tel != "null") {
     return tel;
-  } else
+  } else {
     return "Telefonnummer";
+  }
 }
 
 hintStrasse<String>(strasse) {
   if (strasse != null && strasse != "null") {
     return strasse;
-  } else
+  } else {
     return "Straße";
+  }
 }
 
 hintHausnummer<String>(hausnummer) {
   if (hausnummer != null && hausnummer != "null") {
     return hausnummer;
-  } else
+  } else {
     return "Hausnummer";
+  }
 }
 
 hintPlz<String>(plz) {
   if (plz != null && plz != "null") {
     return plz;
-  } else
+  } else {
     return "PLZ";
-}
-
-hintOrt<String>(ort) {
-  if (ort != null && ort != "null") {
-    return ort;
-  } else
-    return "Ort";
+  }
 }
 
 errorToast(String errorMessage) {
