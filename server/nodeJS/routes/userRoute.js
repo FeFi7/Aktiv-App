@@ -93,9 +93,15 @@ router.post(
       institutionId
     );
 
-    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (
+      (resultIsUserInInstitution.error || !resultIsUserInInstitution) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
-        error: "User ist nicht als Verwalter in Institution registriert",
+        error:
+          "User ist nicht als Verwalter in Institution registriert oder kein Betreiber",
       });
     }
 
@@ -133,9 +139,15 @@ router.delete(
       institutionId
     );
 
-    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (
+      (resultIsUserInInstitution.error || !resultIsUserInInstitution) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
-        error: "User ist nicht als Verwalter in Institution registriert",
+        error:
+          "User ist nicht als Verwalter in Institution registriert oder kein Betreiber",
       });
     }
 
@@ -356,7 +368,10 @@ router.delete(
 
     const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
 
-    if ((Number(userId) !== Number(userZuEntfernenId)) && (resultIsUserBetreiber.error || !resultIsUserBetreiber)) {
+    if (
+      Number(userId) !== Number(userZuEntfernenId) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
         error: "Nur Betreiber oder selbst können User löschen",
       });
@@ -443,7 +458,7 @@ router.get(
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("userId keine Zahl");
     }
-    if(Number(userIdByToken)!==Number(userId)){
+    if (Number(userIdByToken) !== Number(userId)) {
       return res.status(400).send("Fremde userId");
     }
 
@@ -574,7 +589,10 @@ router.delete(
       });
     }
 
-    const result = await userService.deleteGenehmigerPLZs(userIdGenehmiger, plz);
+    const result = await userService.deleteGenehmigerPLZs(
+      userIdGenehmiger,
+      plz
+    );
 
     if (result.error) {
       return res.status(400).json(result);
