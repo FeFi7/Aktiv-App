@@ -139,9 +139,6 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     'page': page
   };
 
-  // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
-  List<String> coordinates = await getActualCoordinates();
-
   if (bis != "-1") {
     qParams.putIfAbsent('bis', () => bis);
   }
@@ -161,9 +158,15 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     qParams.putIfAbsent('sorting', () => sorting);
   }
 
-  if (coordinates != null) {
-    qParams.putIfAbsent('latitude', () => coordinates.first);
-    qParams.putIfAbsent('longitude', () => coordinates.last);
+  try {
+    // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
+    List<String> coordinates = await getActualCoordinates();
+    if (coordinates != null) {
+      qParams.putIfAbsent('latitude', () => coordinates.first);
+      qParams.putIfAbsent('longitude', () => coordinates.last);
+    }
+  } catch (e) {
+    print(e.toString());
   }
 
   String route = "api/veranstaltungen";
