@@ -31,7 +31,7 @@ class EventProvider extends ChangeNotifier {
   /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
   static final Map<int, double> distance = Map<int, double>();
 
-  /// Liste aller Event ID's die in der nähe statt finden TODO: machen!!!!
+  /// Liste aller Event ID's die in der nähe statt finden
   static final List<int> nearby = [];
 
   /// Liste aller Event ID's die als nächstes statt finden (sortiert)
@@ -162,7 +162,6 @@ class EventProvider extends ChangeNotifier {
           UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1",
           text);
       if (response.statusCode == 200) {
-        // log("loadEventsContainingText("+text+"): \n" + response.body);
         var parsedJson = json.decode(response.body);
 
         //log(response.body); // TODO: remove this line
@@ -547,7 +546,7 @@ class EventProvider extends ChangeNotifier {
     else if (json['istGenehmigt'].toString() == "1" &&
         pendingApproval.contains(id)) pendingApproval.remove(id);
 
-    if (json['entfernung'] != null) distance[id] = json['entfernung'];
+    if (json['entfernung'] != null) distance[id] = double.parse(json['entfernung'].toString());
 
     if (isEventLoaded(id)) return loaded[id];
 
