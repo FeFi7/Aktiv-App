@@ -16,7 +16,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
-enum EventListType { UP_COMING, FAVORITES, NEAR_BY }
+enum EventListType { UP_COMING, FAVORITES, NEAR_BY, APPROVE }
 
 class EventProvider extends ChangeNotifier {
   /// Map aller Event Instanzen die zu ihrer ID hinterlegt sind
@@ -115,11 +115,14 @@ class EventProvider extends ChangeNotifier {
                   "\" handelt es sich um kein gültiges Datum Format. Bitte Datum im Format Tag.Monat.Jahr angeben."));
         }
 
-        if (eventPreviews.length == 0)
+        if (eventPreviews.length == 0) {
+          attemptGetTags();
           eventPreviews.add(ErrorPreviewBox(
               "Es konnten keine Veranstaltungen für den " +
                   text +
-                  " gefunden werden."));
+                  " gefunden werden.",
+              "Eingabe zu spezifisch"));
+        }
 
         return eventPreviews;
       case SearchStyle.PERIOD:
@@ -164,8 +167,6 @@ class EventProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 
-        //log(response.body); // TODO: remove this line
-
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
 
@@ -203,10 +204,12 @@ class EventProvider extends ChangeNotifier {
   Future<List<Veranstaltung>> loadEventsUntil(
       int startPage, int maxPages, EventListType type) async {
     DateTime now = DateTime.now();
-    DateTime until = DateTime.utc(now.year, now.month, now.day+ UserProvider.bald);
+    DateTime until =
+        DateTime.utc(now.year, now.month, now.day + UserProvider.bald);
 
-    // TODO; type ? Info von Viktors code
-    String entfernung = EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
+    // TODO; type ? Info von V. code
+    String entfernung =
+        EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
     String sorting = EventListType.NEAR_BY == type
         ? "entfernung"
         : EventListType.UP_COMING == type
@@ -348,7 +351,9 @@ class EventProvider extends ChangeNotifier {
               !upComing.contains(event.id)) upComing.add(event.id);
 
         return upComing.map((id) => getLoadedEventById(id)).toList();
+      case EventListType.NEAR_BY:
 
+        return pendingApproval.map((id) => getLoadedEventById(id)).toList();
       default:
         return [];
     }
@@ -546,7 +551,8 @@ class EventProvider extends ChangeNotifier {
     else if (json['istGenehmigt'].toString() == "1" &&
         pendingApproval.contains(id)) pendingApproval.remove(id);
 
-    if (json['entfernung'] != null) distance[id] = double.parse(json['entfernung'].toString());
+    if (json['entfernung'] != null)
+      distance[id] = double.parse(json['entfernung'].toString());
 
     if (isEventLoaded(id)) return loaded[id];
 

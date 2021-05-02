@@ -27,14 +27,11 @@ class _EventPreviewListState extends State<EventPreviewList> {
 
   ScrollController _controller;
 
-    
-
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      
       setState(() {
-        /// Wenn aufgerufen sollte Liste durch Provider automatisch erweitert werden, tut aber nicht ¯\_(ツ)_/¯
+        _controller.jumpTo(_controller.position.maxScrollExtent);
       });
     }
   }
@@ -43,8 +40,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
   void initState() {
     _controller = ScrollController(keepScrollOffset: true);
     _controller.addListener(_scrollListener);
-    // Provider.of<EventProvider>(context, listen: false)
-    //       .resetEventListType(widget.type);
+
     super.initState();
   }
 
@@ -52,7 +48,6 @@ class _EventPreviewListState extends State<EventPreviewList> {
     return await Provider.of<EventProvider>(context, listen: false)
         .loadEventListOfType(widget.type);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +59,6 @@ class _EventPreviewListState extends State<EventPreviewList> {
           }
 
           final events = snapshot.data;
-
 
           return Container(
               child: events.length > 0

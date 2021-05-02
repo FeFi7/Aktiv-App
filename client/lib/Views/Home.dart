@@ -135,7 +135,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class AppBarTitleProvider extends ChangeNotifier {
-  String _title = 'AktivApp';
+  String _title = 'wir:hier';
 
   ListQueue previous = ListQueue<String>();
 

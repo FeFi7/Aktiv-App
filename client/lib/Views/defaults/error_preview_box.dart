@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'color_palette.dart';
 
 class ErrorPreviewBox extends StatefulWidget {
-  String reason;
+  String header, reason;
 
-  ErrorPreviewBox(this.reason);
+  ErrorPreviewBox(this.reason, [this.header="Keine Veranstaltung gefunden"]);
 
   @override
   _ErrorPreviewBoxState createState() => _ErrorPreviewBoxState();
@@ -36,7 +36,7 @@ class _ErrorPreviewBoxState extends State<ErrorPreviewBox> {
                     child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    "Keine Veranstaltung gefunden",
+                    widget.header,
                     style: TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
