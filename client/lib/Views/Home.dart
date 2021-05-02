@@ -3,6 +3,7 @@ import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/discover/discover_view.dart';
 import 'package:aktiv_app_flutter/Views/favorites/favorites_view.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/anlegen.dart';
@@ -50,19 +51,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
 
-      if (UserProvider.istEingeloggt) {
-        Provider.of<AppBarTitleProvider>(context, listen: false)
-            .resetTitle(_widgetTitles[index]);
-
-        Provider.of<BodyProvider>(context, listen: false)
-            .resetBody(_widgetOptions.elementAt(index));
-      } else if (index != 2) {
-        Provider.of<AppBarTitleProvider>(context, listen: false)
-            .resetTitle(_widgetTitles[index]);
-
-        Provider.of<BodyProvider>(context, listen: false)
-            .resetBody(_widgetOptions.elementAt(index));
-      }
+      Widget body = !UserProvider.istEingeloggt && index == 2
+          ? (ErrorPreviewBox(
+              "Bitte loggen Sie sich ein, oder registrieren Sie sich, um eigene Veranstaltungen erstellen zu können.",
+              "Keine Berechtigung"))
+          : _widgetOptions.elementAt(index);
+      Provider.of<BodyProvider>(context, listen: false).resetBody(body);
     });
   }
 
@@ -88,15 +82,20 @@ class _HomePageState extends State<HomePage> {
         title: Consumer<AppBarTitleProvider>(builder: (context, value, child) {
           return Text(value.title, style: TextStyle(fontSize: 25));
         }),
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 48),
-          onPressed: () {
-            Provider.of<BodyProvider>(context, listen: false)
-                .previousBody(context);
-            Provider.of<AppBarTitleProvider>(context, listen: false)
-                .previousTitle(context);
-          },
-        ),
+        leading:
+            Provider.of<BodyProvider>(context, listen: false).previous.length >
+                    0 || !UserProvider.istEingeloggt
+                ? IconButton(
+                    icon: Icon(Icons.chevron_left_rounded,
+                        color: Colors.white, size: 48),
+                    onPressed: () {
+                      Provider.of<BodyProvider>(context, listen: false)
+                          .previousBody(context);
+                      Provider.of<AppBarTitleProvider>(context, listen: false)
+                          .previousTitle(context);
+                    },
+                  )
+                : Container(),
       ),
       body: Center(
         child: body,

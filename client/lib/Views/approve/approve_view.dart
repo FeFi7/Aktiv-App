@@ -16,11 +16,13 @@ class ApproveView extends StatefulWidget {
 class _ApproveViewState extends State<ApproveView> {
   @override
   Widget build(BuildContext context) {
-        if(UserProvider.getUserRole().allowedToFavEvents) {
-      return EventPreviewList(EventListType.APPROVE, AdditiveFormat.HOLE_DATETIME);
+    // TODO: Richtige allowed permission
+    if (UserProvider.getUserRole().allowedToFavEvents) {
+      return EventPreviewList(
+          EventListType.APPROVE, AdditiveFormat.HOLE_DATETIME);
     } else {
       return ErrorPreviewBox(
-                "Bitte loggen Sie sich ein, um Ihre favorisierten Veranstaltungen einsehen zu können.");
+          ".", "Keine berechtigung");
     }
   }
 }
