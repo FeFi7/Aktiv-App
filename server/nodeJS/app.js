@@ -8,11 +8,19 @@ const routerInstitution = require("./routes/institutionRoute");
 const secureRoute = require("./routes/secureRoute");
 const passport = require("passport");
 const cors = require("cors");
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+
+var access = fs.createWriteStream('/var/log/node/node' + process.env.PORT + '.log');
+process.stdout.write = process.stderr.write = access.write.bind(access);
+
+process.on('uncaughtException', function(err) {
+  console.error((err && err.stack) ? err.stack : err);
+});
 
 app.use(compression());
 app.use(express.urlencoded({ extended: true }));
