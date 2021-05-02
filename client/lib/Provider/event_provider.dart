@@ -197,16 +197,17 @@ class EventProvider extends ChangeNotifier {
   Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
     /// 16 pages begrenzt das Laden der Events auf max 400 Events
     until = DateTime.utc(until.year, until.month, until.day + 1);
-    return loadEventsUntil(until, 1, 16, null);
+    return loadEventsUntil(1, 16, null);
   }
 
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
-      DateTime until, int startPage, int maxPages, EventListType type) async {
-    until = DateTime.utc(until.year, until.month, until.day + 1);
+      int startPage, int maxPages, EventListType type) async {
+    DateTime now = DateTime.now();
+    DateTime until = DateTime.utc(now.year, now.month, now.day+ UserProvider.bald);
 
     // TODO; type ? Info von Viktors code
-    String entfernung = EventListType.NEAR_BY == type ? "100" : "-1";
+    String entfernung = EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
     String sorting = EventListType.NEAR_BY == type
         ? "entfernung"
         : EventListType.UP_COMING == type
@@ -221,12 +222,12 @@ class EventProvider extends ChangeNotifier {
     for (int page = startPage; page < (startPage + maxPages); page++) {
       var response = await attemptGetAllVeranstaltungen(
           // until.toString(),
-          "-1",
+          type == EventListType.FAVORITES ? "-1" : until.toString(),
           "1", // nur genehmigte Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
           userId,
-          "-1", // weil keine volltext suche
+          "-1", // weil keine volltext Suche
           entfernung,
           sorting);
       if (response.statusCode == 200) {
@@ -309,16 +310,12 @@ class EventProvider extends ChangeNotifier {
     /// Wenn letztes Update über eine Stunde zurück liegt: fang von Vorne an
     if (lastUpdated.difference(now).inHours > 1) startPage = 1;
 
-    /// Soll "Utopisch" weit weg sein, dass sich nur um das Paging gekümmert wird
-    DateTime until = DateTime.utc(now.year + 1, now.month, now.day);
-
     //TODO: Wieder auskommentieren, müsste eig. gehen
     /// Favoriten müssen vorher geleerten werden, da dieser Zustand in der
     /// getEventFromJson Methode definiert wird
     // if (startPage == 1 && type == EventListType.FAVORITES) favorites.clear();
 
-    List<Veranstaltung> loaded =
-        await loadEventsUntil(until, startPage, 1, type);
+    List<Veranstaltung> loaded = await loadEventsUntil(startPage, 1, type);
 
     if (loaded == null) return [];
 
@@ -486,7 +483,6 @@ class EventProvider extends ChangeNotifier {
     DateTime nextMonth =
         DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
     loadAllEventsUntil(nextMonth);
-
   }
 
   void loadEvent(Veranstaltung event) {

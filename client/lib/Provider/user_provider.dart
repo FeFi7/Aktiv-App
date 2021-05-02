@@ -14,7 +14,7 @@ class UserProvider extends ChangeNotifier {
   bool _signInWithToken = false;
   bool get isSignInWithToken => _signInWithToken;
   static int userId = -1;
-  int bald, naehe;
+  static int bald = 30, naehe = 100;
   String mail,
       vorname,
       nachname,

@@ -188,17 +188,17 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
 
   getSliderValues() {
     init = false;
-    if (Provider.of<UserProvider>(context, listen: false).bald != null &&
-        Provider.of<UserProvider>(context, listen: false).bald.toString() !=
+    if (UserProvider.bald != null &&
+        UserProvider.bald.toString() !=
             "null") {
       sliderValueBald =
-          Provider.of<UserProvider>(context, listen: false).bald.toDouble();
+          UserProvider.bald.toDouble();
     }
-    if (Provider.of<UserProvider>(context, listen: false).naehe != null &&
-        Provider.of<UserProvider>(context, listen: false).naehe.toString() !=
+    if (UserProvider.naehe != null &&
+        UserProvider.naehe.toString() !=
             "null") {
       sliderValueNaehe =
-          Provider.of<UserProvider>(context, listen: false).naehe.toDouble();
+          UserProvider.naehe.toDouble();
     }
     return SizedBox(height: 2.0);
   }
