@@ -129,7 +129,7 @@ async function getVeranstaltungen(
   if (vollText) {
     vollText = "%" + vollText + "%";
   }
-  console.log("sortiert nach: " + sorting)
+  console.log("sortiert nach: " + sorting);
   const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
   const query =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
@@ -138,7 +138,9 @@ async function getVeranstaltungen(
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
     ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
-    ORDER BY `+ sorting +` asc
+    ORDER BY ` +
+    sorting +
+    ` asc
     LIMIT ?,?`;
   const queryWithUserFavorites =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
@@ -148,7 +150,9 @@ async function getVeranstaltungen(
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
     ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
-    ORDER BY `+ sorting +` asc
+    ORDER BY ` +
+    sorting +
+    ` asc
     LIMIT ?,?`;
 
   let results = {};
@@ -159,28 +163,28 @@ async function getVeranstaltungen(
         queryWithUserFavorites,
         vollText
           ? [
-              latitude,
               longitude,
+              latitude,
               Number(userId),
               Number(istGenehmigt),
               bis,
               vollText,
               vollText,
               vollText,
-              latitude,
               longitude,
+              latitude,
               entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
           : [
-              latitude,
               longitude,
+              latitude,
               Number(userId),
               Number(istGenehmigt),
               bis,
-              latitude,
               longitude,
+              latitude,
               entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
@@ -196,26 +200,26 @@ async function getVeranstaltungen(
         query,
         vollText
           ? [
-              latitude,
               longitude,
+              latitude,
               Number(istGenehmigt),
               bis,
               vollText,
               vollText,
               vollText,
-              latitude,
               longitude,
+              latitude,
               entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
             ]
           : [
-              latitude,
               longitude,
+              latitude,
               Number(istGenehmigt),
               bis,
-              latitude,
               longitude,
+              latitude,
               entfernung,
               Number(limit) * Number(page) - Number(limit),
               Number(limit),
@@ -265,8 +269,8 @@ async function createVeranstaltung(
     beginn,
     ende,
     ortBeschreibung,
-    latitude,
     longitude,
+    latitude,
     Number(institutionId),
     Number(institutionId),
     Number(userId),
