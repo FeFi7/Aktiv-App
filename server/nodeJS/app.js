@@ -8,18 +8,18 @@ const routerInstitution = require("./routes/institutionRoute");
 const secureRoute = require("./routes/secureRoute");
 const passport = require("passport");
 const cors = require("cors");
-const fs = require('fs');
+const fs = require("fs");
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 
-var access = fs.createWriteStream('/var/log/node/node' + process.env.PORT + '.log');
-process.stdout.write = process.stderr.write = access.write.bind(access);
+//var access = fs.createWriteStream('/var/log/node/node' + process.env.PORT + '.log');
+//rocess.stdout.write = process.stderr.write = access.write.bind(access);
 
-process.on('uncaughtException', function(err) {
-  console.error((err && err.stack) ? err.stack : err);
+process.on("uncaughtException", function (err) {
+  console.error(err && err.stack ? err.stack : err);
 });
 
 app.use(compression());
@@ -38,7 +38,7 @@ require("./auth/auth");
 app.use("/api/veranstaltungen", routerVeranstaltungen);
 app.use("/api/fileupload", routerFileUpload);
 app.use("/api/user", routerUser);
-app.use("/api/institutionen",routerInstitution);
+app.use("/api/institutionen", routerInstitution);
 app.use(
   "/api/auth",
   passport.authenticate("jwt", { session: false }),
