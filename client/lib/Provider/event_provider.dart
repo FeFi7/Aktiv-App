@@ -161,7 +161,7 @@ class EventProvider extends ChangeNotifier {
         // log("loadEventsContainingText("+text+"): \n" + response.body);
         var parsedJson = json.decode(response.body);
 
-        // log(response.body); // TODO: remove this line
+        //log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -199,8 +199,8 @@ class EventProvider extends ChangeNotifier {
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
       DateTime until, int startPage, int maxPages, EventListType type) async {
-    until = DateTime.utc(until.year, until.month, until.day + 1); 
-    
+    until = DateTime.utc(until.year, until.month, until.day + 1);
+
     List<Veranstaltung> foundEvents = [];
 
     for (int page = startPage; page < (startPage + maxPages); page++) {

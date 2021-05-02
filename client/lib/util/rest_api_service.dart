@@ -122,10 +122,6 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   return response;
 }
 
-//TODO bis muss + 1 tag sein
-////Jahr-Monat-Tag // Ein Tag draufrechnen, da dieser nicht von mysql berechtigt wird
-//datetime.utc draufrechnen
-//
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
 Future<http.Response> attemptGetAllVeranstaltungen(
@@ -134,12 +130,17 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     String limit = "25",
     String page = "1",
     String userId = "-1",
-    String vollText = "-1"]) async {
+    String vollText = "-1",
+    String entfernung = "-1",
+    String sorting = "-1"]) async {
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
     'page': page
   };
+
+  // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
+  List<String> coordinates = await getActualCoordinates();
 
   if (bis != "-1") {
     qParams.putIfAbsent('bis', () => bis);
@@ -150,6 +151,19 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
   if (vollText != "-1") {
     qParams.putIfAbsent('vollText', () => vollText);
+  }
+
+  if (entfernung != "-1") {
+    qParams.putIfAbsent('entfernung', () => entfernung);
+  }
+
+  if (sorting != "-1") {
+    qParams.putIfAbsent('sorting', () => sorting);
+  }
+
+  if (coordinates != null) {
+    qParams.putIfAbsent('latitude', () => coordinates.first);
+    qParams.putIfAbsent('longitude', () => coordinates.last);
   }
 
   String route = "api/veranstaltungen";
@@ -184,6 +198,7 @@ Future<http.Response> attemptCreateVeranstaltung(
     List<String> tags = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
+  // Hole Breiten- und Laengengrad fuer Veranstlatung
   var coordinateList = await getCoordinatesFromAddress(plz);
   var latitude = coordinateList.first;
   var longitude = coordinateList.last;
