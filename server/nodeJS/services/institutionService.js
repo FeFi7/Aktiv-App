@@ -115,8 +115,9 @@ async function genehmigeInstitution(institutionId) {
 }
 
 async function getUngenehmigteVeranstaltungen() {
-  const query = `SELECT i.id, i.name, i.beschreibung, u.mail, u.tel from Institution i
+  const query = `SELECT i.id, i.name, i.beschreibung, u.mail, u.tel, f.pfad as institutionImage from Institution i
   INNER JOIN User u ON i.ersteller = u.id 
+  LEFT JOIN File f ON i.imageId = f.id
   WHERE i.istGenehmigt = 0 `;
 
   let result = await conn.query(query).catch((error) => {

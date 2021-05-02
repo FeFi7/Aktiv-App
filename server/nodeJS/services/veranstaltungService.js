@@ -133,8 +133,9 @@ async function getVeranstaltungen(
   const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
   const query =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
-    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung FROM Veranstaltung v
+    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, fi.pfad as institutionImage FROM Veranstaltung v
     LEFT JOIN Institution i ON v.institutionId = i.id
+    LEFT JOIN File fi ON i.imageId = fi.id
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
     ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
@@ -144,8 +145,9 @@ async function getVeranstaltungen(
     LIMIT ?,?`;
   const queryWithUserFavorites =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
-    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, IF(f.valide=1, 1, 0) as favorit FROM Veranstaltung v
+    v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, IF(f.valide=1, 1, 0) as favorit, fi.pfad as institutionImage FROM Veranstaltung v
     LEFT JOIN Institution i ON v.institutionId = i.id
+    LEFT JOIN File fi ON i.imageId = fi.id
     LEFT JOIN Favorit f ON v.id = f.veranstaltungId AND f.valide = 1 AND f.userId = ?
     WHERE v.istGenehmigt = ? AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?` +
     (vollText ? queryPartVollText : "") +
