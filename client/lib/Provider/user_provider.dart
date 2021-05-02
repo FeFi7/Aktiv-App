@@ -6,10 +6,10 @@ import 'package:aktiv_app_flutter/Views/profile/components/profile_persoenlich.d
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:aktiv_app_flutter/util/secure_storage_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 
 class UserProvider extends ChangeNotifier {
-  static ROLE _role = ROLE
-      .NOT_REGISTERED; // Brauchte eine Standard Rolle, sorry wens dir was zerschießt, lg Niko
+  static ROLE _role = ROLE.NOT_REGISTERED;
   final SecureStorage storage = SecureStorage();
   bool _signInWithToken = false;
   bool get isSignInWithToken => _signInWithToken;
@@ -75,9 +75,7 @@ class UserProvider extends ChangeNotifier {
     var parsedUser = json.decode(detailedUserInfo.body);
 
     userId = parsedUser['id'];
-    // if (parsedUser['plz'] != null && parsedUser['plz'] != "null") {
     plz = parsedUser['plz'];
-    // }
     hausnummer = parsedUser['hausnummer'];
     tel = parsedUser['tel'];
     bald = parsedUser['baldEinstellung'];
@@ -220,46 +218,89 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
-  setVerwalter(String mail, String institutionsId) async {
+  verwalterHinzufuegen(String mail, String institutionsId) async {
     var verwalter = await attemptGetUser(mail);
     var parsedVerwalter = json.decode(verwalter.body);
     var _map = parsedVerwalter.values.toList();
     if (_map[0] != false) {
       var _userId = _map[1]['id'].toString();
 
-      //## derzeit keine Institutionen vorhanden ##//
-      //TODO
-      // var jwt = await attemptSetVerwalter(
-      //     _userId, institutionsId, await getAccessToken());
-      // return jwt;
-      //###########################################//
+      var jwt = await attemptSetVerwalter(
+          _userId, institutionsId, await getAccessToken());
+      return jwt;
     }
     return null;
   }
 
-  removeVerwalter(String mail, String institutionsId) async {
+  verwalterLoeschen(String mail, String institutionsId) async {
     var verwalter = await attemptGetUser(mail);
     var parsedVerwalter = json.decode(verwalter.body);
     var _map = parsedVerwalter.values.toList();
     if (_map[0] != false) {
       var _userId = _map[1]['id'].toString();
 
-      //## derzeit keine Institutionen vorhanden ##//
-      //TODO
-      // var jwt = await attemptSetVerwalter(
-      //     _userId, institutionsId, await getAccessToken());
-      // return jwt;
-      //###########################################//
+      var jwt = await attemptDeleteVerwalter(
+          _userId, institutionsId, await getAccessToken());
+      return jwt;
     }
     return null;
   }
 
-  getUngenehmigteInstitutionen() async {
-    var institutionen =
-        await attemptGetUngenehmigteInstitutionen(await getAccessToken());
-    var parsedInstitutionen = json.decode(institutionen.body);
+  Future getVerwalteteInstitutionen() async {
+    List _institutionen = [];
+    var _accessToken = await getAccessToken();
+    Response institutionen = await attemptGetVerwalteteInstitutionen(
+        userId.toString(), _accessToken);
 
-    print(parsedInstitutionen);
+    if (institutionen.statusCode == 200) {
+      _institutionen = json.decode(institutionen.body);
+      return _institutionen;
+    }
+    return _institutionen;
+  }
+
+  Future getUngenehmigteInstitutionen() async {
+    List _institutionen = [];
+    var _accessToken = await getAccessToken();
+    Response institutionen =
+        await attemptGetUngenehmigteInstitutionen(_accessToken);
+
+    if (institutionen.statusCode == 200) {
+      _institutionen = json.decode(institutionen.body);
+      return _institutionen;
+    }
+    return _institutionen;
+  }
+
+  institutionGenehmigen(String id) async {
+    var institutionGenehmigen =
+        await attemptApproveInstitution(id, await getAccessToken());
+    if (institutionGenehmigen != null) {
+      return institutionGenehmigen;
+    } else {
+      return null;
+    }
+  }
+
+  institutionLoeschen(String id) async {
+    var institutionLoeschen =
+        await attemptDeleteInstitution(id, await getAccessToken());
+    if (institutionLoeschen != null) {
+      return institutionLoeschen;
+    } else {
+      return null;
+    }
+  }
+
+  attemptNewImageForInstitution(File file) async {
+    //TODO image institution
+
+    // var jwt = await attemptNewImageForInstitution(
+    //     file, institutionsId, await getAccessToken());
+    // var parsedInstitutionsBild = json.decode(jwt.body);
+    // profilBild = parsedInstitutionsBild['pfad'];
+    // notifyListeners();
+    // return jwt;
   }
 
   setGenehmiger(String mail, List<String> plz) async {

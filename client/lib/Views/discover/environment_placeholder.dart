@@ -32,59 +32,57 @@ class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<List<Veranstaltung>>>(
-        future: loadEventsFromProvider(),
-        builder: (context, snapshot) {
-    if (snapshot.connectionState != ConnectionState.done) {
-      return Center(child: CircularProgressIndicator());
-    }
+      future: loadEventsFromProvider(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-    final events = snapshot.data;
+        final events = snapshot.data;
 
-    List<Widget> environment = [];
+        List<Widget> environment = [];
 
-    environment.add(Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Text("Bald", style: headingStyle)));
+        environment.add(Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Text("Bald", style: headingStyle)));
 
-    for (Veranstaltung event in getListPreview(events[0]))
-      environment
-          .add(EventPreviewBox.load(event, AdditiveFormat.TIME_TILL_START));
+        for (Veranstaltung event in getListPreview(events[0]))
+          environment
+              .add(EventPreviewBox.load(event, AdditiveFormat.TIME_TILL_START));
 
-    environment.add(PreviewDots(
-        EventPreviewList(
-            EventListType.UP_COMING, AdditiveFormat.TIME_TILL_START),
-        "Bald"));
+        environment.add(PreviewDots(
+            EventPreviewList(
+                EventListType.UP_COMING, AdditiveFormat.TIME_TILL_START),
+            "Bald"));
 
-    environment.add(Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Text("In der Nähe", style: headingStyle)));
+        environment.add(Container(
+            padding: const EdgeInsets.all(10.0),
+            child: Text("In der Nähe", style: headingStyle)));
 
-    for (Veranstaltung event in getListPreview(events[1]))
-      environment.add(EventPreviewBox.load(event, AdditiveFormat.DISTANCE));
+        for (Veranstaltung event in getListPreview(events[1]))
+          environment.add(EventPreviewBox.load(event, AdditiveFormat.DISTANCE));
 
-    environment.add(PreviewDots(
-        EventPreviewList(EventListType.NEAR_BY, AdditiveFormat.DISTANCE),
-        "In der Nähe"));
+        environment.add(PreviewDots(
+            EventPreviewList(EventListType.NEAR_BY, AdditiveFormat.DISTANCE),
+            "In der Nähe"));
 
-    return Container(
-        child: RawScrollbar(
+        return Container(
+            child: RawScrollbar(
           isAlwaysShown: true,
           thumbColor: ColorPalette.torea_bay.rgb,
           radius: Radius.circular(10),
-                    thickness: 4,
+          thickness: 4,
           controller: _scrollController,
           child: ListView.builder(
-            controller: _scrollController,
+              controller: _scrollController,
               itemCount: environment.length,
               itemBuilder: (BuildContext context, int index) {
                 return environment[index];
               }),
         ));
-        },
-      );
+      },
+    );
   }
-
-  
 
   List<Veranstaltung> getListPreview(List<Veranstaltung> events) {
     List<Veranstaltung> listPreview = [];

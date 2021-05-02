@@ -27,7 +27,7 @@ class ProfileVerwalten extends StatefulWidget {
 }
 
 class _ProfileVerwaltenState extends State<ProfileVerwalten> {
-  File profileImage;
+  File institutionsImage;
   final picker = ImagePicker();
 
   var _userGruppe;
@@ -119,7 +119,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   //Veranstaltungs-/Institutionsbezogener Tab
   Column buildFirstTab() {
     switch (_userGruppe.toLowerCase()) {
-      case "verwalter":
+      case "user":
         return Column(
           children: <Widget>[
             institutionenVerwalten(),
@@ -129,15 +129,15 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "genehmiger":
         return Column(
           children: <Widget>[
-            zuGenehmigen(),
-            //institutionenVerwalten(),
+            zuGenehmigenVeranstaltungen(),
+            institutionenVerwalten(),
           ],
         );
       case "betreiber":
         return Column(
           children: <Widget>[
-            zuGenehmigen(),
-            institutionenVerwalten(),
+            zuGenehmigenVeranstaltungen(),
+            //institutionenVerwalten(),
             institutionenGenehmigen(),
           ],
         );
@@ -151,7 +151,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
 //Benutzerbezogener Tab
   Column buildSecondTab() {
     switch (_userGruppe.toLowerCase()) {
-      case "verwalter":
+      case "user":
         return Column(
           children: <Widget>[
             //verwalterVerwaltenCard(),
@@ -253,7 +253,8 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             )) {
               var verwalter =
                   await Provider.of<UserProvider>(context, listen: false)
-                      .setVerwalter(verwalterController.text, institutionsId);
+                      .verwalterHinzufuegen(
+                          verwalterController.text, institutionsId);
               if (verwalter == null) {
                 errorToast("User nicht vorhanden");
               } else if (verwalter.statusCode != 200) {
@@ -287,13 +288,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             )) {
               var verwalter = await Provider.of<UserProvider>(context,
                       listen: false)
-                  .removeVerwalter(verwalterController.text, institutionsId);
+                  .verwalterLoeschen(verwalterController.text, institutionsId);
               if (verwalter == null) {
                 errorToast("User nicht vorhanden");
               } else if (verwalter.statusCode != 200) {
                 errorToast("Fehler bei der Aktualisierung");
               } else {
-                errorToast("Verwalter hinzugefügt");
+                errorToast("Verwalter entfernt");
               }
             }
           },
@@ -539,10 +540,77 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
-  zuGenehmigen() {
+  zuGenehmigenVeranstaltungen() {
     return CardDropDownImage(
-      decoration: BoxDecoration(
-          color: ColorPalette.malibu.rgb, shape: BoxShape.rectangle),
+      decoration: [
+        Container(
+          child: SizedBox(
+            height: 200,
+            width: 200,
+            child: Stack(
+              clipBehavior: Clip.none,
+              fit: StackFit.expand,
+              children: [
+                Consumer<UserProvider>(
+                  builder: (context, user, child) {
+                    if (UserProvider.istEingeloggt) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: (user.profilBild != null)
+                                ? NetworkImage(
+                                    "https://app.lebensqualitaet-burgrieden.de/" +
+                                        user.profilBild)
+                                : Image.asset(
+                                        "assets/images/profilePic_default.png")
+                                    .image,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return CircleAvatar(
+                        backgroundImage:
+                            Image.asset("assets/images/profilePic_default.png")
+                                .image,
+                      );
+                    }
+                  },
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: SizedBox(
+                    height: 60,
+                    width: 60,
+                    // ignore: deprecated_member_use
+                    child: FlatButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                        side: BorderSide(
+                          width: 3.0,
+                          color: ColorPalette.white.rgb,
+                        ),
+                      ),
+                      color: ColorPalette.malibu.rgb,
+                      onPressed: getImage,
+                      child: CircleAvatar(
+                        backgroundColor: ColorPalette.malibu.rgb,
+                        child: Icon(
+                          Icons.edit,
+                          color: ColorPalette.white.rgb,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        // BoxDecoration(
+        //     color: ColorPalette.malibu.rgb, shape: BoxShape.rectangle),
+      ],
       headerChildren: [
         Icon(
           Icons.event_note_rounded,
@@ -642,328 +710,405 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   }
 
   institutionenVerwalten() {
-    return CardDropDownImage(
-      decoration: BoxDecoration(
-        color: ColorPalette.endeavour.rgb,
-        shape: BoxShape.rectangle,
-      ),
-      headerChildren: [
-        Icon(
-          Icons.image_aspect_ratio_sharp,
-          size: 40.0,
-        ),
-        SizedBox(
-          width: 20.0,
-        ),
-        Text("Institution A"),
-      ],
-      bodyChildren: [
-        Text(
-          "Beschreibung der Institution",
-          style: TextStyle(color: ColorPalette.black.rgb),
-        ),
-        SizedBox(height: 20.0),
-        Container(
-          margin: EdgeInsets.symmetric(
-              vertical: 5), //Abstand um den Button herum (oben/unten)
-          width: 250,
-          child: Divider(
-            color: ColorPalette.malibu.rgb,
-            thickness: 2,
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-                width: 150,
-                alignment: Alignment.centerLeft,
-                child: Text('Kontakt')),
-            Container(
-                width: 150,
-                alignment: Alignment.centerRight,
-                child: Text('max@mustermann.de')),
-          ],
-        ),
-        Container(
-          margin: EdgeInsets.symmetric(
-              vertical: 5), //Abstand um den Button herum (oben/unten)
-          width: 250,
-          child: Divider(
-            color: ColorPalette.malibu.rgb,
-            thickness: 2,
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Text("Email-Adresse des Benutzers eingeben"),
-        RoundedInputEmailField(
-          hintText: "Email",
-        ),
-        RoundedButton(
-          text: "Verwalter hinzufügen",
-          color: ColorPalette.endeavour.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text(
-                  "Möchten Sie dieser Institution den angegebenen Verwalter hinzufügen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Verwalter hinzufügen
-            }
-          },
-        ),
-        RoundedButton(
-          text: "Verwalter entfernen",
-          color: ColorPalette.grey.rgb,
-          press: () async {
-            var institutionsId = "1";
-            // var verwalter =
-            //     await Provider.of<UserProvider>(context, listen: false)
-            //         .setRole(verwalterController.text, "verwalter");
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text("Möchten Sie den Verwalter entfernen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO verwalter entfernen
-              // var verwalter =
-              //     await Provider.of<UserProvider>(context, listen: false)
-              //         .setVerwalter(verwalterController.text, institutionsId);
-              // if (verwalter.statusCode != 200) {
-              //   errorToast("Fehler bei der Aktualisierung");
-              // } else {
-              //   errorToast("Verwalter entfernt");
-              // }
-            }
-          },
-        ),
-        SizedBox(height: 20.0),
-        RoundedButton(
-          text: "Institution genehmigen",
-          color: ColorPalette.endeavour.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text("Möchten Sie diese Institution genehmigen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Institution genehmigen
-            }
-          },
-        ),
-        RoundedButton(
-          text: "Institution löschen",
-          color: ColorPalette.grey.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text("Möchten Sie diese Institution löschen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Institution löschen
-            }
-          },
-        ),
-      ],
-    );
+    Size size = MediaQuery.of(context).size;
+    return FutureBuilder(
+        future: Provider.of<UserProvider>(context, listen: false)
+            .getVerwalteteInstitutionen(),
+        builder: (context, snapShot) {
+          if (snapShot.connectionState == ConnectionState.none &&
+              snapShot.hasData == null) {
+            return Container();
+          }
+          return ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
+              itemBuilder: (context, index) {
+                return Container(
+                  child: CardDropDownImage(
+                    decoration: [
+                      Container(
+                        child: SizedBox(
+                          height: 200,
+                          width: size.width * 0.85,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            fit: StackFit.expand,
+                            children: [
+                              Consumer<UserProvider>(
+                                builder: (context, user, child) {
+                                  if (UserProvider.istEingeloggt) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: (snapShot.data[index]
+                                                      ['institutionImage'] !=
+                                                  null)
+                                              ? NetworkImage(
+                                                  "https://app.lebensqualitaet-burgrieden.de/" +
+                                                      snapShot.data[index]
+                                                          ['institutionImage'])
+                                              : Image.asset(
+                                                      "assets/images/institutionPic_default.png")
+                                                  .image,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return CircleAvatar(
+                                      backgroundImage: Image.asset(
+                                              "assets/images/institutionPic_default.png")
+                                          .image,
+                                    );
+                                  }
+                                },
+                              ),
+                              Positioned(
+                                right: 25,
+                                bottom: 5,
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  // ignore: deprecated_member_use
+                                  child: FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(50),
+                                      side: BorderSide(
+                                        width: 3.0,
+                                        color: ColorPalette.white.rgb,
+                                      ),
+                                    ),
+                                    color: ColorPalette.malibu.rgb,
+                                    onPressed: getImage,
+                                    child: CircleAvatar(
+                                      backgroundColor: ColorPalette.malibu.rgb,
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: ColorPalette.white.rgb,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    headerChildren: [
+                      Icon(Icons.image_aspect_ratio_sharp, size: 40.0),
+                      SizedBox(width: 20.0),
+                      Text(snapShot.data[index]['name']),
+                    ],
+                    bodyChildren: [
+                      Text(
+                        snapShot.data[index]['beschreibung'],
+                        style: TextStyle(color: ColorPalette.black.rgb),
+                      ),
+                      SizedBox(height: 40.0),
+                      Text("Email-Adresse des neuen Verwalters eingeben"),
+                      RoundedInputEmailField(
+                        hintText: "Email",
+                        controller: verwalterController,
+                      ),
+                      SizedBox(height: 20.0),
+                      RoundedButton(
+                        text: "Verwalter hinzufügen",
+                        color: ColorPalette.endeavour.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content: Text(
+                                "Möchten Sie diesen Verwalter hinzufügen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var institutionGenehmigen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .verwalterHinzufuegen(
+                                        verwalterController.text,
+                                        snapShot.data[index]['id'].toString());
+                            if (institutionGenehmigen == null) {
+                              errorToast("User nicht vorhanden");
+                            } else if (institutionGenehmigen.statusCode !=
+                                200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Verwalter hinzugefügt");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      RoundedButton(
+                        text: "Verwalter entfernen",
+                        color: ColorPalette.grey.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content:
+                                Text("Möchten Sie diesen Verwalter entfernen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var institutionGenehmigen =
+                                Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .verwalterLoeschen(verwalterController.text,
+                                        snapShot.data[index]['id'].toString());
+                            if (institutionGenehmigen == null) {
+                              errorToast("User nicht vorhanden");
+                            } else if (institutionGenehmigen.statusCode !=
+                                200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Verwalter entfernt");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      SizedBox(height: 20.0),
+                      RoundedButton(
+                        text: "Institution löschen",
+                        color: ColorPalette.grey.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content:
+                                Text("Möchten Sie diese Institution löschen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var institutionLoeschen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .institutionLoeschen(
+                                        snapShot.data[index]['id'].toString());
+                            if (institutionLoeschen == null) {
+                              errorToast("Institution nicht vorhanden");
+                            } else if (institutionLoeschen.statusCode != 200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Institution gelöscht");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              });
+        });
   }
 
   institutionenGenehmigen() {
-    List institutionList = [];
-
-    return ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: institutionList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            child: CardDropDownImage(
-              decoration: BoxDecoration(
-                color: ColorPalette.endeavour.rgb,
-                shape: BoxShape.rectangle,
-              ),
-              headerChildren: [
-                Icon(Icons.image_aspect_ratio_sharp, size: 40.0),
-                SizedBox(width: 20.0),
-                Text("Institution A"),
-              ],
-              bodyChildren: [
-                Text(
-                  "Beschreibung der Institution",
-                  style: TextStyle(color: ColorPalette.black.rgb),
-                ),
-                SizedBox(height: 20.0),
-                Container(
-                  margin: EdgeInsets.symmetric(
-                      vertical: 5), //Abstand um den Button herum (oben/unten)
-                  width: 250,
-                  child: Divider(
-                    color: ColorPalette.malibu.rgb,
-                    thickness: 2,
+    Size size = MediaQuery.of(context).size;
+    return FutureBuilder(
+        future: Provider.of<UserProvider>(context, listen: false)
+            .getUngenehmigteInstitutionen(),
+        builder: (context, snapShot) {
+          if (snapShot.connectionState == ConnectionState.none &&
+              snapShot.hasData == null) {
+            return Container();
+          }
+          return ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
+              itemBuilder: (context, index) {
+                return Container(
+                  child: CardDropDownImage(
+                    decoration: [
+                      Container(
+                        child: SizedBox(
+                          height: 200,
+                          width: size.width * 0.85,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            fit: StackFit.expand,
+                            children: [
+                              Consumer<UserProvider>(
+                                builder: (context, user, child) {
+                                  if (UserProvider.istEingeloggt) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: (snapShot.data[index]
+                                                      ['institutionImage'] !=
+                                                  null)
+                                              ? NetworkImage(
+                                                  "https://app.lebensqualitaet-burgrieden.de/" +
+                                                      snapShot.data[index]
+                                                          ['institutionImage'])
+                                              : Image.asset(
+                                                      "assets/images/institutionPic_default.png")
+                                                  .image,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return CircleAvatar(
+                                      backgroundImage: Image.asset(
+                                              "assets/images/institutionPic_default.png")
+                                          .image,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    headerChildren: [
+                      Icon(Icons.image_aspect_ratio_sharp, size: 40.0),
+                      SizedBox(width: 20.0),
+                      Text(snapShot.data[index]['name']),
+                    ],
+                    bodyChildren: [
+                      Text(
+                        snapShot.data[index]['beschreibung'],
+                        style: TextStyle(color: ColorPalette.black.rgb),
+                      ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                              width: 50,
+                              alignment: Alignment.centerLeft,
+                              child: Text('Kontakt')),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: Text(snapShot.data[index]['mail']),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
+                      ),
+                      SizedBox(height: 20.0),
+                      RoundedButton(
+                        text: "Institution genehmigen",
+                        color: ColorPalette.endeavour.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content: Text(
+                                "Möchten Sie diese Institution genehmigen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var institutionGenehmigen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .institutionGenehmigen(
+                                        snapShot.data[index]['id'].toString());
+                            if (institutionGenehmigen == null) {
+                              errorToast("Institution nicht vorhanden");
+                            } else if (institutionGenehmigen.statusCode !=
+                                200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Institution genehmigt");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      RoundedButton(
+                        text: "Institution löschen",
+                        color: ColorPalette.grey.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content:
+                                Text("Möchten Sie diese Institution löschen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var institutionLoeschen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .institutionLoeschen(
+                                        snapShot.data[index]['id'].toString());
+                            if (institutionLoeschen == null) {
+                              errorToast("Institution nicht vorhanden");
+                            } else if (institutionLoeschen.statusCode != 200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Institution gelöscht");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                        width: 150,
-                        alignment: Alignment.centerLeft,
-                        child: Text('Kontakt')),
-                    Container(
-                        width: 150,
-                        alignment: Alignment.centerRight,
-                        child: Text('max@mustermann.de')),
-                  ],
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(
-                      vertical: 5), //Abstand um den Button herum (oben/unten)
-                  width: 250,
-                  child: Divider(
-                    color: ColorPalette.malibu.rgb,
-                    thickness: 2,
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                Text("Email-Adresse des Benutzers eingeben"),
-                RoundedInputEmailField(
-                  hintText: "Email",
-                ),
-                RoundedButton(
-                  text: "Verwalter hinzufügen",
-                  color: ColorPalette.endeavour.rgb,
-                  press: () async {
-                    if (await confirm(
-                      context,
-                      title: Text("Bestätigung"),
-                      content: Text(
-                          "Möchten Sie dieser Institution den angegebenen Verwalter hinzufügen?"),
-                      textOK: Text(
-                        "Bestätigen",
-                        style: TextStyle(color: ColorPalette.grey.rgb),
-                      ),
-                      textCancel: Text(
-                        "Abbrechen",
-                        style: TextStyle(color: ColorPalette.endeavour.rgb),
-                      ),
-                    )) {
-                      //TODO Verwalter hinzufügen
-                    }
-                  },
-                ),
-                RoundedButton(
-                  text: "Verwalter entfernen",
-                  color: ColorPalette.grey.rgb,
-                  press: () async {
-                    var institutionsId = "1";
-                    // var verwalter =
-                    //     await Provider.of<UserProvider>(context, listen: false)
-                    //         .setRole(verwalterController.text, "verwalter");
-                    if (await confirm(
-                      context,
-                      title: Text("Bestätigung"),
-                      content: Text("Möchten Sie den Verwalter entfernen?"),
-                      textOK: Text(
-                        "Bestätigen",
-                        style: TextStyle(color: ColorPalette.grey.rgb),
-                      ),
-                      textCancel: Text(
-                        "Abbrechen",
-                        style: TextStyle(color: ColorPalette.endeavour.rgb),
-                      ),
-                    )) {
-                      //TODO verwalter entfernen
-                      // var verwalter =
-                      //     await Provider.of<UserProvider>(context, listen: false)
-                      //         .setVerwalter(verwalterController.text, institutionsId);
-                      // if (verwalter.statusCode != 200) {
-                      //   errorToast("Fehler bei der Aktualisierung");
-                      // } else {
-                      //   errorToast("Verwalter entfernt");
-                      // }
-                    }
-                  },
-                ),
-                SizedBox(height: 20.0),
-                RoundedButton(
-                  text: "Institution genehmigen",
-                  color: ColorPalette.endeavour.rgb,
-                  press: () async {
-                    if (await confirm(
-                      context,
-                      title: Text("Bestätigung"),
-                      content:
-                          Text("Möchten Sie diese Institution genehmigen?"),
-                      textOK: Text(
-                        "Bestätigen",
-                        style: TextStyle(color: ColorPalette.grey.rgb),
-                      ),
-                      textCancel: Text(
-                        "Abbrechen",
-                        style: TextStyle(color: ColorPalette.endeavour.rgb),
-                      ),
-                    )) {
-                      //TODO Institution löschen
-                    }
-                  },
-                ),
-                RoundedButton(
-                  text: "Institution löschen",
-                  color: ColorPalette.grey.rgb,
-                  press: () async {
-                    if (await confirm(
-                      context,
-                      title: Text("Bestätigung"),
-                      content: Text("Möchten Sie diese Institution löschen?"),
-                      textOK: Text(
-                        "Bestätigen",
-                        style: TextStyle(color: ColorPalette.grey.rgb),
-                      ),
-                      textCancel: Text(
-                        "Abbrechen",
-                        style: TextStyle(color: ColorPalette.endeavour.rgb),
-                      ),
-                    )) {
-                      //TODO Institution löschen
-                    }
-                  },
-                ),
-              ],
-            ),
-          );
+                );
+              });
         });
   }
 
@@ -985,9 +1130,9 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       setState(
         () {
           if (pickedFile != null) {
-            profileImage = File(pickedFile.path);
+            institutionsImage = File(pickedFile.path);
             Provider.of<UserProvider>(context, listen: false)
-                .changeProfileImage(profileImage);
+                .attemptNewImageForInstitution(institutionsImage);
           }
         },
       );

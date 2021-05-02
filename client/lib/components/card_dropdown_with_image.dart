@@ -2,7 +2,8 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 class CardDropDownImage extends StatelessWidget {
-  final BoxDecoration decoration;
+  //final BoxDecoration decoration;
+  final List<Widget> decoration;
   final List<Widget> headerChildren;
   final List<Widget> bodyChildren;
   const CardDropDownImage(
@@ -20,7 +21,7 @@ class CardDropDownImage extends StatelessWidget {
             SizedBox(
               height: 100.0,
               child: Container(
-                decoration: decoration,
+                child: Row(children: decoration),
               ),
             ),
             ScrollOnExpand(
