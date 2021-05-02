@@ -59,7 +59,8 @@ class EventPreviewBox extends StatefulWidget {
                                 .toString() +
                             " Minuten"))));
       case AdditiveFormat.DISTANCE:
-        return "-1 km weit entfernt";
+        double distance = EventProvider.getDistanceToEvent(id);
+        return distance.toString() + " km weit entfernt";
       default:
         return "null";
     }

@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:developer';
+import 'dart:ffi';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
@@ -24,8 +25,11 @@ class EventProvider extends ChangeNotifier {
   /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
   static final Map<DateTime, List<int>> dated = Map<DateTime, List<int>>();
 
-  /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
+  /// Map aller Veranstaltungs Zeitstempel die zu ihrem Beginn Event ID's hinterlegt sind
   static final Map<int, DateTime> loadedTs = Map<int, DateTime>();
+
+  /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
+  static final Map<int, double> distance = Map<int, double>();
 
   /// Liste aller Event ID's die in der nähe statt finden TODO: machen!!!!
   static final List<int> nearby = [];
@@ -201,19 +205,32 @@ class EventProvider extends ChangeNotifier {
       DateTime until, int startPage, int maxPages, EventListType type) async {
     until = DateTime.utc(until.year, until.month, until.day + 1);
 
+    // TODO; type ? Info von Viktors code
+    String entfernung = EventListType.NEAR_BY == type ? "100" : "-1";
+    String sorting = EventListType.NEAR_BY == type
+        ? "entfernung"
+        : EventListType.UP_COMING == type
+            ? "beginn_ts"
+            : "-1";
+
+    String userId =
+        UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1";
+
     List<Veranstaltung> foundEvents = [];
 
     for (int page = startPage; page < (startPage + maxPages); page++) {
       var response = await attemptGetAllVeranstaltungen(
-          until.toString(),
+          // until.toString(),
+          "-1",
           "1", // nur genehmigte Events == 0, alle == 1
           pageSize.toString(),
           page.toString(),
-          UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1");
+          userId,
+          "-1", // weil keine volltext suche
+          entfernung,
+          sorting);
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
-
-        // log(response.body); // TODO: remove this line
 
         final List<dynamic> dynamicList =
             await parsedJson.map((item) => getEventFromJson(item)).toList();
@@ -275,6 +292,10 @@ class EventProvider extends ChangeNotifier {
     upComing.sort((a, b) => order(a, b));
   }
 
+  static double getDistanceToEvent(int id) {
+    return distance[id] ?? -1;
+  }
+
   /// Methode ruft attemptGetAllVeranstaltungen auf uns sortiert die Rückgabe
   /// in die, der übergebenen EventListType, entsprechend ein. Wenn das letzte
   /// laden des Types über eine Stunde her ist lädt er Alle Events neu, ansonsten
@@ -288,8 +309,7 @@ class EventProvider extends ChangeNotifier {
     /// Wenn letztes Update über eine Stunde zurück liegt: fang von Vorne an
     if (lastUpdated.difference(now).inHours > 1) startPage = 1;
 
-    /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
-    ///
+    /// Soll "Utopisch" weit weg sein, dass sich nur um das Paging gekümmert wird
     DateTime until = DateTime.utc(now.year + 1, now.month, now.day);
 
     //TODO: Wieder auskommentieren, müsste eig. gehen
@@ -313,11 +333,11 @@ class EventProvider extends ChangeNotifier {
 
         /// Denkfehler, weil near by nicht auf GetAll zurück greift
         /// Wenn von Anfang an geladen (Page=1) dann bisher geladenes löschen
-        // if (startPage == 1) nearby.clear();
+        if (startPage == 1) nearby.clear();
 
-        // for (Veranstaltung event in loaded)
-        //   if (!pendingApproval.contains(event.id) && !nearby.contains(event.id))
-        //     nearby.add(event.id);
+        for (Veranstaltung event in loaded)
+          if (!pendingApproval.contains(event.id) && !nearby.contains(event.id))
+            nearby.add(event.id);
 
         /// TODO: Wenn nearby dann nicht get all sondern dafpr noch austehende api route aufrufen
 
@@ -467,9 +487,6 @@ class EventProvider extends ChangeNotifier {
         DateTime.utc(DateTime.now().year, DateTime.now().month + 2, 0);
     loadAllEventsUntil(nextMonth);
 
-    // loadFavoriteEvents(context);
-    // loadUpComingEvents();
-    // loadEventsNearBy();
   }
 
   void loadEvent(Veranstaltung event) {
@@ -533,6 +550,8 @@ class EventProvider extends ChangeNotifier {
       pendingApproval.add(id);
     else if (json['istGenehmigt'].toString() == "1" &&
         pendingApproval.contains(id)) pendingApproval.remove(id);
+
+    if (json['entfernung'] != null) distance[id] = json['entfernung'];
 
     if (isEventLoaded(id)) return loaded[id];
 
