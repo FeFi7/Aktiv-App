@@ -24,6 +24,9 @@ class EventProvider extends ChangeNotifier {
   /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
   static final Map<DateTime, List<int>> dated = Map<DateTime, List<int>>();
 
+  /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
+  static final Map<int, DateTime> loadedTs = Map<int, DateTime>();
+
   /// Liste aller Event ID's die in der nähe statt finden TODO: machen!!!!
   static final List<int> nearby = [];
 
@@ -251,6 +254,24 @@ class EventProvider extends ChangeNotifier {
     }
   }
 
+  int order(int a, int b) {
+    Veranstaltung eventA = loaded[a];
+    Veranstaltung eventB = loaded[b];
+    if (eventA != null && eventB != null)
+      return eventA.beginnTs.compareTo(eventB.beginnTs);
+    return 0;
+  }
+
+  bool shouldSortFavorites = true;
+
+  void sortLoadedFavoriteEvents() {
+    favorites.sort((a, b) => order(a, b));
+  }
+
+  void sortLoadedUpComingEvents() {
+    upComing.sort((a, b) => order(a, b));
+  }
+
   /// Methode ruft attemptGetAllVeranstaltungen auf uns sortiert die Rückgabe
   /// in die, der übergebenen EventListType, entsprechend ein. Wenn das letzte
   /// laden des Types über eine Stunde her ist lädt er Alle Events neu, ansonsten
@@ -265,7 +286,7 @@ class EventProvider extends ChangeNotifier {
     if (lastUpdated.difference(now).inHours > 1) startPage = 1;
 
     /// Soll Utopisch weit weg sein, dass sich nur um das Paging gekümmert wird
-    /// 
+    ///
     DateTime until = DateTime.utc(now.year + 1, now.month, now.day);
 
     //TODO: Wieder auskommentieren, müsste eig. gehen
@@ -283,6 +304,7 @@ class EventProvider extends ChangeNotifier {
     /// Geladene Events werden dem EventListType entsprechend einsortiert
     switch (type) {
       case EventListType.FAVORITES:
+        if (shouldSortFavorites) sortLoadedFavoriteEvents();
         return getLoadedFavoritesEvents();
       case EventListType.NEAR_BY:
 
@@ -293,7 +315,7 @@ class EventProvider extends ChangeNotifier {
         // for (Veranstaltung event in loaded)
         //   if (!pendingApproval.contains(event.id) && !nearby.contains(event.id))
         //     nearby.add(event.id);
-        
+
         /// TODO: Wenn nearby dann nicht get all sondern dafpr noch austehende api route aufrufen
 
         return nearby.map((id) => getLoadedEventById(id)).toList();
@@ -481,6 +503,7 @@ class EventProvider extends ChangeNotifier {
       favorites.remove(eventId);
     } else {
       favorites.add(eventId);
+      shouldSortFavorites = true;
     }
 
     if (UserProvider.getUserRole().allowedToFavEvents) {
@@ -497,9 +520,10 @@ class EventProvider extends ChangeNotifier {
   Veranstaltung getEventFromJson(Map<String, dynamic> json) {
     int id = json['id'];
 
-    if (json['favorit'].toString() == "1" && !favorites.contains(id))
+    if (json['favorit'].toString() == "1" && !favorites.contains(id)) {
       favorites.add(id);
-    else if (json['favorit'].toString() == "0" && favorites.contains(id))
+      shouldSortFavorites = true;
+    } else if (json['favorit'].toString() == "0" && favorites.contains(id))
       favorites.remove(id);
 
     if (json['istGenehmigt'].toString() == "0" && !pendingApproval.contains(id))

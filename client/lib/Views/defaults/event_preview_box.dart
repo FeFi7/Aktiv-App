@@ -109,7 +109,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 ),
               ),
               Container(
-                width: size.width * 0.45,
+                width: size.width * 0.44,
                 padding: const EdgeInsets.all(7.5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
