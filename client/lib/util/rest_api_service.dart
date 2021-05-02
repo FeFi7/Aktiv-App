@@ -132,7 +132,8 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     String userId = "-1",
     String vollText = "-1",
     String entfernung = "-1",
-    String sorting = "-1"]) async {
+    String sorting = "-1",
+    String datum = "-1"]) async {
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
@@ -158,12 +159,17 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     qParams.putIfAbsent('sorting', () => sorting);
   }
 
+  if (datum != "-1") {
+    qParams.putIfAbsent('datum', () => datum);
+  }
+
   try {
     // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
     List<String> coordinates = await getActualCoordinates();
     if (coordinates != null) {
       qParams.putIfAbsent('latitude', () => coordinates.first);
       qParams.putIfAbsent('longitude', () => coordinates.last);
+      print('lat: ' + coordinates.first + ", longitude: " + coordinates.last);
     }
   } catch (e) {
     print(e.toString());
