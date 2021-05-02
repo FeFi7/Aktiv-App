@@ -61,7 +61,7 @@ class EventPreviewBox extends StatefulWidget {
       case AdditiveFormat.DISTANCE:
         return "-1 km weit entfernt";
       default:
-        return null;
+        return "null";
     }
   }
 
@@ -73,13 +73,15 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
   @override
   void initState() {
     super.initState();
-    widget.liked = Provider.of<EventProvider>(context, listen: false)
-        .isEventFavorite(widget.id);
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
+    if (widget.liked == null)
+      widget.liked = Provider.of<EventProvider>(context, listen: false)
+          .isEventFavorite(widget.id);
 
     return FractionallySizedBox(
       widthFactor: 1,
@@ -168,14 +170,10 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                             ),
                             onPressed: () {
                               setState(() {
-
                                 widget.liked = !widget.liked;
-                                                                
                               });
-                              Provider.of<EventProvider>(context,
-                                        listen: false)
-                                    .toggleEventFavoriteState(
-                                        context, widget.id);
+                              Provider.of<EventProvider>(context, listen: false)
+                                  .toggleEventFavoriteState(context, widget.id);
                             })
                         : Container()),
                     IconButton(

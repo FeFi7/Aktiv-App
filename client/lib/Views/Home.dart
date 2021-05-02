@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
 
   static const List<String> _widgetTitles = <String>[
     'Entdecken',
-    'Persönlicher Kalender',
+    'Kalender',
     'Eigene Veranstaltung',
     'Favoriten',
     'Eigenes Profil',

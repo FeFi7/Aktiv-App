@@ -79,11 +79,6 @@ class _CalendarViewState extends State<CalendarView> {
                                 .getLoadedEventsOfDay(_selectedDay)
                             : Provider.of<EventProvider>(context, listen: false)
                                 .getLoadedAndLikedEventsOfDay(_selectedDay);
-                        log("menge gelandener evnets: " +
-                            Provider.of<EventProvider>(context, listen: false)
-                                .getLoadedEvents()
-                                .length
-                                .toString());
                       });
                     }
                   },

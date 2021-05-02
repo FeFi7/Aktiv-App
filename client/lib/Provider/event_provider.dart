@@ -192,12 +192,15 @@ class EventProvider extends ChangeNotifier {
   /// Lädt alle Events von neu bis zu einem gewissen Datum
   Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
     /// 16 pages begrenzt das Laden der Events auf max 400 Events
+    until = DateTime.utc(until.year, until.month, until.day + 1);
     return loadEventsUntil(until, 1, 16, null);
   }
 
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
       DateTime until, int startPage, int maxPages, EventListType type) async {
+    until = DateTime.utc(until.year, until.month, until.day + 1); 
+    
     List<Veranstaltung> foundEvents = [];
 
     for (int page = startPage; page < (startPage + maxPages); page++) {
