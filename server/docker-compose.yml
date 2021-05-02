@@ -85,10 +85,9 @@ services:
         expose:
             - '3306'
         volumes:
-            - db-config:/etc/mysql
             - db-data:/var/lib/mysql
             - /data/db/backup/:/data_backup/data
-            #- ./db/backup/files/:/data_backup/data
+            - /data/logs/mysql/:/var/log/mysql
+            - /data/config/conf.d/:/etc/mysql/conf.d
 volumes: 
-    db-config:
     db-data:
