@@ -47,7 +47,9 @@ class _BodyState extends State<Body> {
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
                 CircleAvatar(
                   radius: 120,
-                  backgroundImage: AssetImage("assets/images/wir_logo.png"),
+                  backgroundImage:
+                      AssetImage("assets/images/wir_hier_logo_transparent.png"),
+                  backgroundColor: Color.fromARGB(0, 0, 0, 0),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
                 RoundedInputEmailField(
@@ -89,7 +91,7 @@ class _BodyState extends State<Body> {
                             ),
                           );
                         } else if (jwt.statusCode == 401) {
-                          errorToast("Ungültige Anmeldedaten");
+                          errorToast("Unauthorisierter Benutzer");
                         } else {
                           errorToast("Ungültige Anmeldedaten");
                         }

@@ -47,7 +47,7 @@ router.get("/:veranstaltungId", async function (req, res) {
   }
 
   veranstaltung.files = veranstaltungFiles;
-  return res.status(200).json(veranstaltung)
+  return res.status(200).json(veranstaltung);
 });
 
 // [DELETE] lösche einzelne Veranstaltung
@@ -126,6 +126,10 @@ router.post(
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
+  const latitudeUlm = 48.399620;
+  const longitudeUlm = 9.996610;
+  const sortsErlaubt = ["beginn_ts", "entfernung"]
+
   const query = req.query;
   let page = query.page;
   let bis = query.bis;
@@ -134,6 +138,10 @@ router.get("/*", async function (req, res) {
   let userId = query.userId;
   let vollText = query.vollText;
   let datum = query.datum;
+  let entfernung = query.entfernung;
+  let latitude = query.latitude;
+  let longitude = query.longitude;
+  let sorting = query.sorting;
 
   if (limit) {
     // ist query eine Zahl?
@@ -150,6 +158,28 @@ router.get("/*", async function (req, res) {
   } else {
     page = 1;
   }
+  // falls keine entfernung mitgegeben, 100km standard
+  if (entfernung) {
+    if (!/^\d+$/.test(entfernung)) {
+      entfernung = 100;
+    }
+  } else {
+    entfernung = 100;
+  }
+  if (latitude) {
+    if (!/^[+-]?\d+(\.\d+)?$/.test(latitude)) {
+      latitude = latitudeUlm;
+    }
+  } else {
+    latitude = latitudeUlm;
+  }
+  if (longitude) {
+    if (!/^[+-]?\d+(\.\d+)?$/.test(longitude)) {
+      longitude = longitudeUlm;
+    }
+  } else {
+    longitude = longitudeUlm;
+  }
   // falls keine userId mitgegeben Wert 0 und es wird in der Funktion nicht beachtet
   if (userId) {
     if (!/^\d+$/.test(userId)) {
@@ -160,6 +190,14 @@ router.get("/*", async function (req, res) {
   }
   if (!istGenehmigt) {
     istGenehmigt = 1;
+  }
+  if(!sorting){
+    sorting = sortsErlaubt[0]
+  }
+  else{
+    if(!sortsErlaubt.includes(sorting)){
+      sorting = sortsErlaubt[0]
+    }
   }
   if (!bis) {
     const dt = new Date();
@@ -184,7 +222,11 @@ router.get("/*", async function (req, res) {
     userId,
     page,
     vollText,
-    datum
+    datum,
+    latitude,
+    longitude,
+    entfernung,
+    sorting
   );
 
   if (veranstaltungen.error) {
@@ -192,6 +234,7 @@ router.get("/*", async function (req, res) {
   } else {
     res.status(200).json(veranstaltungen);
   }
+
 });
 
 // [POST] Erstelle eine Veranstaltung

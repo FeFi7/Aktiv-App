@@ -14,6 +14,12 @@ class ProfilePersoenlich extends StatefulWidget {
 }
 
 class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
+  @override
+  void initState() {
+    super.initState();
+    checkValues();
+  }
+
   var jwt;
   int currentStep = 0; //startIndex für Stepper
   bool complete = false; //Ausfüllen abgeschlossen?
@@ -21,9 +27,15 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   static String nachname;
   static String plz;
   static String tel;
-  static String ort;
   static String hausnummer;
   static String strasse;
+
+  final vornameController = TextEditingController();
+  final nachnameController = TextEditingController();
+  final plzController = TextEditingController();
+  final telController = TextEditingController();
+  final hausnummerController = TextEditingController();
+  final strasseController = TextEditingController();
 
   List<Step> steps;
 
@@ -101,6 +113,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         content: Column(
                           children: <Widget>[
                             RoundedInputField(
+                              controller: vornameController,
                               hintText: hintVorname(Provider.of<UserProvider>(
                                       context,
                                       listen: false)
@@ -109,22 +122,29 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   vorname = value;
+                                  vorname = vornameController.text;
+                                } else {
+                                  vorname = vornameController.text;
                                 }
                               },
                             ),
                             RoundedInputField(
-                              hintText: hintNachname(Provider.of<UserProvider>(
-                                      context,
-                                      listen: false)
-                                  .nachname
-                                  .toString()),
-                              onChanged: (value) {
-                                if (value != null && value != "null") {
-                                  nachname = value;
-                                }
-                              },
-                            ),
+                                controller: nachnameController,
+                                hintText: hintNachname(
+                                    Provider.of<UserProvider>(context,
+                                            listen: false)
+                                        .nachname
+                                        .toString()),
+                                onChanged: (value) {
+                                  if (value != null && value != "null") {
+                                    nachname = value;
+                                    nachname = nachnameController.text;
+                                  } else {
+                                    nachnameController.text = value;
+                                  }
+                                }),
                             RoundedInputFieldNumeric(
+                              controller: telController,
                               hintText: hintTel(Provider.of<UserProvider>(
                                       context,
                                       listen: false)
@@ -134,6 +154,9 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   tel = value;
+                                  tel = telController.text;
+                                } else {
+                                  tel = telController.text;
                                 }
                               },
                             ),
@@ -145,6 +168,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         content: Column(
                           children: <Widget>[
                             RoundedInputField(
+                              controller: strasseController,
                               hintText: hintStrasse(Provider.of<UserProvider>(
                                       context,
                                       listen: false)
@@ -154,10 +178,14 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   strasse = value;
+                                  strasse = strasseController.text;
+                                } else {
+                                  strasse = strasseController.text;
                                 }
                               },
                             ),
                             RoundedInputFieldNumeric(
+                              controller: hausnummerController,
                               hintText: hintHausnummer(
                                   Provider.of<UserProvider>(context,
                                           listen: false)
@@ -167,10 +195,14 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   hausnummer = value;
+                                  hausnummer = hausnummerController.text;
+                                } else {
+                                  hausnummer = hausnummerController.text;
                                 }
                               },
                             ),
                             RoundedInputFieldNumeric(
+                              controller: plzController,
                               hintText: hintPlz(Provider.of<UserProvider>(
                                       context,
                                       listen: false)
@@ -180,19 +212,9 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                               onChanged: (value) {
                                 if (value != null && value != "null") {
                                   plz = value;
-                                }
-                              },
-                            ),
-                            RoundedInputField(
-                              hintText: hintOrt(Provider.of<UserProvider>(
-                                      context,
-                                      listen: false)
-                                  .ort
-                                  .toString()),
-                              icon: Icons.gps_fixed_outlined,
-                              onChanged: (value) {
-                                if (value != null && value != "null") {
-                                  ort = value;
+                                  plz = plzController.text;
+                                } else {
+                                  plz = plzController.text;
                                 }
                               },
                             ),
@@ -216,7 +238,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       goToStep(currentStep + 1);
     } else {
       var jwt = await Provider.of<UserProvider>(context, listen: false)
-          .updateUserInfo(vorname, nachname, plz, tel);
+          .updateUserInfo(vorname, nachname, plz, tel, strasse, hausnummer);
       if (jwt.statusCode == 200) {
         setState(() => complete = true);
       } else {
@@ -234,55 +256,100 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   goToStep(int step) {
     setState(() => currentStep = step);
   }
+
+  void checkValues() {
+    (Provider.of<UserProvider>(context, listen: false).vorname.toString() !=
+            "null")
+        ? vornameController.text =
+            Provider.of<UserProvider>(context, listen: false).vorname.toString()
+        : vornameController.text = hintVorname(vorname);
+    vorname = vornameController.text;
+
+    (Provider.of<UserProvider>(context, listen: false).nachname.toString() !=
+            "null")
+        ? nachnameController.text =
+            Provider.of<UserProvider>(context, listen: false)
+                .nachname
+                .toString()
+        : nachnameController.text = hintNachname(nachname);
+    nachname = nachnameController.text;
+
+    (Provider.of<UserProvider>(context, listen: false).plz.toString() != "null")
+        ? plzController.text =
+            Provider.of<UserProvider>(context, listen: false).plz.toString()
+        : plzController.text = hintPlz(plz);
+    plz = plzController.text;
+
+    (Provider.of<UserProvider>(context, listen: false).tel.toString() != "null")
+        ? telController.text =
+            Provider.of<UserProvider>(context, listen: false).tel.toString()
+        : telController.text = hintTel(tel);
+    tel = telController.text;
+
+    (Provider.of<UserProvider>(context, listen: false).hausnummer.toString() !=
+            "null")
+        ? hausnummerController.text =
+            Provider.of<UserProvider>(context, listen: false)
+                .hausnummer
+                .toString()
+        : hausnummerController.text = hintHausnummer(hausnummer);
+    hausnummer = hausnummerController.text;
+
+    (Provider.of<UserProvider>(context, listen: false).strasse.toString() !=
+            "null")
+        ? strasseController.text =
+            Provider.of<UserProvider>(context, listen: false).strasse.toString()
+        : strasseController.text = hintStrasse(strasse);
+    strasse = strasseController.text;
+  }
 }
 
 hintVorname<String>(vorname) {
   if (vorname != null && vorname != "null") {
     return vorname;
-  } else
+  } else {
     return "Vorname";
+  }
 }
 
 hintNachname<String>(nachname) {
   if (nachname != null && nachname != "null") {
     return nachname;
-  } else
+  } else {
     return "Nachname";
+  }
 }
 
 hintTel<String>(tel) {
   if (tel != null && tel != "null") {
     return tel;
-  } else
+  } else {
     return "Telefonnummer";
+  }
 }
 
 hintStrasse<String>(strasse) {
   if (strasse != null && strasse != "null") {
     return strasse;
-  } else
+  } else {
     return "Straße";
+  }
 }
 
 hintHausnummer<String>(hausnummer) {
   if (hausnummer != null && hausnummer != "null") {
     return hausnummer;
-  } else
+  } else {
     return "Hausnummer";
+  }
 }
 
 hintPlz<String>(plz) {
   if (plz != null && plz != "null") {
     return plz;
-  } else
+  } else {
     return "PLZ";
-}
-
-hintOrt<String>(ort) {
-  if (ort != null && ort != "null") {
-    return ort;
-  } else
-    return "Ort";
+  }
 }
 
 errorToast(String errorMessage) {

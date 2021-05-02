@@ -7,6 +7,7 @@ import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:provider/provider.dart';
 
+import 'color_palette.dart';
 import 'event_preview_box.dart';
 import 'package:flutter/material.dart';
 
@@ -26,10 +27,12 @@ class _EventPreviewListState extends State<EventPreviewList> {
 
   ScrollController _controller;
 
+    
+
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
-      //
+      
       setState(() {
         /// Wenn aufgerufen sollte Liste durch Provider automatisch erweitert werden, tut aber nicht ¯\_(ツ)_/¯
       });
@@ -50,6 +53,7 @@ class _EventPreviewListState extends State<EventPreviewList> {
         .loadEventListOfType(widget.type);
   }
 
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Veranstaltung>>(
@@ -61,21 +65,30 @@ class _EventPreviewListState extends State<EventPreviewList> {
 
           final events = snapshot.data;
 
+
           return Container(
               child: events.length > 0
                   ? RefreshIndicator(
-                      child: ListView.builder(
-                          key: new PageStorageKey(widget.type.toString()),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _controller,
-                          padding: const EdgeInsets.all(8),
-                          itemCount: events.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return EventPreviewBox.load(
-                                events[index], widget.additiveFormat);
-                          }),
+                      child: RawScrollbar(
+                        isAlwaysShown: true,
+                        thumbColor: ColorPalette.torea_bay.rgb,
+                        radius: Radius.circular(10),
+                        thickness: 4,
+                        controller: _controller,
+                        child: ListView.builder(
+                            key: new PageStorageKey(widget.type.toString()),
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            controller: _controller,
+                            padding: const EdgeInsets.all(8),
+                            itemCount: events.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return EventPreviewBox.load(
+                                  events[index], widget.additiveFormat);
+                            }),
+                      ),
                       onRefresh: _refreshData)
-                  : ErrorPreviewBox("Es konnten keine passenden Veranstaltungen aus der Datenbank geladen werden."));
+                  : ErrorPreviewBox(
+                      "Es konnten keine passenden Veranstaltungen aus der Datenbank geladen werden."));
         });
   }
 

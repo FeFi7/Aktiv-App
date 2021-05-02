@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
@@ -28,7 +29,7 @@ class VeranstaltungAnlegenView extends StatefulWidget {
 class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
- //int id = 0;
+  //int id = 0;
   String starttext = "Beginn";
   String endtext = "Ende";
   String titel = "Titel",
@@ -38,22 +39,31 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
       adresse = "Adresse",
       start = "Start",
       ende = "Ende";
+  Locale de = Locale('de', 'DE');
   Future<void> _selectDate(BuildContext context) async {
     final DateTime pickedDate = await showDatePicker(
+        locale: de,
         context: context,
         initialDate: currentDate,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2050));
+        firstDate: DateTime.now(),
+        lastDate: DateTime.now().add(Duration(days: 365 * 10)));
 
-    if (pickedDate != null && pickedDate != currentDate)
+    if (pickedDate != null && pickedDate != currentDate) {
       setState(() {
         currentDate = pickedDate;
       });
-    await _selectTime(context);
+      await _selectTime(context);
+    }
   }
 
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay selectedTime = await showTimePicker(
+      builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child),
+      helpText: "Uhrzeit wählen",
+      confirmText: "Ok",
+      cancelText: "Abbrechen",
       initialTime: TimeOfDay.now(),
       context: context,
     );
@@ -204,29 +214,48 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                 color: ColorPalette.orange.rgb,
                 textColor: Colors.white,
                 press: () async {
-                  Provider.of<EventProvider>(context,listen: false).createEvent(titel, beschreibung, email, start, ende, adresse).then((event) =>{
-                
-                    Provider.of<BodyProvider>(context, listen: false)
-                      .setBody(VeranstaltungDetailView(event.id))
-                 // Provider.of<AppBarTitleProvider>(context, listen: false)
-                 //     .setTitle('Übersicht');
+                  Provider.of<UserProvider>(context, listen: false)
+                      .checkDataCompletion();
+                  if (Provider.of<UserProvider>(context, listen: false)
+                      .getDatenVollstaendig) {
+                    await Provider.of<EventProvider>(context, listen: false)
+                        .createEvent(
+                            titel, beschreibung, email, start, ende, adresse)
+                        .then((event) => {
+                              Provider.of<BodyProvider>(context, listen: false)
+                                  .setBody(VeranstaltungDetailView(event.id))
+                              // Provider.of<AppBarTitleProvider>(context, listen: false)
+                              //     .setTitle('Übersicht');
+                            });
 
-
-                  });
-                  
-                  setState(() {
-                    Fluttertoast.showToast(
-                        msg: "Test",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: ColorPalette.white.rgb,
-                        textColor: ColorPalette.orange.rgb);
-                  });
+                    setState(() {
+                      Fluttertoast.showToast(
+                          msg: "Test",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 2,
+                          backgroundColor: ColorPalette.white.rgb,
+                          textColor: ColorPalette.orange.rgb);
+                    });
+                  } else {
+                    errorToast("Nutzerdaten nicht vollständig");
+                  }
                 }),
           ),
         ],
       ),
     );
+  }
+
+  errorToast(String errorMessage) {
+    Fluttertoast.showToast(
+      msg: errorMessage,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: ColorPalette.orange.rgb,
+      textColor: ColorPalette.white.rgb,
+    );
+    FocusManager.instance.primaryFocus.unfocus();
   }
 }

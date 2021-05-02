@@ -277,12 +277,10 @@ async function getInstitutionenFromUser(userId) {
   INNER JOIN Institution i ON m.institutionId = i.id 
   WHERE istGenehmigt = 1 AND m.userId = ?`;
 
-  let results = await conn
-    .query(query, [userId])
-    .catch((error) => {
-      console.log(error);
-      return { error: "Fehler in Db" };
-    });
+  let results = await conn.query(query, [userId]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler in Db" };
+  });
 
   if (results) {
     return results[0];
@@ -296,12 +294,10 @@ async function getPLZsFromGenehmiger(userId) {
   INNER JOIN PLZ p ON v.plzId = p.id
   WHERE v.userId = ?`;
 
-  let results = await conn
-    .query(query, [userId])
-    .catch((error) => {
-      console.log(error);
-      return { error: "Fehler in Db" };
-    });
+  let results = await conn.query(query, [userId]).catch((error) => {
+    console.log(error);
+    return { error: "Fehler in Db" };
+  });
 
   if (results) {
     return results[0];
@@ -429,7 +425,16 @@ async function updateUserRolle(userId, rolleId, userIdBetreiber) {
   }
 }
 
-async function updateUserInformation(id, mail, vorname, nachname, plz, tel, strasse, hausnummer) {
+async function updateUserInformation(
+  id,
+  mail,
+  vorname,
+  nachname,
+  plz,
+  tel,
+  strasse,
+  hausnummer
+) {
   // Falls noch keine ID für PLZ angelegt
   if (plz) {
     const queryPlz = `INSERT INTO PLZ(PLZ.plz) VALUES(?) ON DUPLICATE KEY UPDATE PLZ.plz = PLZ.plz;`;
@@ -472,15 +477,15 @@ async function updateUserInformation(id, mail, vorname, nachname, plz, tel, stra
   }
 }
 
-async function setGenehmigerPLZs(userId, plzs) {
-  // lösche alte Einträge 
-  const queryDelete = `DELETE FROM VerwaltungPlzUser v WHERE v.userId = ?`;
-  await conn.query(queryDelete, [userId]).catch((error) => {
-    console.log(error);
-    return { error: "Fehler bei Db" };
-  });
+async function addGenehmigerPLZs(userId, plzs) {
+  // lösche alte Einträge
+  // const queryDelete = `DELETE FROM VerwaltungPlzUser v WHERE v.userId = ?`;
+  // await conn.query(queryDelete, [userId]).catch((error) => {
+  //   console.log(error);
+  //   return { error: "Fehler bei Db" };
+  // });
 
-  const queryAdd = `INSERT INTO VerwaltungPlzUser(userId, plzId) VALUES(?,(SELECT id FROM PLZ WHERE PLZ.plz = ? LIMIT 1)) ON DUPLICATE KEY UPDATE userId=userId`; 
+  const queryAdd = `INSERT INTO VerwaltungPlzUser(userId, plzId) VALUES(?,(SELECT id FROM PLZ WHERE PLZ.plz = ? LIMIT 1)) ON DUPLICATE KEY UPDATE userId=userId`;
   const queryPlz = `INSERT INTO PLZ(PLZ.plz) VALUES(?) ON DUPLICATE KEY UPDATE PLZ.plz = PLZ.plz;`;
 
   await plzs.forEach(async function (plz) {
@@ -491,6 +496,20 @@ async function setGenehmigerPLZs(userId, plzs) {
     });
     //erstelle verknüpfung
     await conn.query(queryAdd, [userId, plz]).catch((error) => {
+      console.log(error);
+      return { error: "Fehler bei Db" };
+    });
+  });
+
+  return true;
+}
+
+async function deleteGenehmigerPLZs(userId, plzs) {
+  const queryDelete = `DELETE FROM VerwaltungPlzUser v WHERE v.userId = ? AND v.plzId =  (SELECT id FROM PLZ WHERE PLZ.plz = ? LIMIT 1)`;
+
+  await plzs.forEach(async function (plz) {
+    //lösche verknüpfung
+    await conn.query(queryDelete, [userId, plz]).catch((error) => {
       console.log(error);
       return { error: "Fehler bei Db" };
     });
@@ -521,6 +540,7 @@ module.exports = {
   mailExists: mailExists,
   deleteUser: deleteUser,
   deleteUserToInstitut: deleteUserToInstitut,
-  setGenehmigerPLZs: setGenehmigerPLZs,
-  getPLZsFromGenehmiger: getPLZsFromGenehmiger
+  addGenehmigerPLZs: addGenehmigerPLZs,
+  getPLZsFromGenehmiger: getPLZsFromGenehmiger,
+  deleteGenehmigerPLZs: deleteGenehmigerPLZs
 };

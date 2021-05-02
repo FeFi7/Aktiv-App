@@ -1,16 +1,20 @@
-# aktiv_app_flutter
+# wir:hier
 
-A new Flutter project.
+Teamorientiertes Projekt der Hochschule Ulm in Zusammenarbeit mit Lebensqualtität Burgrieden e.V.
 
-## Getting Started
+![alt text](http://app.lebensqualitaet-burgrieden.de/wir_logo.jpg)
 
-This project is a starting point for a Flutter application.
+## Veranstaltungs App mit Flutter
 
-A few resources to get you started if this is your first Flutter project:
+Teammitglieder:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+- Viktor Dötzel
+- Felix Filser
+- Fabian Bösel
+- Niko Burkert
+- Moritz Nentwig
+- Florian Kovacsik
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Die App wurde als Projekt im Informatik Studium durchgeführt. Die .apk kann heruntergeladen werden und auf allen Android Geräten genutzt werden. Weitere Informationen erhalten Sie unter: /Hilfelink/
+
+Das Ziel war es eine App auf den Weg bringen, die es bspw. Vereinen, öffentlichen Einrichtungen (Gemeinde, Schulen, Kirchen), Non-Profit Organisationen oder anderen Interessensgemeinschaften / Arbeitskreisen, Gewerbevereinen und kulturellen Anbietern ermöglicht, sich und ihre Aktivitäten den Menschen vor Ort näherzubringen und gemeinsam aktiv das Gemeindeleben zu gestalten. Die App soll in der ersten Phase in der Gemeinde getestet werden und im Anschluss an das Projekt vom Kunden übernommen und weiter betreut.

@@ -128,7 +128,7 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
 //
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
-Future<http.Response> attemptGetAllVeranstaltungen(String datum,
+Future<http.Response> attemptGetAllVeranstaltungen(
     [String bis = "-1",
     String istGenehmigt = "1",
     String limit = "25",
@@ -138,8 +138,7 @@ Future<http.Response> attemptGetAllVeranstaltungen(String datum,
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
-    'page': page,
-    'datum': datum
+    'page': page
   };
 
   if (bis != "-1") {
@@ -674,10 +673,15 @@ Future<http.Response> attemptDeleteVeranstaltung(
 }
 
 // [GET] Bekomme tags (optional gefiltert)
-Future<http.Response> attemptGetTags(List<String> tag) async {
+Future<http.Response> attemptGetTags([String tag = "[-1]"]) async {
   String route = "tags";
+  Map<String, dynamic> qParams;
 
-  final response = await http.get(Uri.https(SERVER_IP, route));
+  if (tag != "[-1]") {
+    qParams.putIfAbsent('tag', () => tag);
+  }
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams));
 
   if (response.statusCode == 200) {
     print("Bekomme tags erfolgreich");
@@ -715,7 +719,7 @@ Future<http.Response> attemptDeleteVerwalter(
 // [DELETE] Lösche User (nur als Betreiber möglich)
 Future<http.Response> attemptDeleteUser(
     String userId, String accessToken) async {
-  String route = "api/" + userId;
+  String route = "api/user/" + userId;
 
   Map<String, dynamic> qParams = {'secret_token': accessToken};
 
@@ -737,11 +741,13 @@ Future<http.Response> attemptDeleteUser(
 
 // [POST] Generiere Verbindung von Genehmiger zu PLZs
 Future<http.Response> attemptSetGenehmiger(
-    String userId, String plz, String accessToken) async {
-  String route = "api/" + userId + "/genehmigung";
+    String userId, List<String> plz, String accessToken) async {
+  String route = "api/user/" + userId + "/genehmigung";
 
   Map<String, dynamic> qParams = {'secret_token': accessToken};
-  Map<String, dynamic> body = {'plz': plz};
+  Map<String, dynamic> body = {};
+
+  body.putIfAbsent('plz', () => plz.toString());
 
   final response = await http.post(Uri.https(SERVER_IP, route, qParams),
       headers: <String, String>{
@@ -751,7 +757,33 @@ Future<http.Response> attemptSetGenehmiger(
       encoding: Encoding.getByName("utf-8"));
 
   if (response.statusCode == 200) {
-    print("Genehmiger erfolgreich gesetzt für" + plz);
+    print("Genehmiger erfolgreich gesetzt für " + body.toString());
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
+
+// [DELETE] Generiere Verbindung von Genehmiger zu PLZs
+Future<http.Response> attemptRemoveGenehmiger(
+    String userId, List<String> plz, String accessToken) async {
+  String route = "api/user/" + userId + "/genehmigung";
+
+  Map<String, dynamic> qParams = {'secret_token': accessToken};
+  Map<String, dynamic> body = {};
+
+  body.putIfAbsent('plz', () => plz.toString());
+
+  final response = await http.delete(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      },
+      body: body,
+      encoding: Encoding.getByName("utf-8"));
+
+  if (response.statusCode == 200) {
+    print("Genehmiger erfolgreich entfernt " + body.toString());
   } else {
     print(response.statusCode);
   }
@@ -795,8 +827,27 @@ Future<http.Response> attemptGetFavorite(
   return response;
 }
 
-// [GET] Bekomme alle Institutionen
-Future<http.Response> attemptGetAllInstitutionen() async {}
+// [GET] Bekomme alle ungenehmigten Institutionen
+Future<http.Response> attemptGetUngenehmigteInstitutionen(
+    String accessToken) async {
+  Map<String, dynamic> qParams = {
+    'secret_token': accessToken,
+  };
+  String route = "api/institutionen/ungenehmigt";
+
+  final response = await http.get(Uri.https(SERVER_IP, route, qParams),
+      headers: <String, String>{
+        'Content-Type': "application/x-www-form-urlencoded"
+      });
+
+  if (response.statusCode == 200) {
+    print("GET All Institutionen erfolgreich");
+  } else {
+    print(response.statusCode);
+  }
+
+  return response;
+}
 
 // [DELETE] Lösche einzelnes File
 Future<http.Response> attemptDeleteFile() async {}

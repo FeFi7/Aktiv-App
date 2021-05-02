@@ -23,8 +23,8 @@ class _WelcomeScreen extends State<WelcomeScreen> {
     autoSignIn();
   }
 
-  // TODO: muss eigentlich standard mäßig auf true sein, wird aber wenn man sich 
-  // nicht automatisc einloggt, nie false & idk why 
+  // TODO: muss eigentlich standard mäßig auf true sein, wird aber wenn man sich
+  // nicht automatisc einloggt, nie false & idk why
   bool loadOverlay = false;
 
   @override
@@ -86,7 +86,8 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
                 CircleAvatar(
                   radius: 180.0,
-                  foregroundImage: AssetImage("assets/images/wir_hier_logo_transparent.png"),
+                  foregroundImage:
+                      AssetImage("assets/images/wir_hier_logo_transparent.png"),
                   backgroundColor: Color.fromARGB(0, 0, 0, 0),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
@@ -154,8 +155,10 @@ class _WelcomeScreen extends State<WelcomeScreen> {
 
   route() async {
     await Provider.of<UserProvider>(context, listen: false).signInWithToken();
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => HomePage()));
+    if (Provider.of<UserProvider>(context, listen: false).isSignInWithToken) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomePage()));
+    }
   }
 
   autoSignIn() async {

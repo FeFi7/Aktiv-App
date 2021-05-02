@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/institution/institution_view.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/background.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_verwalten.dart';
@@ -179,6 +180,7 @@ class _BodyState extends State<Body> {
           SizedBox(height: 10),
           verwaltenButton(context),
           persoenlichButton(context),
+          institutionenButton(context),
           einstellungenButton(context),
           RoundedButton(
             text: "Hilfe",
@@ -274,6 +276,19 @@ class _BodyState extends State<Body> {
         ],
       );
     }
+  }
+
+  RoundedButton institutionenButton(BuildContext context) {
+    return RoundedButton(
+      text: "Institution beantragen",
+      color: ColorPalette.endeavour.rgb,
+      press: () {
+        Provider.of<BodyProvider>(context, listen: false)
+            .setBody(InstitutionView());
+        Provider.of<AppBarTitleProvider>(context, listen: false)
+            .setTitle('Institution beantragen');
+      },
+    );
   }
 
   RoundedButton einstellungenButton(BuildContext context) {

@@ -93,9 +93,15 @@ router.post(
       institutionId
     );
 
-    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (
+      (resultIsUserInInstitution.error || !resultIsUserInInstitution) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
-        error: "User ist nicht als Verwalter in Institution registriert",
+        error:
+          "User ist nicht als Verwalter in Institution registriert oder kein Betreiber",
       });
     }
 
@@ -133,9 +139,15 @@ router.delete(
       institutionId
     );
 
-    if (resultIsUserInInstitution.error || !resultIsUserInInstitution) {
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+
+    if (
+      (resultIsUserInInstitution.error || !resultIsUserInInstitution) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
-        error: "User ist nicht als Verwalter in Institution registriert",
+        error:
+          "User ist nicht als Verwalter in Institution registriert oder kein Betreiber",
       });
     }
 
@@ -356,9 +368,12 @@ router.delete(
 
     const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
 
-    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+    if (
+      Number(userId) !== Number(userZuEntfernenId) &&
+      (resultIsUserBetreiber.error || !resultIsUserBetreiber)
+    ) {
       return res.status(400).json({
-        error: "Nur Betreiber können User löschen",
+        error: "Nur Betreiber oder selbst können User löschen",
       });
     }
 
@@ -436,11 +451,15 @@ router.get(
   "/:userId/favorit",
   passport.authenticate("jwt", { session: false }),
   async function (req, res) {
+    const userIdByToken = req.user._id;
     const userId = req.params.userId;
     let limit = req.query.limit;
     let page = req.query.page;
     if (!/^\d+$/.test(userId)) {
       return res.status(400).send("userId keine Zahl");
+    }
+    if (Number(userIdByToken) !== Number(userId)) {
+      return res.status(400).send("Fremde userId");
     }
 
     if (limit) {
@@ -516,7 +535,64 @@ router.post(
       });
     }
 
-    const result = await userService.setGenehmigerPLZs(userIdGenehmiger, plz);
+    const result = await userService.addGenehmigerPLZs(userIdGenehmiger, plz);
+
+    if (result.error) {
+      return res.status(400).json(result);
+    } else {
+      return res.status(200).json(result);
+    }
+  }
+);
+
+// [DELETE] Lösche Verbindung von Genehmiger zu PLZs
+router.delete(
+  "/:userId/genehmigung",
+  passport.authenticate("jwt", { session: false }),
+  async function (req, res) {
+    const userId = req.user._id;
+    const userIdGenehmiger = req.params.userId;
+    let plz = req.body.plz;
+    if (!/^\d+$/.test(userIdGenehmiger)) {
+      return res.status(400).send("userId keine Zahl");
+    }
+
+    if (plz) {
+      try {
+        plz = JSON.parse(plz);
+      } catch (e) {
+        console.log("Fehler bei Parsung plz");
+        return res
+          .status(400)
+          .json({ error: "plz werden nicht als Array übergeben" });
+      }
+      if (!Array.isArray(plz)) {
+        return res
+          .status(400)
+          .json({ error: "plz werden nicht als Array übergeben" });
+      }
+    }
+
+    // Ist anfragender User Betreiber und Ziel Genehmiger?
+    const resultIsUserGenehmiger = await userService.isUserGenehmiger(
+      userIdGenehmiger
+    );
+    if (resultIsUserGenehmiger.error || !resultIsUserGenehmiger) {
+      return res.status(400).json({
+        error: "ZielUser besitzt keine Genehmigerrolle",
+      });
+    }
+    const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
+    if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
+      return res.status(400).json({
+        error: "Nur Betreiber können PLZ zuweisen/löschen",
+      });
+    }
+
+    const result = await userService.deleteGenehmigerPLZs(
+      userIdGenehmiger,
+      plz
+    );
 
     if (result.error) {
       return res.status(400).json(result);

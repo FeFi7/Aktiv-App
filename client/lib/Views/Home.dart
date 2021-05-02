@@ -36,10 +36,10 @@ class _HomePageState extends State<HomePage> {
 
   static const List<String> _widgetTitles = <String>[
     'Entdecken',
-    'Kalender',
-    'Erstellen',
+    'Persönlicher Kalender',
+    'Eigene Veranstaltung',
     'Favoriten',
-    'Profil',
+    'Eigenes Profil',
   ];
 
   static Widget body = Consumer<BodyProvider>(builder: (context, value, child) {
