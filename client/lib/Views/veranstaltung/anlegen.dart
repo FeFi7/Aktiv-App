@@ -202,16 +202,18 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                       if (value.endsWith(" ")) {
                         selectedTags.add(value);
                         _controller.clear();
+                        setState(() {
+                          
+                        });
                       }
                       if (value.endsWith(",")) {
                         selectedTags.add(value);
                         _controller.clear();
-                      }
-                      if (selectedTags.length != 0) {
                         setState(() {
-                          tcVisibility = true;
+                          
                         });
                       }
+                     
                       ;
                     },
                     onSubmitted: (value) {
@@ -219,7 +221,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
 
                       if (selectedTags.length != 0) {
                         setState(() {
-                          tcVisibility = true;
+                          
                         });
                       }
                       ;
