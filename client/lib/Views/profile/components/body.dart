@@ -31,7 +31,6 @@ class _BodyState extends State<Body> {
   var sliderValueBald = 2.0;
 
   final List<bool> userGruppe = [true, false, false];
-  //int userGruppeIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -127,56 +126,10 @@ class _BodyState extends State<Body> {
   }
 
   Column buttons(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     if (UserProvider.istEingeloggt) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Container(
-          //   height: 60.0,
-          //   //Temporäre ToggleButtons zum wählen der Rolle
-          //   child: ToggleButtons(
-          //     children: [
-          //       Container(
-          //           alignment: Alignment.center,
-          //           width: size.width * 0.8 / userGruppe.length,
-          //           padding: const EdgeInsets.all(10.0),
-          //           child: Text('Verwalter')),
-          //       Container(
-          //           alignment: Alignment.center,
-          //           width: size.width * 0.8 / userGruppe.length,
-          //           padding: const EdgeInsets.all(10.0),
-          //           child: Text('Genehmiger')),
-          //       Container(
-          //           alignment: Alignment.center,
-          //           width: size.width * 0.8 / userGruppe.length,
-          //           padding: const EdgeInsets.all(10.0),
-          //           child: Text('LQ')),
-          //     ],
-          //     isSelected: userGruppe,
-          //     onPressed: (int index) {
-          //       setState(
-          //         () {
-          //           for (int buttonIndex = 0;
-          //               buttonIndex < userGruppe.length;
-          //               buttonIndex++) {
-          //             if (buttonIndex == index) {
-          //               userGruppe[buttonIndex] = true;
-          //             } else {
-          //               userGruppe[buttonIndex] = false;
-          //             }
-          //           }
-          //           userGruppeIndex = index;
-          //         },
-          //       );
-          //     },
-          //     borderRadius: BorderRadius.circular(30),
-          //     borderWidth: 1,
-          //     selectedColor: ColorPalette.white.rgb,
-          //     fillColor: ColorPalette.endeavour.rgb,
-          //     disabledBorderColor: ColorPalette.french_pass.rgb,
-          //   ),
-          // ),
           SizedBox(height: 10),
           verwaltenButton(context),
           persoenlichButton(context),

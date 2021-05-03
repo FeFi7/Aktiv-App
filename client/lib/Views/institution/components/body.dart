@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/institution/components/background.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field.dart';
-import 'package:aktiv_app_flutter/components/rounded_input_field_beschreibung.dart';
+import 'package:aktiv_app_flutter/components/rounded_input_field_beschreibung_institution.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +44,7 @@ class _BodyState extends State<Body> {
                 titelController.text = value;
               },
             ),
-            RoundedInputFieldBeschreibung(
+            RoundedInputFieldBeschreibungInstitution(
               hintText: 'Beschreibung der Institution',
               icon: Icons.edit,
               onChanged: (value) {
@@ -73,7 +75,8 @@ class _BodyState extends State<Body> {
                       await Provider.of<UserProvider>(context, listen: false)
                           .getAccessToken());
                   if (jwt.statusCode != 200) {
-                    errorToast("Antrag fehlgeschlagen");
+                    var error = json.decode(jwt.body);
+                    errorToast(error['error'].toString());
                   } else {
                     errorToast("erfolgreich beantragt");
                   }

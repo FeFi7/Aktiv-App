@@ -1,7 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/card_dropdown.dart';
@@ -9,7 +6,6 @@ import 'package:aktiv_app_flutter/components/card_dropdown_with_image.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field_numeric_komma.dart';
-import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +32,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   final betreiberController = TextEditingController();
   final benutzerController = TextEditingController();
   final plzController = TextEditingController();
+  final _scrollController = ScrollController();
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
 
@@ -136,7 +133,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "betreiber":
         return Column(
           children: <Widget>[
-            zuGenehmigenVeranstaltungen(),
+            // zuGenehmigenVeranstaltungen(), - vido
             //institutionenVerwalten(),
             institutionenGenehmigen(),
           ],
@@ -756,10 +753,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                                       ),
                                     );
                                   } else {
-                                    return CircleAvatar(
-                                      backgroundImage: Image.asset(
-                                              "assets/images/institutionPic_default.png")
-                                          .image,
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: Image.asset(
+                                                      "assets/images/institutionPic_default.png")
+                                                  .image)),
                                     );
                                   }
                                 },
@@ -940,6 +940,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             return Container();
           }
           return ListView.builder(
+              controller: _scrollController,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               itemCount: (snapShot.data != null) ? snapShot.data.length : 0,

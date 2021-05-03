@@ -6,12 +6,10 @@ import 'package:aktiv_app_flutter/Views/Registrieren/registrieren_screen.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/account_vorhanden_check.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
-import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
 
 import '../../Home.dart';
 import '../../../util/secure_storage_service.dart';
