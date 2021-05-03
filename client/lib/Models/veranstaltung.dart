@@ -1,11 +1,14 @@
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 
 class Veranstaltung {
-  int id;
-  String titel, beschreibung, kontakt, ortBeschr, plz;
+
+  int id, institutionsId;
+  String titel, beschreibung, kontakt, plz, ortBeschr;
+
   DateTime beginnTs, endeTs, erstelltTs;
   double latitude, longitude;
-
+  List<String> selectedTags = [];
+  List<String> imageIds = [];
   //Bilder mit abspeichern
 
   Veranstaltung.create(
@@ -15,8 +18,10 @@ class Veranstaltung {
     this.ortBeschr,
     this.beginnTs,
     this.endeTs,
-    this.latitude,
-    this.longitude,
+
+    this.institutionsId,
+    this.imageIds,
+    this.selectedTags,
   ) {
     // Muss noch code für id von database geschrieben werden
     // Aktuell noch nur platzhalter
@@ -35,8 +40,10 @@ class Veranstaltung {
     this.beginnTs,
     this.endeTs,
     this.erstelltTs,
-    this.latitude,
-    this.longitude
+  
+    this.institutionsId,
+    this.imageIds,
+    this.selectedTags,
   );
 
   EventPreviewBox getPreviewBox() {

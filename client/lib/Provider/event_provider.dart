@@ -524,12 +524,12 @@ class EventProvider extends ChangeNotifier {
   }
 
   Future<Veranstaltung> createEvent(String titel, String beschreibung,
-      String email, String start, String ende, String adresse) async {
-    // int id = 0;
-
+      String email, String start, String ende, String adresse,String plz,int institutionsid,int istGehnemigt,List<String>imageIds,List<String>selectedTags) async {
+    int userId = UserProvider.userId;
+    // 
     /// TODO: ACHTUNG NOCH KONSTANTE PARAM ÜBERGABE
     Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
-        start, ende, adresse, '89231', '1', '1', '1');
+        start, ende, adresse, plz,  institutionsid.toString(), userId.toString(),istGehnemigt.toString(),imageIds,selectedTags);
 
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
@@ -540,7 +540,7 @@ class EventProvider extends ChangeNotifier {
       DateTime erstelltTs = DateTime.now();
 
       Veranstaltung veranstaltung = Veranstaltung.load(eventId, titel,
-          beschreibung, email, adresse, startTs, endeTs, erstelltTs, 0, 0);
+          beschreibung, email, adresse, startTs, endeTs, erstelltTs,1,[],[]);
 
       loadEvent(veranstaltung);
 
@@ -641,7 +641,7 @@ class EventProvider extends ChangeNotifier {
 
     // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(
-        id, titel, description, contact, place, start, end, created, 0, 0);
+        id, titel, description, contact, place, start, end, created, 1,[],[]);
 
     loadEvent(event);
 
