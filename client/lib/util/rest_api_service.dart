@@ -122,6 +122,9 @@ Future<http.Response> attemptGetVeranstaltungByID(int veranstaltungsId) async {
   return response;
 }
 
+DateTime lastGps;
+String latitude, longitude;
+
 // [GET] Bekomme alle Veranstaltungen innerhalb eines Zeitraums, Genehmigungsstatus,
 // Maximallimit und Page
 Future<http.Response> attemptGetAllVeranstaltungen(
@@ -164,13 +167,24 @@ Future<http.Response> attemptGetAllVeranstaltungen(
   }
 
   try {
-    // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
-    List<String> coordinates = await getActualCoordinates();
-    if (coordinates != null) {
-      qParams.putIfAbsent('latitude', () => coordinates.first);
-      qParams.putIfAbsent('longitude', () => coordinates.last);
-      print('lat: ' + coordinates.first + ", longitude: " + coordinates.last);
+    if (lastGps == null || lastGps.difference(DateTime.now()).inMinutes >= 5) {
+      // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
+      List<String> coordinates = await getActualCoordinates();
+      if (coordinates != null) {
+        // qParams.putIfAbsent('latitude', () => coordinates.first);
+        // qParams.putIfAbsent('longitude', () => coordinates.last);
+        latitude = coordinates.first;
+        longitude = coordinates.last;
+        print('new lat: ' +
+            coordinates.first +
+            ", longitude: " +
+            coordinates.last);
+      }
+
+      lastGps = DateTime.now();
     }
+    qParams.putIfAbsent('latitude', () => latitude);
+    qParams.putIfAbsent('longitude', () => longitude);
   } catch (e) {
     print(e.toString());
   }

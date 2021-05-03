@@ -635,7 +635,7 @@ class EventProvider extends ChangeNotifier {
 
     var institutionImage = json['institutionImage'];
     log(institutionImage.toString());
-    if (institutionImage != null) loadInstitutionImage(institutionImage);
+    if (institutionImage != null) loadInstitutionImage(id, institutionImage);
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 
@@ -648,7 +648,7 @@ class EventProvider extends ChangeNotifier {
     return event;
   }
 
-  void loadInstitutionImage(String institutionImage) async {
+  void loadInstitutionImage(int eventId, String institutionImage) async {
     log("institutionImage" + institutionImage);
     var response = await attemptGetFile(institutionImage);
 
