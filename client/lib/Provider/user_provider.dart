@@ -27,7 +27,8 @@ class UserProvider extends ChangeNotifier {
       rolle,
       profilBild,
       hausnummer,
-      plz;
+      plz,
+      institutionBild;
   static bool istEingeloggt = false;
   bool datenVollstaendig = false;
   bool get getDatenVollstaendig => datenVollstaendig;
@@ -292,15 +293,19 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  attemptNewImageForInstitution(File file) async {
-    //TODO image institution
+  attemptImageForInstitution(File file, String institutionId) async {
+    var jwt = await attemptNewImageForInstitution(
+        file, institutionId, await getAccessToken());
+    var parsedInstitutionsBild = json.decode(jwt.body);
+    institutionBild = parsedInstitutionsBild['pfad'];
+    notifyListeners();
+    return jwt;
+  }
 
-    // var jwt = await attemptNewImageForInstitution(
-    //     file, institutionsId, await getAccessToken());
-    // var parsedInstitutionsBild = json.decode(jwt.body);
-    // profilBild = parsedInstitutionsBild['pfad'];
-    // notifyListeners();
-    // return jwt;
+  loadInstitutionImage() async {
+    var jwt = await attemptGetFile(institutionBild);
+    notifyListeners();
+    return jwt;
   }
 
   setGenehmiger(String mail, List<String> plz) async {

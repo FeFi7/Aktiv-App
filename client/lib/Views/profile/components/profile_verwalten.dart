@@ -119,6 +119,14 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "user":
         return Column(
           children: <Widget>[
+            Text(
+              "Meine Institutionen",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
             institutionenVerwalten(),
           ],
         );
@@ -126,7 +134,24 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "genehmiger":
         return Column(
           children: <Widget>[
+            Text(
+              "Meine Institutionen",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
             zuGenehmigenVeranstaltungen(),
+            SizedBox(height: 30.0),
+            Text(
+              "Zu genehmigen",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
             institutionenVerwalten(),
           ],
         );
@@ -134,7 +159,24 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         return Column(
           children: <Widget>[
             // zuGenehmigenVeranstaltungen(), - vido
-            //institutionenVerwalten(),
+            Text(
+              "Meine Institutionen",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
+            institutionenVerwalten(),
+            SizedBox(height: 30.0),
+            Text(
+              "Zu genehmigende Institutionen",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
             institutionenGenehmigen(),
           ],
         );
@@ -590,7 +632,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                       color: ColorPalette.malibu.rgb,
-                      onPressed: getImage,
+                      onPressed: () => getImage("1"),
                       child: CircleAvatar(
                         backgroundColor: ColorPalette.malibu.rgb,
                         child: Icon(
@@ -717,6 +759,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             return Container();
           }
           return ListView.builder(
+              controller: _scrollController,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
@@ -732,40 +775,25 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                             clipBehavior: Clip.none,
                             fit: StackFit.expand,
                             children: [
-                              Consumer<UserProvider>(
-                                builder: (context, user, child) {
-                                  if (UserProvider.istEingeloggt) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: (snapShot.data[index]
-                                                      ['institutionImage'] !=
-                                                  null)
-                                              ? NetworkImage(
-                                                  "https://app.lebensqualitaet-burgrieden.de/" +
-                                                      snapShot.data[index]
-                                                          ['institutionImage'])
-                                              : Image.asset(
-                                                      "assets/images/institutionPic_default.png")
-                                                  .image,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: Image.asset(
-                                                      "assets/images/institutionPic_default.png")
-                                                  .image)),
-                                    );
-                                  }
-                                },
+                              Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: (snapShot.data[index]
+                                                ['institutionImage'] !=
+                                            null)
+                                        ? NetworkImage(
+                                            "https://app.lebensqualitaet-burgrieden.de/" +
+                                                snapShot.data[index]
+                                                    ['institutionImage'])
+                                        : Image.asset(
+                                                "assets/images/institutionPic_default.png")
+                                            .image,
+                                  ),
+                                ),
                               ),
                               Positioned(
-                                right: 25,
+                                right: 5,
                                 bottom: 5,
                                 child: SizedBox(
                                   height: 60,
@@ -780,7 +808,8 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                                       ),
                                     ),
                                     color: ColorPalette.malibu.rgb,
-                                    onPressed: getImage,
+                                    onPressed: () => getImage(
+                                        snapShot.data[index]['id'].toString()),
                                     child: CircleAvatar(
                                       backgroundColor: ColorPalette.malibu.rgb,
                                       child: Icon(
@@ -937,7 +966,12 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         builder: (context, snapShot) {
           if (snapShot.connectionState == ConnectionState.none &&
               snapShot.hasData == null) {
-            return Container();
+            return Center(
+                child: Container(
+              width: 50.0,
+              height: 50.0,
+              child: CircularProgressIndicator(),
+            ));
           }
           return ListView.builder(
               controller: _scrollController,
@@ -956,34 +990,22 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                             clipBehavior: Clip.none,
                             fit: StackFit.expand,
                             children: [
-                              Consumer<UserProvider>(
-                                builder: (context, user, child) {
-                                  if (UserProvider.istEingeloggt) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: (snapShot.data[index]
-                                                      ['institutionImage'] !=
-                                                  null)
-                                              ? NetworkImage(
-                                                  "https://app.lebensqualitaet-burgrieden.de/" +
-                                                      snapShot.data[index]
-                                                          ['institutionImage'])
-                                              : Image.asset(
-                                                      "assets/images/institutionPic_default.png")
-                                                  .image,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return CircleAvatar(
-                                      backgroundImage: Image.asset(
-                                              "assets/images/institutionPic_default.png")
-                                          .image,
-                                    );
-                                  }
-                                },
+                              Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: (snapShot.data[index]
+                                                ['institutionImage'] !=
+                                            null)
+                                        ? NetworkImage(
+                                            "https://app.lebensqualitaet-burgrieden.de/" +
+                                                snapShot.data[index]
+                                                    ['institutionImage'])
+                                        : Image.asset(
+                                                "assets/images/institutionPic_default.png")
+                                            .image,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -1125,18 +1147,16 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     FocusManager.instance.primaryFocus.unfocus();
   }
 
-  Future getImage() async {
-    if (UserProvider.istEingeloggt) {
-      final pickedFile = await picker.getImage(source: ImageSource.gallery);
-      setState(
-        () {
-          if (pickedFile != null) {
-            institutionsImage = File(pickedFile.path);
-            Provider.of<UserProvider>(context, listen: false)
-                .attemptNewImageForInstitution(institutionsImage);
-          }
-        },
-      );
-    }
+  Future getImage(String institutionId) async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(
+      () {
+        if (pickedFile != null) {
+          institutionsImage = File(pickedFile.path);
+          Provider.of<UserProvider>(context, listen: false)
+              .attemptImageForInstitution(institutionsImage, institutionId);
+        }
+      },
+    );
   }
 }
