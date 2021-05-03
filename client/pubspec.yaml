@@ -68,7 +68,7 @@ dependencies:
   intl: ^0.17.0 # Add this line
 
 flutter_icons:
-  image_path: "wir_logo.png"
+  image_path: "assets/images/wir_logo.png"
   android: "launcher_icon"
 
 dev_dependencies:
