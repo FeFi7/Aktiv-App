@@ -169,6 +169,28 @@ async function saveProfilbildIdToInstitution(institutionId, pofilbildId) {
   }
 }
 
+async function isInstitutionNameVorhanden(titel) {
+  const query = `SELECT * FROM Institution i WHERE i.name = ?`;
+
+  let results = await conn
+    .query(query, [titel])
+    .catch((error) => {
+      console.log(error);
+      return { error: "Fehler in Db" };
+    });
+
+  if (results) {
+    results = results[0];
+    if (results.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 module.exports = {
   getInstitutionById: getInstitutionById,
   erstelleInstitution: erstelleInstitution,
@@ -178,4 +200,5 @@ module.exports = {
   saveProfilbildIdToInstitution: saveProfilbildIdToInstitution,
   deleteInstitutionById: deleteInstitutionById,
   getUngenehmigteVeranstaltungen: getUngenehmigteVeranstaltungen,
+  isInstitutionNameVorhanden: isInstitutionNameVorhanden
 };

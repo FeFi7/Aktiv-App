@@ -108,7 +108,7 @@ async function getVeranstaltungen(
   entfernung,
   sorting
 ) {
-  console.log("in der richtigen Funktion")
+  console.log("in der richtigen Funktion");
   // Falls nichts angegeben bis 1 Monat in der Zukunft
   if (!bis) {
     const dt = new Date();
@@ -137,7 +137,10 @@ async function getVeranstaltungen(
     v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, fi.pfad as institutionImage FROM Veranstaltung v
     LEFT JOIN Institution i ON v.institutionId = i.id
     LEFT JOIN File fi ON i.imageId = fi.id
-    WHERE v.istGenehmigt = ? `+  (datum ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)` : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
+    WHERE v.istGenehmigt = ? ` +
+    (datum
+      ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)`
+      : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
     (vollText ? queryPartVollText : "") +
     ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
     ORDER BY ` +
@@ -150,7 +153,10 @@ async function getVeranstaltungen(
     LEFT JOIN Institution i ON v.institutionId = i.id
     LEFT JOIN File fi ON i.imageId = fi.id
     LEFT JOIN Favorit f ON v.id = f.veranstaltungId AND f.valide = 1 AND f.userId = ?
-    WHERE v.istGenehmigt = ? `+  (datum ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)` : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
+    WHERE v.istGenehmigt = ? ` +
+    (datum
+      ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)`
+      : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
     (vollText ? queryPartVollText : "") +
     ` AND st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000 < ?
     ORDER BY ` +
@@ -171,7 +177,7 @@ async function getVeranstaltungen(
               latitude,
               Number(userId),
               Number(istGenehmigt),
-              ...datumParams,//bis),
+              ...datumParams, //bis),
               vollText,
               vollText,
               vollText,
@@ -186,7 +192,7 @@ async function getVeranstaltungen(
               latitude,
               Number(userId),
               Number(istGenehmigt),
-              ...datumParams,//bis),
+              ...datumParams, //bis),
               longitude,
               latitude,
               entfernung,
@@ -199,7 +205,7 @@ async function getVeranstaltungen(
         return { error: "Fehler bei Db" };
       });
   } else {
-    console.log(query)
+    console.log(query);
     results = await conn
       .query(
         query,
@@ -208,7 +214,7 @@ async function getVeranstaltungen(
               longitude,
               latitude,
               Number(istGenehmigt),
-              ...datumParams,//bis),
+              ...datumParams, //bis),
               vollText,
               vollText,
               vollText,
@@ -222,7 +228,7 @@ async function getVeranstaltungen(
               longitude,
               latitude,
               Number(istGenehmigt),
-              ...datumParams,//bis),
+              ...datumParams, //bis),
               longitude,
               latitude,
               entfernung,

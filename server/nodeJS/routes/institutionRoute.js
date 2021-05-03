@@ -145,6 +145,12 @@ router.post(
       return res.status(400).send({ error: "Beschreibung nicht vorhanden" });
     }
 
+    const istNameVorhanden = await institutionService.isInstitutionNameVorhanden(body.name)
+
+    if(istNameVorhanden || istNameVorhanden.error){
+      return res.status(400).json({error: "Name der Institution schon vergeben"})
+    }
+
     const result = await institutionService.erstelleInstitution(
       body.name,
       body.beschreibung,
