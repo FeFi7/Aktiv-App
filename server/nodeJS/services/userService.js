@@ -273,7 +273,7 @@ async function deleteUserToInstitut(userId, institutionId) {
 }
 
 async function getInstitutionenFromUser(userId) {
-  const query = `SELECT i.id, i.name, i.beschreibung, f.pfad AS institutionImage FROM MitgliedUserInstitution m 
+  const query = `SELECT i.id, i.name, i.beschreibung, f.pfad AS institutionImage, i.ersteller FROM MitgliedUserInstitution m 
           INNER JOIN Institution i ON m.institutionId = i.id 
           LEFT JOIN File f ON i.imageId = f.id
           WHERE istGenehmigt = 1 AND m.userId = ?`;
