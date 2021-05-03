@@ -344,7 +344,6 @@ router.post("/*", async function (req, res) {
     }
   }
   //-------------------------Überprüfung Parameter---------------------------
-
   const veranstaltungen = await veranstaltungService.createVeranstaltung(
     titel,
     beschreibung,
@@ -357,7 +356,7 @@ router.post("/*", async function (req, res) {
     longitude,
     institutionId,
     userId,
-    istGenehmigt ? 1 : 0
+    istGenehmigt
   );
 
   if (veranstaltungen.error) {
