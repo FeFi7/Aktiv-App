@@ -106,7 +106,8 @@ async function getVeranstaltungen(
   latitude,
   longitude,
   entfernung,
-  sorting
+  sorting,
+  plz
 ) {
   console.log("in der richtigen Funktion");
   // Falls nichts angegeben bis 1 Monat in der Zukunft
@@ -130,6 +131,9 @@ async function getVeranstaltungen(
   if (vollText) {
     vollText = "%" + vollText + "%";
   }
+  // if(plz){
+  //   plz = "%" + plz + "%";
+  // }
   console.log("sortiert nach: " + sorting);
   const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
   const query =
@@ -138,6 +142,7 @@ async function getVeranstaltungen(
     LEFT JOIN Institution i ON v.institutionId = i.id
     LEFT JOIN File fi ON i.imageId = fi.id
     WHERE v.istGenehmigt = ? ` +
+    (plz ? ` AND (SELECT plz from PLZ where id = v.plzId) = ? ` : ``) +
     (datum
       ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)`
       : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
@@ -154,6 +159,7 @@ async function getVeranstaltungen(
     LEFT JOIN File fi ON i.imageId = fi.id
     LEFT JOIN Favorit f ON v.id = f.veranstaltungId AND f.valide = 1 AND f.userId = ?
     WHERE v.istGenehmigt = ? ` +
+    (plz ? ` AND (SELECT plz from PLZ where id = v.plzId) = ? ` : ``) +
     (datum
       ? `AND v.beginn_ts >= ? AND v.beginn_ts < DATE_ADD(?, INTERVAL 1 DAY)`
       : `AND v.beginn_ts >= NOW() AND v.beginn_ts <= ?`) +
@@ -166,6 +172,7 @@ async function getVeranstaltungen(
 
   let results = {};
   const datumParams = datum ? [datum, datum] : [bis];
+  const plzParams = plz ? [plz] : [];
 
   if (userId !== 0) {
     results = await conn
@@ -177,6 +184,7 @@ async function getVeranstaltungen(
               latitude,
               Number(userId),
               Number(istGenehmigt),
+              ...plzParams,
               ...datumParams, //bis),
               vollText,
               vollText,
@@ -192,6 +200,7 @@ async function getVeranstaltungen(
               latitude,
               Number(userId),
               Number(istGenehmigt),
+              ...plzParams,
               ...datumParams, //bis),
               longitude,
               latitude,
@@ -214,6 +223,7 @@ async function getVeranstaltungen(
               longitude,
               latitude,
               Number(istGenehmigt),
+              ...plzParams,
               ...datumParams, //bis),
               vollText,
               vollText,
@@ -228,6 +238,7 @@ async function getVeranstaltungen(
               longitude,
               latitude,
               Number(istGenehmigt),
+              ...plzParams,
               ...datumParams, //bis),
               longitude,
               latitude,

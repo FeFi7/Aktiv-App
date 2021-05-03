@@ -142,6 +142,7 @@ router.get("/*", async function (req, res) {
   let latitude = query.latitude;
   let longitude = query.longitude;
   let sorting = query.sorting;
+  let plz = query.plz;
 
   if (limit) {
     // ist query eine Zahl?
@@ -188,6 +189,11 @@ router.get("/*", async function (req, res) {
   } else {
     userId = 0;
   }
+  if (plz) {
+    if (!/^\d+$/.test(plz)) {
+      return res.status(400).json({error: "Keine passende plz"})
+    }
+  }
   if (!istGenehmigt) {
     istGenehmigt = 1;
   }
@@ -226,7 +232,8 @@ router.get("/*", async function (req, res) {
     latitude,
     longitude,
     entfernung,
-    sorting
+    sorting,
+    plz
   );
 
   if (veranstaltungen.error) {
