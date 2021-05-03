@@ -698,7 +698,7 @@ Future<http.Response> attemptDeleteVeranstaltung(
 
 // [GET] Bekomme tags (optional gefiltert)
 Future<http.Response> attemptGetTags([String tag = "[-1]"]) async {
-  String route = "tags";
+  String route = "api/veranstaltungen/tags";
   Map<String, dynamic> qParams;
 
   if (tag != "[-1]") {
