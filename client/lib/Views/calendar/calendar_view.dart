@@ -96,17 +96,19 @@ class _CalendarViewState extends State<CalendarView> {
                   },
                 )),
             Positioned(
-              right: 60,
+              right: 45,
+              top: 10,
               child: UserProvider.getUserRole().allowedToFavEvents
                   ? (Container(
+                    height: 40,
                       margin: const EdgeInsets.all(10.0),
                       child: ToggleButtons(
                         children: [
                           Container(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(5.0),
                               child: Text('Allgemein')),
                           Container(
-                              padding: const EdgeInsets.all(10.0),
+                              padding: const EdgeInsets.all(5.0),
                               child: Text('Persönlich')),
                         ],
                         isSelected: isSelected,
@@ -126,7 +128,7 @@ class _CalendarViewState extends State<CalendarView> {
                             _selectedEvents.value = [];
                           });
                         },
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(40),
                         borderWidth: 1,
                         selectedColor: ColorPalette.white.rgb,
                         fillColor: ColorPalette.endeavour.rgb,
