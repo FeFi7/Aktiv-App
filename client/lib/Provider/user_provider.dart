@@ -33,6 +33,9 @@ class UserProvider extends ChangeNotifier {
   bool datenVollstaendig = false;
   bool get getDatenVollstaendig => datenVollstaendig;
   List<String> genehmigerPLZs;
+  List<dynamic> verwalteteInstitutionen = [];
+  bool get hatVerwalteteInstitutionen =>
+      verwalteteInstitutionen.length != 0 ? true : false;
 
   // TODO: Evtl die Rolle über den
 
@@ -91,6 +94,7 @@ class UserProvider extends ChangeNotifier {
     profilBild = parsedUser['profilbild'];
     datenVollstaendig = checkDataCompletion();
     //genehmigerPLZs = getGenehmigerPLZs(userId);
+    verwalteteInstitutionen = await getVerwalteteInstitutionen();
   }
 
   getAccessToken() async {

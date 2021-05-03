@@ -57,11 +57,11 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        "powered by\nLEBENSQUALITÄT\nBURGRIEDEN E.V.",
+                        "powered by\nLebensqualität\nBurgrieden e.V.\n& Bürgerstiftung\nBurgrieden",
                         textAlign: TextAlign.end,
                         style: TextStyle(
                           color: ColorPalette.endeavour.rgb,
-                          fontSize: 12.0,
+                          fontSize: 10.0,
                           decoration: TextDecoration.none,
                         ),
                       ),

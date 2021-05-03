@@ -21,7 +21,9 @@ class CardDropDownImage extends StatelessWidget {
             SizedBox(
               height: 100.0,
               child: Container(
-                child: Row(children: decoration),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: decoration),
               ),
             ),
             ScrollOnExpand(

@@ -6,6 +6,7 @@ import 'package:aktiv_app_flutter/Views/institution/institution_view.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/background.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_einstellungen.dart';
 import 'package:aktiv_app_flutter/Views/profile/components/profile_verwalten.dart';
+import 'package:aktiv_app_flutter/Views/profile/info.dart';
 import 'package:aktiv_app_flutter/Views/welcome_screen.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
@@ -131,7 +132,17 @@ class _BodyState extends State<Body> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(height: 10),
-          verwaltenButton(context),
+          Visibility(
+            visible: Provider.of<UserProvider>(context, listen: false)
+                    .hatVerwalteteInstitutionen ||
+                (Provider.of<UserProvider>(context, listen: false)
+                        .rolle
+                        .toLowerCase() !=
+                    "user"),
+            child: Container(
+              child: verwaltenButton(context),
+            ),
+          ),
           persoenlichButton(context),
           institutionenButton(context),
           einstellungenButton(context),
@@ -190,6 +201,15 @@ class _BodyState extends State<Body> {
               }
             },
           ),
+          TextButton(
+            onPressed: () {
+              Provider.of<BodyProvider>(context, listen: false)
+                  .setBody(InfoView());
+              Provider.of<AppBarTitleProvider>(context, listen: false)
+                  .setTitle('');
+            },
+            child: Text("Info"),
+          ),
         ],
       );
     } else {
@@ -225,6 +245,15 @@ class _BodyState extends State<Body> {
                 ),
               );
             },
+          ),
+          TextButton(
+            onPressed: () {
+              Provider.of<BodyProvider>(context, listen: false)
+                  .setBody(InfoView());
+              Provider.of<AppBarTitleProvider>(context, listen: false)
+                  .setTitle('');
+            },
+            child: Text("Info"),
           ),
         ],
       );

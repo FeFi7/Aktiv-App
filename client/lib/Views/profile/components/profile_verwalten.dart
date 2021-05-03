@@ -142,7 +142,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            zuGenehmigenVeranstaltungen(),
+            institutionenVerwalten(),
             SizedBox(height: 30.0),
             Text(
               "Zu genehmigen",
@@ -152,7 +152,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            institutionenVerwalten(),
+            zuGenehmigenVeranstaltungen(),
           ],
         );
       case "betreiber":
@@ -770,7 +770,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                       Container(
                         child: SizedBox(
                           height: 200,
-                          width: size.width * 0.85,
+                          width: size.width * 0.8,
                           child: Stack(
                             clipBehavior: Clip.none,
                             fit: StackFit.expand,
@@ -874,82 +874,94 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                               errorToast("Fehler bei der Aktualisierung");
                             } else {
                               errorToast("Verwalter hinzugefügt");
+                              verwalterController.clear();
                             }
                             setState(() {});
                           }
                         },
                       ),
-                      RoundedButton(
-                        text: "Verwalter entfernen",
-                        color: ColorPalette.grey.rgb,
-                        press: () async {
-                          if (await confirm(
-                            context,
-                            title: Text("Bestätigung"),
-                            content:
-                                Text("Möchten Sie diesen Verwalter entfernen?"),
-                            textOK: Text(
-                              "Bestätigen",
-                              style: TextStyle(color: ColorPalette.grey.rgb),
-                            ),
-                            textCancel: Text(
-                              "Abbrechen",
-                              style:
-                                  TextStyle(color: ColorPalette.endeavour.rgb),
-                            ),
-                          )) {
-                            var institutionGenehmigen =
-                                Provider.of<UserProvider>(context,
-                                        listen: false)
-                                    .verwalterLoeschen(verwalterController.text,
-                                        snapShot.data[index]['id'].toString());
-                            if (institutionGenehmigen == null) {
-                              errorToast("User nicht vorhanden");
-                            } else if (institutionGenehmigen.statusCode !=
-                                200) {
-                              errorToast("Fehler bei der Aktualisierung");
-                            } else {
-                              errorToast("Verwalter entfernt");
+                      Visibility(
+                        visible: (snapShot.data[index]['ersteller'] !=
+                                UserProvider.userId
+                            ? false
+                            : true),
+                        child: RoundedButton(
+                          text: "Verwalter entfernen",
+                          color: ColorPalette.grey.rgb,
+                          press: () async {
+                            if (await confirm(
+                              context,
+                              title: Text("Bestätigung"),
+                              content: Text(
+                                  "Möchten Sie diesen Verwalter entfernen?"),
+                              textOK: Text(
+                                "Bestätigen",
+                                style: TextStyle(color: ColorPalette.grey.rgb),
+                              ),
+                              textCancel: Text(
+                                "Abbrechen",
+                                style: TextStyle(
+                                    color: ColorPalette.endeavour.rgb),
+                              ),
+                            )) {
+                              var institutionGenehmigen = await Provider.of<
+                                      UserProvider>(context, listen: false)
+                                  .verwalterLoeschen(verwalterController.text,
+                                      snapShot.data[index]['id'].toString());
+                              if (institutionGenehmigen == null) {
+                                errorToast("User nicht vorhanden");
+                              } else if (institutionGenehmigen.statusCode !=
+                                  200) {
+                                errorToast("Fehler bei der Aktualisierung");
+                              } else {
+                                errorToast("Verwalter entfernt");
+                              }
+                              setState(() {});
                             }
-                            setState(() {});
-                          }
-                        },
+                          },
+                        ),
                       ),
                       SizedBox(height: 20.0),
-                      RoundedButton(
-                        text: "Institution löschen",
-                        color: ColorPalette.grey.rgb,
-                        press: () async {
-                          if (await confirm(
-                            context,
-                            title: Text("Bestätigung"),
-                            content:
-                                Text("Möchten Sie diese Institution löschen?"),
-                            textOK: Text(
-                              "Bestätigen",
-                              style: TextStyle(color: ColorPalette.grey.rgb),
-                            ),
-                            textCancel: Text(
-                              "Abbrechen",
-                              style:
-                                  TextStyle(color: ColorPalette.endeavour.rgb),
-                            ),
-                          )) {
-                            var institutionLoeschen =
-                                await Provider.of<UserProvider>(context,
-                                        listen: false)
-                                    .institutionLoeschen(
-                                        snapShot.data[index]['id'].toString());
-                            if (institutionLoeschen == null) {
-                              errorToast("Institution nicht vorhanden");
-                            } else if (institutionLoeschen.statusCode != 200) {
-                              errorToast("Fehler bei der Aktualisierung");
-                            } else {
-                              errorToast("Institution gelöscht");
+                      Visibility(
+                        visible: (snapShot.data[index]['ersteller'] !=
+                                UserProvider.userId
+                            ? false
+                            : true),
+                        child: RoundedButton(
+                          text: "Institution löschen",
+                          color: ColorPalette.grey.rgb,
+                          press: () async {
+                            if (await confirm(
+                              context,
+                              title: Text("Bestätigung"),
+                              content: Text(
+                                  "Möchten Sie diese Institution löschen?"),
+                              textOK: Text(
+                                "Bestätigen",
+                                style: TextStyle(color: ColorPalette.grey.rgb),
+                              ),
+                              textCancel: Text(
+                                "Abbrechen",
+                                style: TextStyle(
+                                    color: ColorPalette.endeavour.rgb),
+                              ),
+                            )) {
+                              var institutionLoeschen = await Provider.of<
+                                      UserProvider>(context, listen: false)
+                                  .institutionLoeschen(
+                                      snapShot.data[index]['id'].toString());
+                              if (institutionLoeschen == null) {
+                                errorToast("Institution nicht vorhanden");
+                              } else if (institutionLoeschen.statusCode !=
+                                  200) {
+                                errorToast("Fehler bei der Aktualisierung");
+                              } else {
+                                errorToast("Institution gelöscht");
+                              }
+                              setState(() {});
                             }
-                            setState(() {});
-                          }
-                        },
+                          },
+                        ),
                       ),
                     ],
                   ),
