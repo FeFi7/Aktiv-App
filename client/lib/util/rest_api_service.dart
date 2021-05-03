@@ -242,11 +242,11 @@ Future<http.Response> attemptCreateVeranstaltung(
   };
 
   if (fileids.toString() != "[-1]") {
-    body.putIfAbsent('fileIds', () => fileids.toString());
+    body.putIfAbsent('fileIds', () => jsonEncode(fileids));
   }
 
   if (tags.toString() != "[-1]") {
-    body.putIfAbsent('tags', () => tags.toString());
+    body.putIfAbsent('tags', () => jsonEncode(tags));
   }
 
   final response = await http.post(Uri.http(SERVER_IP, route),
