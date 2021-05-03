@@ -87,11 +87,11 @@ class _HomePageState extends State<HomePage> {
         title: Consumer<AppBarTitleProvider>(builder: (context, value, child) {
           return Text(value.title, style: TextStyle(fontSize: 25));
         }),
-        leading: (!UserProvider.istEingeloggt ||
+        leading: /*(!UserProvider.istEingeloggt ||
                 Provider.of<BodyProvider>(context, listen: false)
                         .previous
                         .length >
-                    0)
+                    0)*/ true
             ? IconButton(
                 icon: Icon(Icons.chevron_left_rounded,
                     color: Colors.white, size: 48),
