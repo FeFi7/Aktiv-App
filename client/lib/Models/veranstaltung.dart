@@ -2,7 +2,7 @@ import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 
 class Veranstaltung {
   int id;
-  String titel, beschreibung, kontakt, ortBeschr;
+  String titel, beschreibung, kontakt, ortBeschr, plz;
   DateTime beginnTs, endeTs, erstelltTs;
   double latitude, longitude;
 

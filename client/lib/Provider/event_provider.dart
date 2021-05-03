@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:ffi';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
+import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Models/role_permissions.dart';
@@ -27,6 +28,9 @@ class EventProvider extends ChangeNotifier {
 
   /// Map aller Veranstaltungs Zeitstempel die zu ihrem Beginn Event ID's hinterlegt sind
   static final Map<int, DateTime> loadedTs = Map<int, DateTime>();
+
+  /// Map aller Veranstaltungs Vorschau(/Institution) Bildern
+  static final Map<int, String> previewImage = Map<int, String>();
 
   /// Map aller Event ID's die zu ihrem Beginn Zeitstempel hinterlegt sind
   static final Map<int, double> distance = Map<int, double>();
@@ -104,23 +108,29 @@ class EventProvider extends ChangeNotifier {
 
         DateTime dateTime = isValidDate(text);
         if (dateTime != null) {
-          return getLoadedEventsOfDay(dateTime)
+          List<Veranstaltung> events = await loadEventsAtDate(dateTime);
+          return events
               .map((event) =>
                   EventPreviewBox.load(event, AdditiveFormat.HOLE_DATETIME))
               .toList();
+
+          // return getLoadedEventsOfDay(dateTime)
+          //     .map((event) =>
+          //         EventPreviewBox.load(event, AdditiveFormat.HOLE_DATETIME))
+          //     .toList();
         } else {
           eventPreviews.add(ErrorPreviewBox(
               "Bei der von Ihnen getätigten Suchanfrage \"" +
                   text +
-                  "\" handelt es sich um kein gültiges Datum Format. Bitte Datum im Format Tag.Monat.Jahr angeben."));
+                  "\" handelt es sich um kein gültiges Datum Format. Bitte Datum im Format Tag.Monat.Jahr (DD.MM.YYYY) angeben."));
         }
 
         if (eventPreviews.length == 0) {
-          attemptGetTags();
+          // attemptGetTags();
           eventPreviews.add(ErrorPreviewBox(
               "Es konnten keine Veranstaltungen für den " +
                   text +
-                  " gefunden werden.",
+                  " gefunden werden. Bitte versuchen sie einen aderes Datum.",
               "Eingabe zu spezifisch"));
         }
 
@@ -189,7 +199,51 @@ class EventProvider extends ChangeNotifier {
         /// Abbruch weil fehler geworfen
       }
     }
+    return foundEvents;
+  }
 
+  /// Lädt durch Datumsuche suche Events aus der Datenbank
+  Future<List<Veranstaltung>> loadEventsAtDate(DateTime date) async {
+    List<Veranstaltung> foundEvents = [];
+
+    /// Da in der Regel für jede Suche andere Ergebnisse zurück kommen
+    /// startet die Suche immer bei Seite 1 und Endet bei max Seite 4
+    for (int page = 1; page < 4; page++) {
+      var response = await attemptGetAllVeranstaltungen(
+          "-1", //bis datum
+          "1", // nur zugelassene Events == 0, alle == 1
+          pageSize.toString(),
+          page.toString(),
+          UserProvider.istEingeloggt ? UserProvider.userId.toString() : "-1",
+          "-1", //volltext
+          "-1", //entfernung
+          "-1", //sorting
+          date.toString());
+      if (response.statusCode == 200) {
+        var parsedJson = json.decode(response.body);
+
+        final List<dynamic> dynamicList =
+            await parsedJson.map((item) => getEventFromJson(item)).toList();
+
+        final List<Veranstaltung> responseList =
+            List<Veranstaltung>.from(dynamicList).toList();
+
+        foundEvents.addAll(responseList);
+
+        /// Abbruch wenn keine neuen Events geladen wurden
+        if (responseList == null || responseList.length == 0) break;
+      } else {
+        log("Fehler bei der Suche nach Events an folgendem Datum:" +
+            date.toString() +
+            " auf Seite: " +
+            page.toString() +
+            ", response.statusCode:" +
+            response.statusCode.toString());
+        break;
+
+        /// Abbruch weil fehler geworfen
+      }
+    }
     return foundEvents;
   }
 
@@ -197,16 +251,13 @@ class EventProvider extends ChangeNotifier {
   Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
     /// 16 pages begrenzt das Laden der Events auf max 400 Events
     until = DateTime.utc(until.year, until.month, until.day + 1);
-    return loadEventsUntil(1, 16, null);
+
+    return loadEventsUntil(1, 16, null, until);
   }
 
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
-      int startPage, int maxPages, EventListType type) async {
-    DateTime now = DateTime.now();
-    DateTime until =
-        DateTime.utc(now.year, now.month, now.day + UserProvider.bald);
-
+      int startPage, int maxPages, EventListType type, DateTime until) async {
     // TODO; type ? Info von V. code
     String entfernung =
         EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
@@ -274,6 +325,9 @@ class EventProvider extends ChangeNotifier {
       case EventListType.FAVORITES:
         // NIX RESETTEN! Favorites regelt sich durch getEventFromJson
         break;
+      case EventListType.APPROVE:
+        // NIX RESETTEN! Favorites regelt sich durch getEventFromJson
+        break;
     }
   }
 
@@ -312,12 +366,11 @@ class EventProvider extends ChangeNotifier {
     /// Wenn letztes Update über eine Stunde zurück liegt: fang von Vorne an
     if (lastUpdated.difference(now).inHours > 1) startPage = 1;
 
-    //TODO: Wieder auskommentieren, müsste eig. gehen
-    /// Favoriten müssen vorher geleerten werden, da dieser Zustand in der
-    /// getEventFromJson Methode definiert wird
-    // if (startPage == 1 && type == EventListType.FAVORITES) favorites.clear();
+    DateTime until =
+        DateTime.utc(now.year, now.month, now.day + UserProvider.bald);
 
-    List<Veranstaltung> loaded = await loadEventsUntil(startPage, 1, type);
+    List<Veranstaltung> loaded =
+        await loadEventsUntil(startPage, 1, type, until);
 
     if (loaded == null) return [];
 
@@ -351,9 +404,26 @@ class EventProvider extends ChangeNotifier {
               !upComing.contains(event.id)) upComing.add(event.id);
 
         return upComing.map((id) => getLoadedEventById(id)).toList();
-      case EventListType.NEAR_BY:
+      case EventListType.APPROVE:
+        // if (startPage == 1) pendingApproval.clear();
 
-        return pendingApproval.map((id) => getLoadedEventById(id)).toList();
+        var response = await attemptGetPLZs(UserProvider.userId.toString());
+
+        if (response.statusCode == 200) {
+          log("plzs: " + response.body);
+          // TODO: Zugewiese Posteiltzahlen einfügen
+          //
+        }
+
+        List<int> allowedToApprove = pendingApproval.toList();
+
+        for (int i = 0; i < allowedToApprove.length; i++) {
+          Veranstaltung event = loaded[allowedToApprove[i]];
+          // if(event.)
+          // TODO: Veranstaltungen removen die man nicht verwaten darf
+        }
+
+        return allowedToApprove.map((id) => getLoadedEventById(id)).toList();
       default:
         return [];
     }
@@ -446,7 +516,7 @@ class EventProvider extends ChangeNotifier {
     if (response.statusCode == 200) {
       var parsedJson = json.decode(response.body);
 
-      Veranstaltung event = getEventFromJson(parsedJson);
+      Veranstaltung event = await getEventFromJson(parsedJson);
 
       return event;
     }
@@ -517,7 +587,7 @@ class EventProvider extends ChangeNotifier {
 
   /// Ändert (toggelt) den Favorisierungs Zustand eines events sowohl im EventProvider,
   /// als auch in der Datenbank
-  Future<bool> toggleEventFavoriteState(
+  Future<bool> toggleEventsFavoriteState(
       BuildContext context, int eventId) async {
     if (isEventFavorite(eventId)) {
       favorites.remove(eventId);
@@ -563,6 +633,10 @@ class EventProvider extends ChangeNotifier {
     DateTime end = DateTime.parse(json['ende_ts']);
     String place = json['ortBeschreibung'];
 
+    var institutionImage = json['institutionImage'];
+    log(institutionImage.toString());
+    if (institutionImage != null) loadInstitutionImage(institutionImage);
+
     DateTime created = DateTime.parse(json['erstellt_ts']);
 
     // TODO: latitude, longitude noch anpassen...
@@ -572,5 +646,14 @@ class EventProvider extends ChangeNotifier {
     loadEvent(event);
 
     return event;
+  }
+
+  void loadInstitutionImage(String institutionImage) async {
+    log("institutionImage" + institutionImage);
+    var response = await attemptGetFile(institutionImage);
+
+    if (response.statusCode == 200) {
+      log(response.body);
+    }
   }
 }

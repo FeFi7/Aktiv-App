@@ -9,6 +9,7 @@ import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 
 class ApproveView extends StatefulWidget {
+
   @override
   _ApproveViewState createState() => _ApproveViewState();
 }

@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
@@ -8,11 +8,13 @@ import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/discover/environment_placeholder.dart';
+import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flappy_search_bar/scaled_tile.dart';
 import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
 
 // class EnvironmentView extends StatelessWidget {
 class DiscoverView extends StatefulWidget {
@@ -34,16 +36,34 @@ class _DiscoverViewState extends State<DiscoverView> {
     return value.getToggleButtons();
   });
 
-  FocusNode _focus = new FocusNode();
+  static String tooSpecific =
+      "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden.";
 
   @override
   void initState() {
     super.initState();
-    _focus.addListener(_onFocusChange);
+    loadTags();
   }
 
-  void _onFocusChange() {
-    debugPrint("Focus: " + _focus.hasFocus.toString());
+  void loadTags() async {
+    var response = await attemptGetTags();
+
+    if (response.statusCode == 200) {
+      var parsedJson = json.decode(response.body);
+      final List<dynamic> dynamicList =
+          await parsedJson.map((item) => item['name']).toList();
+
+      final List<String> responseList = List<String>.from(dynamicList).toList();
+
+      int max = responseList.length < 5 ? responseList.length : 5;
+      if (max > 0)
+        tooSpecific +=
+            " Für eine allgemeinere Suche verwenden Sie Tags. Mögliche Tags währen z.B.: ";
+
+      for (int i = 0; i < max; i++) {
+        tooSpecific += responseList[i] + (i < (max - 1) ? ", " : ".");
+      }
+    }
   }
 
   //TODO: tooglen wenn Searchbar fokus wechselt
@@ -55,7 +75,6 @@ class _DiscoverViewState extends State<DiscoverView> {
         SearchBarController();
 
     return Container(
-    
         child: SearchBar<Widget>(
       searchBarPadding: EdgeInsets.only(left: 15, right: 15, top: 15),
 
@@ -84,8 +103,7 @@ class _DiscoverViewState extends State<DiscoverView> {
               color: ColorPalette.french_pass.rgb,
               borderRadius: BorderRadius.all(Radius.circular(36.0))),
           child: Icon(Icons.close_rounded, size: 35)),
-      emptyWidget: ErrorPreviewBox(
-          "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden."),
+      emptyWidget: ErrorPreviewBox(tooSpecific),
       indexedScaledTileBuilder: (int index) => ScaledTile.count(1, 0.475),
       header: Center(
         child: Visibility(
@@ -95,7 +113,7 @@ class _DiscoverViewState extends State<DiscoverView> {
       minimumChars: 1,
 
       onCancelled: () {
-        print("Cancelled triggered");
+        // print("Cancelled triggered");
 
         FocusScope.of(context)
             .requestFocus(new FocusNode()); // Schließt Tastatur

@@ -174,7 +174,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                                 widget.liked = !widget.liked;
                               });
                               Provider.of<EventProvider>(context, listen: false)
-                                  .toggleEventFavoriteState(context, widget.id);
+                                  .toggleEventsFavoriteState(context, widget.id);
                             })
                         : Container()),
                     IconButton(
