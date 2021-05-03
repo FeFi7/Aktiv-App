@@ -84,6 +84,16 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
       widget.liked = Provider.of<EventProvider>(context, listen: false)
           .isEventFavorite(widget.id);
 
+    //  image = NetworkImage("https://app.lebensqualitaet-burgrieden.de/" +"");
+    //  AssetImage("assets/images/lq_logo_klein.png");
+
+    // CircleAvatar image = CircleAvatar(
+    //                 // TODO: Bild der Preview Box muss noch dynamisch werden
+    //                 backgroundImage: AssetImage("assets/images/lq_logo_klein.png"),
+    //               );
+    CircleAvatar image = Provider.of<EventProvider>(context, listen: false)
+          .getPreviewImage(widget.id);
+
     return FractionallySizedBox(
       widthFactor: 1,
       child: Container(
@@ -104,11 +114,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                 width: 100,
                 child: Container(
                   margin: const EdgeInsets.all(2.0),
-                  child: CircleAvatar(
-                    // TODO: Bild der Preview Box muss noch dynamisch werden
-                    backgroundImage:
-                        AssetImage("assets/images/lq_logo_klein.png"),
-                  ),
+                  child: image,
                 ),
               ),
               Container(

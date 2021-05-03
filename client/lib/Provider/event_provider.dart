@@ -634,8 +634,8 @@ class EventProvider extends ChangeNotifier {
     String place = json['ortBeschreibung'];
 
     var institutionImage = json['institutionImage'];
-    log(institutionImage.toString());
-    if (institutionImage != null) loadInstitutionImage(id, institutionImage);
+
+    if (institutionImage != null) previewImage[id] = institutionImage;;
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 
@@ -648,12 +648,15 @@ class EventProvider extends ChangeNotifier {
     return event;
   }
 
-  void loadInstitutionImage(int eventId, String institutionImage) async {
-    log("institutionImage" + institutionImage);
-    var response = await attemptGetFile(institutionImage);
-
-    if (response.statusCode == 200) {
-      log(response.body);
-    }
+  CircleAvatar getPreviewImage(int eventId) {
+    if (previewImage[eventId] == null)
+      return CircleAvatar(
+        backgroundImage: AssetImage("assets/images/wir_logo.png"),
+      );
+    else
+      return CircleAvatar(
+          backgroundImage: NetworkImage(
+              "https://app.lebensqualitaet-burgrieden.de/" +
+                  previewImage[eventId]));
   }
 }
