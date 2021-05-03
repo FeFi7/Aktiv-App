@@ -24,8 +24,7 @@ class VeranstaltungDetailView extends StatefulWidget {
 
 class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
   Veranstaltung veranstaltung;
-  File profileImage;
-  final picker = ImagePicker();
+
   @override
   Widget build(BuildContext context) {
     DateTime start = DateTime.now();
@@ -67,7 +66,8 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               width: size.width * 0.40,
                               child: RichText(
                                 text: TextSpan(
-                                  text: 'Name Veranstalter, + kurze Beschreibung',
+                                  text:
+                                      'Name Veranstalter, + kurze Beschreibung',
                                   style: DefaultTextStyle.of(context).style,
                                 ),
                                 softWrap: true,
@@ -110,21 +110,6 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               }).toList(),
                             ),
                           ),
-                          Container(
-                            child: Container(margin: EdgeInsets.fromLTRB(5, 15, 0, 0),
-                              alignment: Alignment.bottomLeft,
-                              child: RoundedButtonDynamic(
-                                  width: size.width * 0.2,
-                                  text: '+',
-                                  textSize: 24,
-                                  color: ColorPalette.orange.rgb,
-                                  textColor: Colors.white,
-                                  press: () async {
-                                    await getImage();
-                                    await attemptFileUpload('Bild1', profileImage);
-                                  }),
-                            ),
-                          )
                         ],
                       ),
                     ),
@@ -220,7 +205,8 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                               Container(
                                   width: size.width * 0.4,
                                   alignment: Alignment.centerRight,
-                                  child: Text(veranstaltung.beginnTs.toString())),
+                                  child:
+                                      Text(veranstaltung.beginnTs.toString())),
                             ],
                           ),
                           Container(
@@ -334,16 +320,6 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
             ),
           ),
         );
-      },
-    );
-  }
-
-  Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(
-      () {
-        if (pickedFile != null) profileImage = File(pickedFile.path);
       },
     );
   }

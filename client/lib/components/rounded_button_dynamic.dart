@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:flutter/material.dart';
 
 class RoundedButtonDynamic extends StatelessWidget {
@@ -7,6 +8,7 @@ class RoundedButtonDynamic extends StatelessWidget {
   final EdgeInsets margin;
   final double width;
   final double textSize;
+  final IconData icon;
   const RoundedButtonDynamic({
     Key key,
     this.text,
@@ -15,7 +17,8 @@ class RoundedButtonDynamic extends StatelessWidget {
     this.textColor = Colors.white, 
     this.margin,
     this.width, 
-    this.textSize,
+    this.textSize, 
+    this.icon,
 
     
   }) : super(key: key);
@@ -24,22 +27,38 @@ class RoundedButtonDynamic extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      margin:EdgeInsets.only(right:size.width*0.1),
+     // margin:EdgeInsets.only(right:size.width*0.1),
       width: width,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(29),
         // ignore: deprecated_member_use
         child: FlatButton(
           padding: EdgeInsets.symmetric(
-              vertical: 20, horizontal: 20), //max Höhe/Breite
+              vertical: 17, horizontal: 0), //max Höhe/Breite
           color: color,
           onPressed: press,
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textColor,
-              fontSize: textSize
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                  child: Icon(
+                    icon,
+                    color: ColorPalette.torea_bay.rgb,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 5), //max Höhe/Breite
+                  child: Text(
+                    text,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

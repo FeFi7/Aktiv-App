@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.0"
+  autocomplete_textfield:
+    dependency: "direct main"
+    description:
+      name: autocomplete_textfield
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.7.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -149,6 +156,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_vant_kit:
+    dependency: "direct main"
+    description:
+      name: flutter_vant_kit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.7"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -273,6 +287,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  multi_image_picker:
+    dependency: transitive
+    description:
+      name: multi_image_picker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.8.00"
   nested:
     dependency: transitive
     description:
