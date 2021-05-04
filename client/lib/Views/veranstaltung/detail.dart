@@ -37,13 +37,15 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
             return Center(child: CircularProgressIndicator());
           }
 
-          final veranstaltung = snapshot.data;
+          
 
-          if (veranstaltung == null)
+          if (snapshot.data == null)
             return Center(
                 child: ErrorPreviewBox(
                     "Fehler 404 - Es konnte keine passende Veranstaltung aus der Datenbank geladen werden.",
                     "Fehler beim Laden"));
+
+          final veranstaltung = snapshot.data;
 
           return LayoutBuilder(
             builder:
@@ -85,7 +87,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            veranstaltung.institutionName,
+                                            veranstaltung.institutionName ?? "404",
                                             textAlign: TextAlign.start,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
@@ -96,7 +98,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                             ),
                                           ),
                                           Text(
-                                            veranstaltung.institutBeschreibung,
+                                            veranstaltung.institutBeschreibung ?? "404",
                                             textAlign: TextAlign.left,
                                             maxLines: 5,
                                             overflow: TextOverflow.ellipsis,
