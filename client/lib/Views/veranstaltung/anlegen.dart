@@ -151,7 +151,10 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
           if (pickedFile != null) {
             //profileImage = File(pickedFile.path);
             images.add(profileImage.path);
-            imageList.add(Image.file(File(profileImage.path)));
+            if (['.jpg', '.jpeg', '.png'].contains(profileImage.path
+                .substring(profileImage.path.lastIndexOf(".")))) {
+              imageList.add(Image.file(File(profileImage.path)));
+            }
           }
         },
       );
@@ -463,37 +466,44 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   Visibility(
                     visible: institutionVorhanden,
                     child: Container(
-                      width: size.width * 0.8,
-                      height: 58,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 20, horizontal: 26),
                       decoration: BoxDecoration(
-                          color: ColorPalette.malibu.rgb,
-                          borderRadius: BorderRadius.circular(29)),
-                      child: new DropdownButton<dynamic>(
-                        iconEnabledColor: ColorPalette.endeavour.rgb,
-                        style: TextStyle(color: ColorPalette.black.rgb),
-                        dropdownColor: ColorPalette.malibu.rgb,
-                        hint: Text(
-                          selectedInstitutition,
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold),
+                        borderRadius: BorderRadius.circular(29),
+                        color: ColorPalette.malibu.rgb,
+                      ),
+                      height: 58,
+                      width: size.width * 0.8,
+                      padding: const EdgeInsets.fromLTRB(25, 5, 20, 0),
+                      child: new Theme(
+                        data: Theme.of(context).copyWith(
+                          canvasColor: Colors.blue.shade200,
                         ),
-                        items: institutionen.keys.map((String value) {
-                          return new DropdownMenuItem<String>(
-                            value: value,
-                            child: Container(
+                        child: new DropdownButton<dynamic>(
+                          style: TextStyle(
+                            color: ColorPalette.torea_bay.rgb,
+                          ),
+                          iconEnabledColor: ColorPalette.torea_bay.rgb,
+                          hint: Text(
+                            selectedInstitutition,
+                            style: TextStyle(
+                              color: ColorPalette.torea_bay.rgb,
+                            ),
+                          ),
+                          items: institutionen.keys.map((String value) {
+                            return new DropdownMenuItem<String>(
+                              value: value,
+                              child: Container(
+                                child: new Text(value),
                                 width: size.width * 0.6,
-                                child: new Text(value)),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedInstitutition = value;
-                            institutionsId = institutionen[value];
-                          });
-                        },
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedInstitutition = value;
+                              institutionsId = institutionen[value];
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
