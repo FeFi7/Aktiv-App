@@ -37,7 +37,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   List<String> imageIds = [];
   Map<String, int> institutionen = Map<String, int>();
 
-  String selectedInstitutition = 'Institution';
+  String selectedInstitutition = 'Institution auswählen';
   var tcVisibility = true;
   File profileImage;
   final picker = ImagePicker();
@@ -169,24 +169,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  Visibility(
-                    visible: institutionVorhanden,
-                    child: new DropdownButton<dynamic>(
-                      hint: Text(selectedInstitutition),
-                      items: institutionen.keys.map((String value) {
-                        return new DropdownMenuItem<String>(
-                          value: value,
-                          child: new Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInstitutition = value;
-                          institutionsId = institutionen[value];
-                        });
-                      },
-                    ),
-                  ),
+                  
                   RoundedInputField(
                     hintText: "Titel",
                     icon: Icons.title,
@@ -400,6 +383,24 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                               }
                               setState(() {});}
                             })),
+                  ),
+                  Visibility(
+                    visible: institutionVorhanden,
+                    child: new DropdownButton<dynamic>(
+                      hint: Text(selectedInstitutition),
+                      items: institutionen.keys.map((String value) {
+                        return new DropdownMenuItem<String>(
+                          value: value,
+                          child: new Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedInstitutition = value;
+                          institutionsId = institutionen[value];
+                        });
+                      },
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, size.width * 0.1, 15),
