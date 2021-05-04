@@ -261,7 +261,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
                                         child: Text(DateFormat(
-                                                    'dd.MM.yyyy – kk:mm')
+                                                    'dd.MM.yyyy – HH:mm')
                                                 .format(
                                                     veranstaltung.beginnTs) +
                                             " Uhr")),
@@ -289,7 +289,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
                                         child: Text(DateFormat(
-                                                    'dd.MM.yyyy – kk:mm')
+                                                    'dd.MM.yyyy – HH:mm')
                                                 .format(veranstaltung.endeTs) +
                                             " Uhr")),
                                   ],
