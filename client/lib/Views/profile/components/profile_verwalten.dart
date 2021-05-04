@@ -35,6 +35,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   final plzController = TextEditingController();
   final veranstaltungController = TextEditingController();
   final _scrollController = ScrollController();
+
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
 
@@ -747,6 +748,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             return Container();
           }
           return ListView.builder(
+              addAutomaticKeepAlives: true,
               controller: _scrollController,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
