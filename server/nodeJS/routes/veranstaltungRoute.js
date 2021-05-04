@@ -70,9 +70,14 @@ router.delete(
     if (resultIsUserErsteller.error || !resultIsUserErsteller) {
       const resultIsUserBetreiber = await userService.isUserBetreiber(userId);
       if (resultIsUserBetreiber.error || !resultIsUserBetreiber) {
-        return res.status(400).json({
-          error: "Nur Ersteller und Betreiber können Veranstaltungen löschen",
-        });
+        const resultIsUserGenehmiger = await userService.isUserGenehmiger(
+          userId
+        );
+        if (resultIsUserGenehmiger.error || !resultIsUserGenehmiger) {
+          return res.status(400).json({
+            error: "Nur Ersteller, Betreiber und Genehmiger können Veranstaltungen löschen",
+          });
+        }
       }
     }
 
@@ -126,9 +131,9 @@ router.post(
 
 // [GET] bekomme alle Veranstaltung
 router.get("/*", async function (req, res) {
-  const latitudeUlm = 48.399620;
-  const longitudeUlm = 9.996610;
-  const sortsErlaubt = ["beginn_ts", "entfernung"]
+  const latitudeUlm = 48.39962;
+  const longitudeUlm = 9.99661;
+  const sortsErlaubt = ["beginn_ts", "entfernung"];
 
   const query = req.query;
   let page = query.page;
@@ -191,18 +196,17 @@ router.get("/*", async function (req, res) {
   }
   if (plz) {
     if (!/^\d+$/.test(plz)) {
-      return res.status(400).json({error: "Keine passende plz"})
+      return res.status(400).json({ error: "Keine passende plz" });
     }
   }
   if (!istGenehmigt) {
     istGenehmigt = 1;
   }
-  if(!sorting){
-    sorting = sortsErlaubt[0]
-  }
-  else{
-    if(!sortsErlaubt.includes(sorting)){
-      sorting = sortsErlaubt[0]
+  if (!sorting) {
+    sorting = sortsErlaubt[0];
+  } else {
+    if (!sortsErlaubt.includes(sorting)) {
+      sorting = sortsErlaubt[0];
     }
   }
   if (!bis) {
@@ -241,7 +245,6 @@ router.get("/*", async function (req, res) {
   } else {
     res.status(200).json(veranstaltungen);
   }
-
 });
 
 // [POST] Erstelle eine Veranstaltung
