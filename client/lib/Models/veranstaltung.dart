@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:flutter/material.dart';
 
@@ -60,9 +62,13 @@ class Veranstaltung {
     List<Widget> loadedImages = [];
 
     for (String file in images) {
-      loadedImages.add(Image(
-          image: NetworkImage(
-              "https://app.lebensqualitaet-burgrieden.de/" + file)));
+      try {
+        loadedImages.add(Image(
+            image: NetworkImage(
+                "https://app.lebensqualitaet-burgrieden.de/" + file)));
+      } catch (e) {
+        log("Fehler beim eines Bilder einer Veranstaltung");
+      }
     }
 
     return loadedImages;

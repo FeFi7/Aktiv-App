@@ -42,7 +42,8 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
           if (veranstaltung == null)
             return Center(
                 child: ErrorPreviewBox(
-                    "Fehler 404", "Fehler beim Laden aufgetreten"));
+                    "Fehler 404 - Es konnte keine passende Veranstaltung aus der Datenbank geladen werden.",
+                    "Fehler beim Laden"));
 
           return LayoutBuilder(
             builder:
@@ -61,7 +62,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                           child: Container(
                             child: Container(
                               padding: EdgeInsets.all(20),
-                              height: size.height * 0.3,
+                              // height: size.height * 0.3,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
@@ -79,33 +80,32 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     ),
                                   ),
                                   Container(
-                                      width: size.width * 0.60,
+                                      // width: size.width * 0.60,
+                                      alignment: Alignment.centerLeft,
                                       child: Column(
                                         children: [
-                                          RichText(
-                                            text: TextSpan(
-                                              text:
-                                                  veranstaltung.institutionName,
-                                                  
-                                              style: TextStyle(
-                                                color: ColorPalette.black.rgb,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
-                                              
-                                              ),
+                                          Text(
+                                            veranstaltung.institutionName,
+                                            textAlign: TextAlign.start,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: ColorPalette.black.rgb,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
                                             ),
-                                            softWrap: true,
                                           ),
-                                          RichText(
-                                            text: TextSpan(
-                                              text: veranstaltung
-                                                  .institutBeschreibung,
-                                              style:
-                                                  DefaultTextStyle.of(context)
-                                                      .style,
+                                          Text(
+                                            veranstaltung.institutBeschreibung,
+                                            textAlign: TextAlign.left,
+                                            maxLines: 5,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: ColorPalette.black.rgb,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 13,
                                             ),
-                                            softWrap: true,
-                                          )
+                                          ),
                                         ],
                                       ))
                                 ],

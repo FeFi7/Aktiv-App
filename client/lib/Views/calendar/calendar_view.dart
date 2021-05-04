@@ -48,6 +48,7 @@ class _CalendarViewState extends State<CalendarView> {
                 padding: const EdgeInsets.all(10.0),
                 child: TableCalendar(
                   locale: 'de_DE',
+
                   firstDay: DateTime.now(),
                   // firstDay: DateTime.utc(200),
                   focusedDay: _focusedDay,
@@ -89,7 +90,7 @@ class _CalendarViewState extends State<CalendarView> {
                         .loadAllEventsUntil(DateTime(
                             DateTime.now().year,
                             DateTime.now().month +
-                                futureMonthsLoaded++, //TODO: begrenzen
+                                ++futureMonthsLoaded, //TODO: begrenzen
                             DateTime.now().day));
 
                     /// TODO: Erkennen in welhc richtung gescrollt wird => aktuell laden auch seiten wenn man nach links wischt
@@ -100,7 +101,7 @@ class _CalendarViewState extends State<CalendarView> {
               top: 10,
               child: UserProvider.getUserRole().allowedToFavEvents
                   ? (Container(
-                    height: 40,
+                      height: 40,
                       margin: const EdgeInsets.all(10.0),
                       child: ToggleButtons(
                         children: [
@@ -183,9 +184,19 @@ class _CalendarViewState extends State<CalendarView> {
       disabledBuilder: (context, date, _) {
         return CalendarDay(date.day.toString(), ColorPalette.light_grey.rgb);
       },
-      singleMarkerBuilder: (context, date, _) {
-        return SingleMarkerDay(
-            isSelected[1] ? ColorPalette.orange.rgb : ColorPalette.malibu.rgb);
+      // singleMarkerBuilder: (context, date, _) {
+      //   return SingleMarkerDay(
+      //       isSelected[1] ? ColorPalette.orange.rgb : ColorPalette.malibu.rgb);
+      // },
+
+      markerBuilder: (context, date, events) {
+        return events.length > 0
+            ? (SingleMarkerDay(
+                (isSelected[1]
+                    ? ColorPalette.orange.rgb
+                    : ColorPalette.malibu.rgb),
+                events.length))
+            : Container();
       },
     );
   }
@@ -194,18 +205,28 @@ class _CalendarViewState extends State<CalendarView> {
 // ignore: must_be_immutable
 class SingleMarkerDay extends StatelessWidget {
   Color backgroundColor;
+  int amount;
 
-  SingleMarkerDay(this.backgroundColor);
+  SingleMarkerDay(this.backgroundColor, this.amount);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 10,
-      width: 10,
-      margin: const EdgeInsets.all(2),
-      decoration: new BoxDecoration(
-          color: backgroundColor,
-          borderRadius: new BorderRadius.circular(40.0)),
+    return Positioned(
+      right: 6,
+      bottom: 3,
+      child: Container(
+        height: 14,
+        width: 14,
+        margin: const EdgeInsets.all(2),
+        child: Center(
+          child: Text(amount.toString(),
+              style: TextStyle(
+                  color: ColorPalette.white.rgb, fontWeight: FontWeight.bold, fontSize: 11)),
+        ),
+        decoration: new BoxDecoration(
+            color: backgroundColor,
+            borderRadius: new BorderRadius.circular(40.0)),
+      ),
     );
   }
 }

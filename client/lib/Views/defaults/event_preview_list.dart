@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:math';
 // import 'dart:html';
@@ -30,8 +31,10 @@ class _EventPreviewListState extends State<EventPreviewList> {
   _scrollListener() {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
+          Timer(Duration(milliseconds: 1), () => _controller.jumpTo(_controller.position.maxScrollExtent));
       setState(() {
-        _controller.jumpTo(_controller.position.maxScrollExtent);
+        // 
+        // _controller.jumpTo(_controller.position.maxScrollExtent);
       });
     }
   }
