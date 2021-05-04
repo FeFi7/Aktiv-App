@@ -293,29 +293,37 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                                 .format(veranstaltung.endeTs) +
                                             " Uhr")),
                                   ],
-                                ),Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5),
-                                  width: size.width * 0.9,
-                                  child: Divider(
-                                    color: ColorPalette.malibu.rgb,
-                                    thickness: 2,
-                                  ),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Tags')),
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerRight,
-                                        child: Text(tags)),
-                                  ],
+                                Visibility(
+                                  visible:
+                                      veranstaltung.selectedTags.length > 0,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 5),
+                                        width: size.width * 0.9,
+                                        child: Divider(
+                                          color: ColorPalette.malibu.rgb,
+                                          thickness: 2,
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Container(
+                                              width: size.width * 0.4,
+                                              alignment: Alignment.centerLeft,
+                                              child: Text('Tags')),
+                                          Container(
+                                              width: size.width * 0.4,
+                                              alignment: Alignment.centerRight,
+                                              child: Text(tags)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.symmetric(

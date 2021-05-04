@@ -40,7 +40,12 @@ class _DiscoverViewState extends State<DiscoverView> {
     loadTags();
   }
 
+  bool tagsAlreadyLoaded = false;
+
   void loadTags() async {
+    if (tagsAlreadyLoaded) return;
+    tagsAlreadyLoaded = true;
+
     var response = await attemptGetTags();
 
     if (response.statusCode == 200) {

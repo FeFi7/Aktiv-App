@@ -19,7 +19,6 @@ class Veranstaltung {
   double latitude, longitude;
   List<String> selectedTags = [];
   List<String> images = [];
-  //Bilder mit abspeichern
 
   Veranstaltung.create(
       this.titel,

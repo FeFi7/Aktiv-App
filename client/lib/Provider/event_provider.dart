@@ -518,18 +518,16 @@ class EventProvider extends ChangeNotifier {
 
   Future<Veranstaltung> loadEventById(int id) async {
     // if (isEventLoaded(id)) return loaded[id];
-    log("versuche veranstaltung zu laden: " + id.toString());
+    // log("versuche veranstaltung zu laden: " + id.toString());
     var response = await attemptGetVeranstaltungByID(id);
-    log("response.body.toString(): " + response.body.toString());
+    // log("response.body.toString(): " + response.body.toString());
     if (response.statusCode == 200) {
       var parsedJson = json.decode(response.body);
-      log("parsedJson.toString(): " + parsedJson.toString());
+      // log("parsedJson.toString(): " + parsedJson.toString());
       Veranstaltung event = getEventFromJson(parsedJson, true);
 
       return event;
     }
-    log('response.statusCode != 200 und zwar ' +
-        response.statusCode.toString());
     return null;
     // return Veranstaltung.;
   }
