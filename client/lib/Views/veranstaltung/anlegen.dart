@@ -376,7 +376,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     child: Align(
                         alignment: Alignment.bottomLeft,
                         child: RoundedButtonDynamic(
-                            width: size.width * 0.5,
+                            width: size.width * 0.8,
                             text: 'Bilder',
                             icon: Icons.camera_alt,
                             color: ColorPalette.malibu.rgb,
@@ -402,7 +402,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             })),
                   ),
                   Container(
-                    margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, 0, 15),
+                    margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, size.width * 0.1, 15),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: RoundedButtonDynamic(
