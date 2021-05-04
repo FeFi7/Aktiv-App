@@ -35,26 +35,26 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   int istGenehmigt = 0;
   List<String> imageIds = [];
   Map<String, int> institutionen = Map<String, int>();
-  bool timeChanged, dateChanged;
+
   String selectedInstitutition = 'Institution';
-  var tcVisibility = false;
+  var tcVisibility = true;
   File profileImage;
   final picker = ImagePicker();
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
   bool institutionVorhanden = false;
   //List<dynamic> instituionen = [];
-
+  String imageName;
+  int imageId;
   var _controller = TextEditingController();
-  
-  final controllerTitel= TextEditingController();
+
+  final controllerTitel = TextEditingController();
   final controllerBeschreibung = TextEditingController();
   final controlleremail = TextEditingController();
   final controllerPlz = TextEditingController();
   final controllerAdresse = TextEditingController();
 
-
-  int institutionsId = -1;
+  int institutionsId = 0;
   //
   List<String> images = [];
   String starttext = "Beginn";
@@ -74,7 +74,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   List<String> selectedTags = [];
 
   Future<void> _selectDate(BuildContext context) async {
-    dateChanged = true;
     final DateTime pickedDate = await showDatePicker(
         locale: de,
         context: context,
@@ -85,14 +84,13 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
     if (pickedDate != null && pickedDate != currentDate) {
       setState(() {
         currentDate = pickedDate;
-        dateChanged = true;
       });
+
       await _selectTime(context);
     }
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    timeChanged = true;
     final TimeOfDay selectedTime = await showTimePicker(
       builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -106,7 +104,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
     if (selectedTime != null && selectedTime != currentTime)
       setState(() {
         currentTime = selectedTime;
-        timeChanged = true;
       });
   }
 
@@ -190,39 +187,32 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   RoundedInputFieldBeschreibung(
                     hintText: 'Beschreibung der Veranstaltung',
                     icon: Icons.edit,
-                    controller:controllerBeschreibung,
-                    
+                    controller: controllerBeschreibung,
                   ),
                   RoundedInputFieldSuggestions(
                     controller: _controller,
                     hintText: 'Musik,Sport,Freizeit...',
                     suggestions: tags,
                     icon: Icons.tag,
-                    onChanged: (value)  {
+                    onChanged: (value) {
                       if (value.endsWith(" ")) {
                         selectedTags.add(value);
                         _controller.clear();
-                        setState(() {
-                          
-                        });
+                        setState(() {});
                       }
                       if (value.endsWith(",")) {
                         selectedTags.add(value);
                         _controller.clear();
-                        setState(() {
-                          
-                        });
+                        setState(() {});
                       }
-                     
+
                       ;
                     },
                     onSubmitted: (value) {
                       selectedTags.add(value);
 
                       if (selectedTags.length != 0) {
-                        setState(() {
-                          
-                        });
+                        setState(() {});
                       }
                       ;
                     },
@@ -230,41 +220,39 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   Container(
                     width: size.width * 0.5,
                     child: Visibility(
-                        visible: tcVisibility,
                         child: Container(
-                          margin: EdgeInsets.only(bottom: 10),
-                          child: ListView.builder(
-                            itemCount: selectedTags.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                  decoration: BoxDecoration(
-                                    color: ColorPalette.malibu.rgb,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(29.0)),
-                                  ),
-                                  padding: EdgeInsets.fromLTRB(25, 0, 10, 0),
-                                  margin: EdgeInsets.all(5),
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('${selectedTags[index]}'),
-                                      IconButton(
-                                          icon: Icon(Icons.delete,
-                                              color:
-                                                  ColorPalette.torea_bay.rgb),
-                                          onPressed: () {
-                                            setState(() {
-                                              selectedTags.removeAt(index);
-                                            });
-                                          })
-                                    ],
-                                  ));
-                            },
-                            shrinkWrap: true,
-                          ),
-                        )),
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: ListView.builder(
+                        itemCount: selectedTags.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                              decoration: BoxDecoration(
+                                color: ColorPalette.malibu.rgb,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(29.0)),
+                              ),
+                              padding: EdgeInsets.fromLTRB(25, 0, 10, 0),
+                              margin: EdgeInsets.all(5),
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('${selectedTags[index]}'),
+                                  IconButton(
+                                      icon: Icon(Icons.delete,
+                                          color: ColorPalette.torea_bay.rgb),
+                                      onPressed: () {
+                                        setState(() {
+                                          selectedTags.removeAt(index);
+                                        });
+                                      })
+                                ],
+                              ));
+                        },
+                        shrinkWrap: true,
+                      ),
+                    )),
                   ),
                   RoundedInputEmailField(
                     hintText: "Kontakt",
@@ -275,7 +263,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     hintText: "Postleitzahl",
                     controller: controllerPlz,
                     icon: Icons.home,
-                    
                   ),
                   RoundedInputField(
                     hintText: "Adresse",
@@ -289,47 +276,43 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     press: () async {
                       await _selectDate(context);
 
-                      if (timeChanged == false || dateChanged == false) {
-                        starttext = "Beginn";
-                      } else {
-                        setState(() {
-                          String minute = currentTime.minute.toString();
-                          String hour = currentTime.hour.toString();
-                          String month = currentDate.month.toString();
-                          String day = currentDate.day.toString();
+                      setState(() {
+                        String minute = currentTime.minute.toString();
+                        String hour = currentTime.hour.toString();
+                        String month = currentDate.month.toString();
+                        String day = currentDate.day.toString();
 
-                          if (currentTime.minute.toString().length == 1) {
-                            minute = '0' + currentTime.minute.toString();
-                          }
-                          if (currentTime.hour.toString().length == 1) {
-                            hour = '0' + currentTime.hour.toString();
-                          }
-                          if (currentDate.month.toString().length == 1) {
-                            month = '0' + currentDate.month.toString();
-                          }
-                          if (currentDate.day.toString().length == 1) {
-                            day = '0' + currentDate.day.toString();
-                          }
-                          starttext = day +
-                              "." +
-                              month +
-                              "." +
-                              currentDate.year.toString() +
-                              ", " +
-                              hour +
-                              ":" +
-                              minute;
-                          start = currentDate.year.toString() +
-                              "-" +
-                              month +
-                              "-" +
-                              day +
-                              " " +
-                              hour +
-                              ":" +
-                              minute;
-                        });
-                      }
+                        if (currentTime.minute.toString().length == 1) {
+                          minute = '0' + currentTime.minute.toString();
+                        }
+                        if (currentTime.hour.toString().length == 1) {
+                          hour = '0' + currentTime.hour.toString();
+                        }
+                        if (currentDate.month.toString().length == 1) {
+                          month = '0' + currentDate.month.toString();
+                        }
+                        if (currentDate.day.toString().length == 1) {
+                          day = '0' + currentDate.day.toString();
+                        }
+                        starttext = day +
+                            "." +
+                            month +
+                            "." +
+                            currentDate.year.toString() +
+                            ", " +
+                            hour +
+                            ":" +
+                            minute;
+                        start = currentDate.year.toString() +
+                            "-" +
+                            month +
+                            "-" +
+                            day +
+                            " " +
+                            hour +
+                            ":" +
+                            minute;
+                      });
                     },
                   ),
                   RoundedDatepickerButton(
@@ -339,47 +322,43 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     press: () async {
                       await _selectDate(context);
 
-                      if (timeChanged == false || dateChanged == false) {
-                        endtext = "Ende";
-                      } else {
-                        setState(() {
-                          String minute = currentTime.minute.toString();
-                          String hour = currentTime.hour.toString();
-                          String month = currentDate.month.toString();
-                          String day = currentDate.day.toString();
-                          if (currentTime.minute.toString().length == 1) {
-                            minute = '0' + currentTime.minute.toString();
-                          }
-                          if (currentTime.hour.toString().length == 1) {
-                            hour = '0' + currentTime.hour.toString();
-                          }
-                          if (currentDate.month.toString().length == 1) {
-                            month = '0' + currentDate.month.toString();
-                          }
-                          if (currentDate.day.toString().length == 1) {
-                            day = '0' + currentDate.day.toString();
-                          }
+                      setState(() {
+                        String minute = currentTime.minute.toString();
+                        String hour = currentTime.hour.toString();
+                        String month = currentDate.month.toString();
+                        String day = currentDate.day.toString();
+                        if (currentTime.minute.toString().length == 1) {
+                          minute = '0' + currentTime.minute.toString();
+                        }
+                        if (currentTime.hour.toString().length == 1) {
+                          hour = '0' + currentTime.hour.toString();
+                        }
+                        if (currentDate.month.toString().length == 1) {
+                          month = '0' + currentDate.month.toString();
+                        }
+                        if (currentDate.day.toString().length == 1) {
+                          day = '0' + currentDate.day.toString();
+                        }
 
-                          endtext = day +
-                              "." +
-                              month +
-                              "." +
-                              currentDate.year.toString() +
-                              ", " +
-                              hour +
-                              ":" +
-                              minute;
-                          ende = currentDate.year.toString() +
-                              "-" +
-                              month +
-                              "-" +
-                              day +
-                              " " +
-                              hour +
-                              ":" +
-                              minute;
-                        });
-                      }
+                        endtext = day +
+                            "." +
+                            month +
+                            "." +
+                            currentDate.year.toString() +
+                            ", " +
+                            hour +
+                            ":" +
+                            minute;
+                        ende = currentDate.year.toString() +
+                            "-" +
+                            month +
+                            "-" +
+                            day +
+                            " " +
+                            hour +
+                            ":" +
+                            minute;
+                      });
                     },
                   ),
                   Container(
@@ -400,8 +379,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                               int id = 0;
                               if (resp.statusCode == 200) {
                                 var parsedJson = json.decode(resp.body);
-                                id = parsedJson['id'];
-                                imageIds.add(id.toString());
+                                imageId = parsedJson['id'];
+                                imageIds.add(imageId.toString());
                                 // toastmsg = "Neue Veranstaltung angelegt";
                               } else {
                                 var parsedJson = json.decode(resp.body);
@@ -441,9 +420,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                         ende,
                                         controllerAdresse.text,
                                         controllerPlz.text,
-                                        
-                                        istGenehmigt,
                                         institutionsId,
+                                        istGenehmigt,
                                         imageIds,
                                         selectedTags)
                                     .then((event) => {
