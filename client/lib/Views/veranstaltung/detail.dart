@@ -12,6 +12,7 @@ import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -331,13 +332,46 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     child: RoundedButton(
                                       text: "Veranstaltung löschen",
                                       color: ColorPalette.orange.rgb,
-                                      press: () {
+                                      press: () async {
                                         //TODO: Veranstaltung löschen
                                         //
                                         //
-                                        var accessToken = Provider.of<UserProvider>(context, listen: false).getAccessToken();
-                                        attemptDeleteVeranstaltung(veranstaltung.id.toString(), accessToken);
-                                        Provider.of<BodyProvider>(context, listen: false).previousBody(context);
+                                        if (await confirm(
+                                          context,
+                                          title: Text("Bestätigung"),
+                                          content: Text(
+                                              "Möchten Sie dieser Veranstaltung wirklich löschen?"),
+                                          textOK: Text(
+                                            "Bestätigen",
+                                            style: TextStyle(
+                                                color:
+                                                    ColorPalette.dark_grey.rgb),
+                                          ),
+                                          textCancel: Text(
+                                            "Abbrechen",
+                                            style: TextStyle(
+                                                color:
+                                                    ColorPalette.endeavour.rgb),
+                                          ),
+                                        )) {
+                                          var accessToken =
+                                              await Provider.of<UserProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .getAccessToken();
+
+                                          Provider.of<EventProvider>(context,
+                                                  listen: false)
+                                              .removeEventIfLoaded(
+                                                  veranstaltung.id);
+                                          attemptDeleteVeranstaltung(
+                                              veranstaltung.id.toString(),
+                                              accessToken);
+
+                                          Provider.of<BodyProvider>(context,
+                                                  listen: false)
+                                              .previousBody(context);
+                                        }
                                       },
                                     ))
                               ],

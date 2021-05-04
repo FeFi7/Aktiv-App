@@ -63,6 +63,14 @@ class EventProvider extends ChangeNotifier {
     return loaded.values.toList();
   }
 
+  /// Löscht ein Event, falls es geladen ist
+  void removeEventIfLoaded(int id) {
+    if (loaded.containsKey(id)) loaded.remove(id);
+    if (favorites.contains(id)) favorites.remove(id);
+    if (upComing.contains(id)) upComing.remove(id);
+    if (nearby.contains(id)) nearby.remove(id);
+  }
+
   /// Gibt eine Liste aller Events mit ausstehender genehmigung zurück
   // List<Veranstaltung> getEventWithPendingApproval() {
   //   return pendingApproval.map((id) => getLoadedEventById(id)).toList();
