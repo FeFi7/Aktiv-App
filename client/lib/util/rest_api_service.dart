@@ -136,7 +136,8 @@ Future<http.Response> attemptGetAllVeranstaltungen(
     String vollText = "-1",
     String entfernung = "-1",
     String sorting = "-1",
-    String datum = "-1"]) async {
+    String datum = "-1",
+    String plz = "-1"]) async {
   Map<String, dynamic> qParams = {
     'istGenehmigt': istGenehmigt,
     'limit': limit,
@@ -164,6 +165,10 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
   if (datum != "-1") {
     qParams.putIfAbsent('datum', () => datum);
+  }
+
+  if (plz != "-1") {
+    qParams.putIfAbsent('plz', () => plz);
   }
 
   try {

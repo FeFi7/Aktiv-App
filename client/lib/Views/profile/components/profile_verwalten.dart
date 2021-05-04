@@ -32,6 +32,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   final betreiberController = TextEditingController();
   final benutzerController = TextEditingController();
   final plzController = TextEditingController();
+  final veranstaltungController = TextEditingController();
   final _scrollController = ScrollController();
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
@@ -143,16 +144,6 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             ),
             SizedBox(height: 10.0),
             institutionenVerwalten(),
-            SizedBox(height: 30.0),
-            Text(
-              "Zu genehmigen",
-              style: TextStyle(
-                fontSize: 20.0,
-                color: ColorPalette.endeavour.rgb,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            zuGenehmigenVeranstaltungen(),
           ],
         );
       case "betreiber":
@@ -200,16 +191,42 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       case "genehmiger":
         return Column(
           children: <Widget>[
-            genehmigerCard(),
+            Text(
+              "Veranstaltungen verwalten",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
+            zuGenehmigenVeranstaltungen(),
           ],
         );
       case "betreiber":
         return Column(
           children: <Widget>[
+            Text(
+              "Nutzerverwaltung",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
             //verwalterVerwaltenCard(),
             genehmigerVerwaltenCard(),
             betreiberVerwaltenCard(),
             benutzerLoschenCard(),
+            SizedBox(height: 30.0),
+            Text(
+              "Veranstaltungen verwalten",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: ColorPalette.endeavour.rgb,
+              ),
+            ),
+            SizedBox(height: 10.0),
+            zuGenehmigenVeranstaltungen(),
           ],
         );
       default:
@@ -468,7 +485,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                   .setGenehmiger(
                       genehmigerController.text, plzController.text.split(","));
               if (user == null) {
-                errorToast("User nicht vorhanden");
+                errorToast("User nicht vorhanden, oder ist Betreiber");
               } else if (user.statusCode != 200) {
                 errorToast("Fehler bei der Aktualisierung");
               } else {
@@ -580,172 +597,142 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   }
 
   zuGenehmigenVeranstaltungen() {
-    return CardDropDownImage(
-      decoration: [
-        Container(
-          child: SizedBox(
-            height: 200,
-            width: 200,
-            child: Stack(
-              clipBehavior: Clip.none,
-              fit: StackFit.expand,
-              children: [
-                Consumer<UserProvider>(
-                  builder: (context, user, child) {
-                    if (UserProvider.istEingeloggt) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: (user.profilBild != null)
-                                ? NetworkImage(
-                                    "https://app.lebensqualitaet-burgrieden.de/" +
-                                        user.profilBild)
-                                : Image.asset(
-                                        "assets/images/profilePic_default.png")
-                                    .image,
+    Size size = MediaQuery.of(context).size;
+    return FutureBuilder(
+        future: Provider.of<UserProvider>(context, listen: false)
+            .getUngenehmigteVeranstaltungen(),
+        builder: (context, snapShot) {
+          if (snapShot.connectionState == ConnectionState.none &&
+              snapShot.hasData == null) {
+            return Container();
+          }
+          return ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
+              itemBuilder: (context, index) {
+                return Container(
+                  child: CardDropDownImage(
+                    decoration: [
+                      Container(
+                        child: SizedBox(
+                          height: 200,
+                          width: size.width * 0.8,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            fit: StackFit.expand,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: (snapShot.data[index]
+                                                ['veranstaltungImage'] !=
+                                            null)
+                                        ? NetworkImage(
+                                            "https://app.lebensqualitaet-burgrieden.de/" +
+                                                snapShot.data[index]
+                                                    ['veranstaltungImage'])
+                                        : Image.asset(
+                                                "assets/images/veranstaltungPic_default.png")
+                                            .image,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    } else {
-                      return CircleAvatar(
-                        backgroundImage:
-                            Image.asset("assets/images/profilePic_default.png")
-                                .image,
-                      );
-                    }
-                  },
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: SizedBox(
-                    height: 60,
-                    width: 60,
-                    // ignore: deprecated_member_use
-                    child: FlatButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                        side: BorderSide(
-                          width: 3.0,
-                          color: ColorPalette.white.rgb,
-                        ),
                       ),
-                      color: ColorPalette.malibu.rgb,
-                      onPressed: () => getImage("1"),
-                      child: CircleAvatar(
-                        backgroundColor: ColorPalette.malibu.rgb,
-                        child: Icon(
-                          Icons.edit,
-                          color: ColorPalette.white.rgb,
-                        ),
+                    ],
+                    headerChildren: [
+                      Icon(Icons.calendar_today, size: 40.0),
+                      SizedBox(width: 20.0),
+                      Text(snapShot.data[index]['titel']),
+                    ],
+                    bodyChildren: [
+                      Text(
+                        snapShot.data[index]['beschreibung'],
+                        style: TextStyle(color: ColorPalette.black.rgb),
                       ),
-                    ),
+                      SizedBox(height: 40.0),
+                      RoundedButton(
+                        text: "Veranstaltung genehmigen",
+                        color: ColorPalette.endeavour.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content: Text(
+                                "Möchten Sie diese Veranstaltung genehmigen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var veranstaltungGenehmigen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .veranstaltungGenehmigen(
+                                        snapShot.data[index]['id'].toString());
+                            if (veranstaltungGenehmigen == null) {
+                              errorToast("Veranstaltung nicht vorhanden");
+                            } else if (veranstaltungGenehmigen.statusCode !=
+                                200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Veranstaltung genehmigt");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      RoundedButton(
+                        text: "Veranstaltung ablehnen",
+                        color: ColorPalette.grey.rgb,
+                        press: () async {
+                          if (await confirm(
+                            context,
+                            title: Text("Bestätigung"),
+                            content: Text(
+                                "Möchten Sie diese Veranstaltung ablehnen?"),
+                            textOK: Text(
+                              "Bestätigen",
+                              style: TextStyle(color: ColorPalette.grey.rgb),
+                            ),
+                            textCancel: Text(
+                              "Abbrechen",
+                              style:
+                                  TextStyle(color: ColorPalette.endeavour.rgb),
+                            ),
+                          )) {
+                            var veranstaltungLoeschen =
+                                await Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .veranstaltungLoeschen(
+                                        snapShot.data[index]['id'].toString());
+                            if (veranstaltungLoeschen == null) {
+                              errorToast("Veranstaltung nicht vorhanden");
+                            } else if (veranstaltungLoeschen.statusCode !=
+                                200) {
+                              errorToast("Fehler bei der Aktualisierung");
+                            } else {
+                              errorToast("Veranstaltung abgelehnt");
+                            }
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-        // BoxDecoration(
-        //     color: ColorPalette.malibu.rgb, shape: BoxShape.rectangle),
-      ],
-      headerChildren: [
-        Icon(
-          Icons.event_note_rounded,
-          size: 40.0,
-        ),
-        SizedBox(
-          width: 20.0,
-        ),
-        Text("Beispielveranstaltung"),
-      ],
-      bodyChildren: [
-        Text(
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-          style: TextStyle(color: ColorPalette.black.rgb),
-        ),
-        SizedBox(height: 20.0),
-        Container(
-          margin: EdgeInsets.symmetric(
-              vertical: 5), //Abstand um den Button herum (oben/unten)
-          width: 250,
-          child: Divider(
-            color: ColorPalette.malibu.rgb,
-            thickness: 2,
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-                width: 150,
-                alignment: Alignment.centerLeft,
-                child: Text('Kontakt')),
-            Container(
-                width: 150,
-                alignment: Alignment.centerRight,
-                child: Text('max@mustermann.de')),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Container(
-                width: 150,
-                alignment: Alignment.centerLeft,
-                child: Text('Ersteller')),
-            Container(
-                width: 150,
-                alignment: Alignment.centerRight,
-                child: Text('Max Mustermann')),
-          ],
-        ),
-        SizedBox(height: 20.0),
-        RoundedButton(
-          text: "Veranstaltung genehmigen",
-          color: ColorPalette.endeavour.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text("Möchten Sie diese Veranstaltung genehmigen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Veranstaltung genehmigen
-            }
-          },
-        ),
-        RoundedButton(
-          text: "Veranstaltung ablehnen",
-          color: ColorPalette.grey.rgb,
-          press: () async {
-            if (await confirm(
-              context,
-              title: Text("Bestätigung"),
-              content: Text("Möchten Sie diese Veranstaltung ablehnen?"),
-              textOK: Text(
-                "Bestätigen",
-                style: TextStyle(color: ColorPalette.grey.rgb),
-              ),
-              textCancel: Text(
-                "Abbrechen",
-                style: TextStyle(color: ColorPalette.endeavour.rgb),
-              ),
-            )) {
-              //TODO Veranstaltung ablehnen
-            }
-          },
-        ),
-      ],
-    );
+                );
+              });
+        });
   }
 
   institutionenVerwalten() {

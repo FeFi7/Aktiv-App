@@ -313,18 +313,29 @@ class UserProvider extends ChangeNotifier {
   }
 
   setGenehmiger(String mail, List<String> plz) async {
-    if (await setRole(mail, "genehmiger") != null) {
-      var genehmiger = await attemptGetUser(mail);
-      var parsedgenehmiger = json.decode(genehmiger.body);
-      var _map = parsedgenehmiger.values.toList();
-      if (_map[0] != false) {
-        var _userId = _map[1]['id'].toString();
+    var _betreiber = await attemptGetUser(mail);
+    var parsedgenehmiger = json.decode(_betreiber.body);
+    var genehmigerId = parsedgenehmiger.values.toList();
+    var _genehmigerId = genehmigerId[1]['id'].toString();
 
-        var _accessToken = await getAccessToken();
+    var betreiber =
+        await attemptGetUserInfo(_genehmigerId, await getAccessToken());
+    var parsedBetreiber = json.decode(betreiber.body);
+    if (parsedBetreiber['rolle'].toString().toLowerCase() != 'betreiber') {
+      if (await setRole(mail, "genehmiger") != null) {
+        var genehmiger = await attemptGetUser(mail);
+        var parsedgenehmiger = json.decode(genehmiger.body);
 
-        var jwt = await attemptSetGenehmiger(_userId, plz, _accessToken);
-        notifyListeners();
-        return jwt;
+        var _map = parsedgenehmiger.values.toList();
+        if (_map[0] != false) {
+          var _userId = _map[1]['id'].toString();
+
+          var _accessToken = await getAccessToken();
+
+          var jwt = await attemptSetGenehmiger(_userId, plz, _accessToken);
+
+          return jwt;
+        }
       }
     }
     return null;
@@ -351,9 +362,44 @@ class UserProvider extends ChangeNotifier {
   getGenehmigerPLZs(String userId) async {
     var jwt = await attemptGetPLZs(userId);
     if (jwt != null) {
-      var _gene = await getGenehmigerPLZs(userId);
-      genehmigerPLZs = _gene.join(",");
-      print(genehmigerPLZs);
+      var genehmigerPLZs = jwt.body;
+      return json.decode(genehmigerPLZs);
+    } else {
+      return null;
+    }
+  }
+
+  Future getUngenehmigteVeranstaltungen() async {
+    List _veranstaltungen = [];
+    List _genehmigerPLZs = await getGenehmigerPLZs(userId.toString());
+    if (_genehmigerPLZs != null) {
+      _genehmigerPLZs.forEach((element) async {
+        var veranstaltungen = await attemptGetAllVeranstaltungen(
+            "-1", "0", "25", "1", "-1", "-1", "-1", "-1", "-1", element);
+
+        if (veranstaltungen.statusCode == 200) {
+          _veranstaltungen.addAll(json.decode(veranstaltungen.body));
+        }
+      });
+    }
+    return _veranstaltungen;
+  }
+
+  veranstaltungGenehmigen(String id) async {
+    var institutionGenehmigen =
+        await attemptApproveVeranstaltung(id, await getAccessToken());
+    if (institutionGenehmigen != null) {
+      return institutionGenehmigen;
+    } else {
+      return null;
+    }
+  }
+
+  veranstaltungLoeschen(String id) async {
+    var institutionLoeschen =
+        await attemptDeleteVeranstaltung(id, await getAccessToken());
+    if (institutionLoeschen != null) {
+      return institutionLoeschen;
     } else {
       return null;
     }
