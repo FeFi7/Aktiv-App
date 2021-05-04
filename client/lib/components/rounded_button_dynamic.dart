@@ -25,7 +25,7 @@ class RoundedButtonDynamic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    // Size size = MediaQuery.of(context).size;
     return Container(
      // margin:EdgeInsets.only(right:size.width*0.1),
       width: width,

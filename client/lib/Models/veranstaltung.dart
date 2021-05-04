@@ -33,7 +33,7 @@ class Veranstaltung {
       this.selectedTags,
       this.institutionName,
       this.institutBeschreibung,
-      this.erstellerId) {}
+      this.erstellerId);
 
   Veranstaltung.load(
       this.id,

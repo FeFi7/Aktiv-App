@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
-import 'package:aktiv_app_flutter/Views/Home.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:aktiv_app_flutter/components/rounded_button_dynamic.dart';
@@ -165,7 +164,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
               return Center(child: CircularProgressIndicator());
             }
 
-            final events = snapshot.data;
+            // final events = snapshot.data;
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -182,7 +181,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   ),
                   RoundedInputFieldSuggestions(
                     controller: _controller,
-                    hintText: 'Musik,Sport,Freizeit...',
+                    hintText: 'Musik, Sport, Freizeit...',
                     suggestions: tags,
                     icon: Icons.tag,
                     onChanged: (value) {
@@ -197,7 +196,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                         setState(() {});
                       }
 
-                      ;
+                      
                     },
                     onSubmitted: (value) {
                       selectedTags.add(value);
@@ -205,7 +204,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                       if (selectedTags.length != 0) {
                         setState(() {});
                       }
-                      ;
+                      
                     },
                   ),
                   Container(
@@ -369,16 +368,16 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                               if(profileImage != null){
                               Response resp = await attemptFileUpload(
                                   'Bild1', profileImage);
-                              print(resp.body);
-                              int id = 0;
+                              // print(resp.body);
+                              // int id = 0;
                               if (resp.statusCode == 200) {
                                 var parsedJson = json.decode(resp.body);
                                 imageId = parsedJson['id'];
                                 imageIds.add(imageId.toString());
                                 // toastmsg = "Neue Veranstaltung angelegt";
                               } else {
-                                var parsedJson = json.decode(resp.body);
-                                var error = parsedJson['error'];
+                                // var parsedJson = json.decode(resp.body);
+                                // var error = parsedJson['error'];
                                 // toastmsg = error;
                               }
                               setState(() {});}

@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:io';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
@@ -8,17 +6,15 @@ import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
-import 'package:aktiv_app_flutter/components/rounded_button_dynamic.dart';
-import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class VeranstaltungDetailView extends StatefulWidget {
   int id;
 
@@ -171,16 +167,13 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: Container(
-                            width: size.width * 0.9,
+                        Container(
+                          child: Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5), //Abstand um den Button herum (oben/unten)
+                                  margin: EdgeInsets.symmetric(vertical: 5),
                                   width: size.width * 0.9,
                                   child: Divider(
                                     color: ColorPalette.malibu.rgb,
@@ -192,7 +185,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     alignment: Alignment.topLeft,
                                     child: Text(
                                       veranstaltung.titel + '\n',
-                                      maxLines: 1,
+                                      // maxLines: 1,
                                       style: TextStyle(
                                           fontSize: 16.0,
                                           fontWeight: FontWeight.bold,
@@ -203,7 +196,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     width: size.width * 0.9,
                                     child: Text(
                                       veranstaltung.beschreibung,
-                                      maxLines: 5,
+                                      // maxLines: 10,
                                       style: TextStyle(
                                           fontSize: 14.0,
                                           fontWeight: FontWeight.normal,
@@ -244,9 +237,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                   ],
                                 ),
                                 Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5), //Abstand um den Button herum (oben/unten)
+                                  margin: EdgeInsets.symmetric(vertical: 5),
                                   width: size.width * 0.9,
                                   child: Divider(
                                     color: ColorPalette.malibu.rgb,
@@ -338,9 +329,6 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                       text: "Veranstaltung löschen",
                                       color: ColorPalette.orange.rgb,
                                       press: () async {
-                                        //TODO: Veranstaltung löschen
-                                        //
-                                        //
                                         if (await confirm(
                                           context,
                                           title: Text("Bestätigung"),

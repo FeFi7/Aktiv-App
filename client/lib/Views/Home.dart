@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
-import 'package:aktiv_app_flutter/Views/approve/approve_view.dart';
 import 'package:aktiv_app_flutter/Views/calendar/calendar_view.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/Views/discover/discover_view.dart';

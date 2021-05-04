@@ -897,6 +897,7 @@ Future<http.Response> attemptGetUngenehmigteInstitutionen(
 }
 
 // [DELETE] Lösche einzelnes File
+// ignore: missing_return
 Future<http.Response> attemptDeleteFile() async {}
 
 // [GET] TEST API

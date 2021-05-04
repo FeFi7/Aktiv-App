@@ -1,9 +1,7 @@
-import 'dart:collection';
+
 import 'dart:developer';
-import 'dart:ffi';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
-import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Models/role_permissions.dart';
@@ -112,7 +110,6 @@ class EventProvider extends ChangeNotifier {
       case SearchStyle.DATE:
 
         /// Suche nach Events, die an dem Datum statt finden
-        // TODO: Suche nach allen Events an dem Datum aus der Datenbank laden un zurück geben
 
         DateTime dateTime = isValidDate(text);
         if (dateTime != null) {
@@ -268,7 +265,7 @@ class EventProvider extends ChangeNotifier {
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
       int startPage, int maxPages, EventListType type, DateTime until) async {
-    // TODO; type ? Info von V. code
+
     String entfernung =
         EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
     String sorting = EventListType.NEAR_BY == type
@@ -402,8 +399,6 @@ class EventProvider extends ChangeNotifier {
           if (/*!pendingApproval.contains(event.id) && */ !nearby
               .contains(event.id)) nearby.add(event.id);
 
-        /// TODO: Wenn nearby dann nicht get all sondern dafpr noch austehende api route aufrufen
-
         return nearby.map((id) => getLoadedEventById(id)).toList();
       case EventListType.UP_COMING:
 
@@ -422,7 +417,7 @@ class EventProvider extends ChangeNotifier {
 
       //   if (response.statusCode == 200) {
       //     log("plzs: " + response.body);
-      //     // TODO: Zugewiese Posteiltzahlen einfügen
+      //     //
       //     //
       //   }
 
@@ -431,7 +426,7 @@ class EventProvider extends ChangeNotifier {
       //   for (int i = 0; i < allowedToApprove.length; i++) {
       //     Veranstaltung event = loaded[allowedToApprove[i]];
       //     // if(event.)
-      //     // TODO: Veranstaltungen removen die man nicht verwaten darf
+      //     
       //   }
 
       //   return allowedToApprove.map((id) => getLoadedEventById(id)).toList();
@@ -552,8 +547,8 @@ class EventProvider extends ChangeNotifier {
       List<String> imageIds,
       List<String> selectedTags) async {
     int userId = UserProvider.userId;
-    //
-    /// TODO: ACHTUNG NOCH KONSTANTE PARAM ÜBERGABE
+
+
     Response resp = await attemptCreateVeranstaltung(
         titel,
         beschreibung,
@@ -595,7 +590,7 @@ class EventProvider extends ChangeNotifier {
           [],
           null,
           null,
-          erstellerId); //TODO: null weg machen
+          erstellerId);
 
       loadEvent(veranstaltung);
 
@@ -698,7 +693,7 @@ class EventProvider extends ChangeNotifier {
 
     if (institutionImage != null) previewImage[id] = institutionImage;
 
-    List<String> fileList = null;
+    List<String> fileList;
 
     if (json['files'] != null) {
       final List<dynamic> dynamicList =
@@ -709,7 +704,7 @@ class EventProvider extends ChangeNotifier {
       // log("tolle Liste: " + fileList.toString());
     }
 
-    List<String> tagList = null;
+    List<String> tagList;
 
     if (json['tags'] != null) {
       final List<dynamic> dynamicList =
@@ -727,7 +722,6 @@ class EventProvider extends ChangeNotifier {
 
     int erstellerId = json['ersteller'] ?? -1;
 
-    // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(
         id,
         titel,

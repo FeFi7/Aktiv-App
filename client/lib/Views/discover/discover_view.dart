@@ -1,12 +1,7 @@
-import 'dart:developer';
-
-import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/search_behavior_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
-import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
-import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/discover/environment_placeholder.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
@@ -108,8 +103,7 @@ class _DiscoverViewState extends State<DiscoverView> {
       header: Center(
         child: Visibility(
             visible: _showSearchBehaviorProviderButtons, child: toggleButtons),
-      ), //TODO: switch when on search
-      // suggestions: [toogleButtons],
+      ),
       minimumChars: 1,
 
       onCancelled: () {

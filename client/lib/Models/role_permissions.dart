@@ -1,5 +1,4 @@
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
-import 'package:flutter/material.dart';
 
 enum ROLE { NOT_REGISTERED, USER, GENEHMIGER, BETREIBER }
 //weighting:0,              1,    2,          3;

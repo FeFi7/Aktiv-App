@@ -3,6 +3,7 @@ import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// ignore: must_be_immutable
 class RoundedInputFieldNumericKomma extends StatelessWidget {
   final String hintText;
   final IconData icon;

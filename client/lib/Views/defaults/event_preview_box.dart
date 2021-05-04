@@ -3,7 +3,6 @@ import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
-import 'package:aktiv_app_flutter/Views/defaults/event_preview_list.dart';
 import 'package:aktiv_app_flutter/Views/veranstaltung/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +22,6 @@ class EventPreviewBox extends StatefulWidget {
   AdditiveFormat additiveFormat;
   bool liked;
 
-  // TODO: Überprüfe ob Box höhe wirklich einheitlich ist
-
-  // TODO: Ob die veranstaltung geliked ist, sollte nicht übergeben werden,
-  // sondern aus einer singleton Klasse durch die id entnommen werdem
   EventPreviewBox(this.id, this.titel, this.description, this.additive);
 
   EventPreviewBox.load(Veranstaltung event, this.additiveFormat) {
@@ -36,6 +31,7 @@ class EventPreviewBox extends StatefulWidget {
     this.additive = _FormatAdditive(event.beginnTs);
   }
 
+  // ignore: non_constant_identifier_names
   String _FormatAdditive(DateTime dateTime) {
     switch (additiveFormat) {
       case AdditiveFormat.HOLE_DATETIME:
@@ -86,13 +82,6 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
       widget.liked = Provider.of<EventProvider>(context, listen: false)
           .isEventFavorite(widget.id);
 
-    //  image = NetworkImage("https://app.lebensqualitaet-burgrieden.de/" +"");
-    //  AssetImage("assets/images/lq_logo_klein.png");
-
-    // CircleAvatar image = CircleAvatar(
-    //                 // TODO: Bild der Preview Box muss noch dynamisch werden
-    //                 backgroundImage: AssetImage("assets/images/lq_logo_klein.png"),
-    //               );
     CircleAvatar image = Provider.of<EventProvider>(context, listen: false)
         .getPreviewImage(widget.id);
 
@@ -192,7 +181,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                           size: 48,
                         ),
                         onPressed: () {
-                          /// TODO: Verweise auf detail anischt der Veransanstaltung
+
                           Provider.of<BodyProvider>(context, listen: false)
                               .setBody(VeranstaltungDetailView(widget.id));
                           Provider.of<AppBarTitleProvider>(context,

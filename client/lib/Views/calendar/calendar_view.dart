@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
@@ -18,7 +18,6 @@ class CalendarView extends StatefulWidget {
   _CalendarViewState createState() => _CalendarViewState();
 }
 
-// TODO: Namen der Monate auf Deutsch ändern
 class _CalendarViewState extends State<CalendarView> {
   ValueNotifier<List<Veranstaltung>> _selectedEvents;
 

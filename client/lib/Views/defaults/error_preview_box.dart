@@ -1,8 +1,9 @@
-import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+
 import 'package:flutter/material.dart';
 
 import 'color_palette.dart';
 
+// ignore: must_be_immutable
 class ErrorPreviewBox extends StatefulWidget {
   String header, reason;
 

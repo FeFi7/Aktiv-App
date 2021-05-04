@@ -37,8 +37,6 @@ class UserProvider extends ChangeNotifier {
   bool get hatVerwalteteInstitutionen =>
       verwalteteInstitutionen.length != 0 ? true : false;
 
-  // TODO: Evtl die Rolle über den
-
   //  userRole => _role;
   static ROLE getUserRole() {
     return _role;
