@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class Veranstaltung {
   int id, institutionsId, erstellerId;
@@ -31,8 +33,7 @@ class Veranstaltung {
       this.selectedTags,
       this.institutionName,
       this.institutBeschreibung,
-      this.erstellerId) {
-  }
+      this.erstellerId) {}
 
   Veranstaltung.load(
       this.id,
@@ -59,9 +60,14 @@ class Veranstaltung {
 
     for (String file in images) {
       try {
-        loadedImages.add(Image(
-            image: NetworkImage(
-                "https://app.lebensqualitaet-burgrieden.de/" + file)));
+        if (file.endsWith(".pdf")) {
+          loadedImages.add(SfPdfViewer.network(
+              "https://app.lebensqualitaet-burgrieden.de/" + file, enableDoubleTapZooming: true));
+        } else {
+          loadedImages.add(Image(
+              image: NetworkImage(
+                  "https://app.lebensqualitaet-burgrieden.de/" + file)));
+        }
       } catch (e) {
         log("Fehler beim eines Bilder einer Veranstaltung");
       }

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
@@ -51,7 +52,10 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
 
           bool offerToDelete =
               veranstaltung.erstellerId == UserProvider.userId ||
-                  UserProvider.getUserRole() == ROLE.BETREIBER;
+                  Provider.of<UserProvider>(context, listen: false)
+                          .rolle
+                          .toLowerCase() ==
+                      "betreiber";
 
           return LayoutBuilder(
             builder:

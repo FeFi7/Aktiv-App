@@ -24,7 +24,7 @@ class UserProvider extends ChangeNotifier {
       accessToken,
       refreshToken,
       institutionen,
-      rolle,
+      rolle = "",
       profilBild,
       hausnummer,
       plz,
