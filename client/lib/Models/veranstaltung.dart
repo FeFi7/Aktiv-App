@@ -4,7 +4,7 @@ import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
 import 'package:flutter/material.dart';
 
 class Veranstaltung {
-  int id, institutionsId;
+  int id, institutionsId, erstellerId;
   String titel,
       beschreibung,
       kontakt,
@@ -30,13 +30,8 @@ class Veranstaltung {
       this.images,
       this.selectedTags,
       this.institutionName,
-      this.institutBeschreibung) {
-    // Muss noch code für id von database geschrieben werden
-    // Aktuell noch nur platzhalter
-    //int maxid = 0;
-    //maxid++;
-    //this.id = maxid;
-    //this.erstelltTs = DateTime.now();
+      this.institutBeschreibung,
+      this.erstellerId) {
   }
 
   Veranstaltung.load(
@@ -52,7 +47,8 @@ class Veranstaltung {
       this.images,
       this.selectedTags,
       this.institutionName,
-      this.institutBeschreibung);
+      this.institutBeschreibung,
+      this.erstellerId);
 
   EventPreviewBox getPreviewBox() {
     return EventPreviewBox.load(this, AdditiveFormat.HOLE_DATETIME);

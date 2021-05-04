@@ -571,6 +571,8 @@ class EventProvider extends ChangeNotifier {
       DateTime endeTs = DateTime.parse(ende);
       DateTime erstelltTs = DateTime.now();
 
+      int erstellerId = UserProvider.userId;
+
       Veranstaltung veranstaltung = Veranstaltung.load(
           eventId,
           titel,
@@ -584,7 +586,8 @@ class EventProvider extends ChangeNotifier {
           [],
           [],
           null,
-          null); //TODO: null weg machen
+          null,
+          erstellerId); //TODO: null weg machen
 
       loadEvent(veranstaltung);
 
@@ -651,7 +654,7 @@ class EventProvider extends ChangeNotifier {
 
   Veranstaltung getEventFromJson(Map<String, dynamic> json, bool forceNew) {
     // if(forceNew)
-    log('json:' + json.toString());
+    // log('json:' + json.toString());
 
     int id = json['id'];
 
@@ -714,6 +717,8 @@ class EventProvider extends ChangeNotifier {
     String institutionName = json['institutionName'];
     String institutBeschreibung = json['institutBeschreibung'];
 
+    int erstellerId = json['ersteller'] ?? -1;
+
     // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(
         id,
@@ -728,7 +733,8 @@ class EventProvider extends ChangeNotifier {
         fileList ?? [],
         tagList ?? [],
         institutionName,
-        institutBeschreibung);
+        institutBeschreibung,
+        erstellerId);
 
     loadEvent(event);
 

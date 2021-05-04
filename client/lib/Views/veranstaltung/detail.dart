@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
+import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
+import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_button_dynamic.dart';
+import 'package:aktiv_app_flutter/Models/role_permissions.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -37,8 +40,6 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
             return Center(child: CircularProgressIndicator());
           }
 
-          
-
           if (snapshot.data == null)
             return Center(
                 child: ErrorPreviewBox(
@@ -46,6 +47,10 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                     "Fehler beim Laden"));
 
           final veranstaltung = snapshot.data;
+
+          bool offerToDelete =
+              veranstaltung.erstellerId == UserProvider.userId ||
+                  UserProvider.getUserRole() == ROLE.BETREIBER;
 
           return LayoutBuilder(
             builder:
@@ -87,7 +92,8 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            veranstaltung.institutionName ?? "404",
+                                            veranstaltung.institutionName ??
+                                                "404",
                                             textAlign: TextAlign.start,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
@@ -98,7 +104,9 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                             ),
                                           ),
                                           Text(
-                                            veranstaltung.institutBeschreibung ?? "404",
+                                            veranstaltung
+                                                    .institutBeschreibung ??
+                                                "404",
                                             textAlign: TextAlign.left,
                                             maxLines: 5,
                                             overflow: TextOverflow.ellipsis,
@@ -318,54 +326,20 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     thickness: 2,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Ersteller')),
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerRight,
-                                        child: Text('Max Mustermann')),
-                                  ],
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5), //Abstand um den Button herum (oben/unten)
-                                  width: size.width * 0.9,
-                                  child: Divider(
-                                    color: ColorPalette.malibu.rgb,
-                                    thickness: 2,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Genehmigt von:')),
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerRight,
-                                        child: Text('Erika Musterfrau')),
-                                  ],
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5), //Abstand um den Button herum (oben/unten)
-                                  width: size.width * 0.9,
-                                  child: Divider(
-                                    color: ColorPalette.malibu.rgb,
-                                    thickness: 2,
-                                  ),
-                                ),
+                                Visibility(
+                                    visible: offerToDelete,
+                                    child: RoundedButton(
+                                      text: "Veranstaltung löschen",
+                                      color: ColorPalette.orange.rgb,
+                                      press: () {
+                                        //TODO: Veranstaltung löschen
+                                        //
+                                        //
+                                        var accessToken = Provider.of<UserProvider>(context, listen: false).getAccessToken();
+                                        attemptDeleteVeranstaltung(veranstaltung.id.toString(), accessToken);
+                                        Provider.of<BodyProvider>(context, listen: false).previousBody(context);
+                                      },
+                                    ))
                               ],
                             ),
                           ),
