@@ -58,9 +58,16 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   int institutionsId = 0;
   //
   List<String> images = [];
+  List<Image> imageList = [];
   String starttext = "Beginn";
   String endtext = "Ende";
-  String titel, beschreibung, email, plz, adresse, start = "Beginn", ende = "Ende";
+  String titel,
+      beschreibung,
+      email,
+      plz,
+      adresse,
+      start = "Beginn",
+      ende = "Ende";
   Locale de = Locale('de', 'DE');
 
   List<DropdownMenuItem<String>> items = [];
@@ -91,9 +98,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
     if (plz.length != 5) {
       return "PLZ Eingabe ungültig";
     }
-    if (institutionen.keys.length > 1 && institutionsId == 0){
+    if (institutionen.keys.length > 1 && institutionsId == 0) {
       return "Bitte Institution auswählen";
-
     }
     return 'OK';
   }
@@ -145,6 +151,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
           if (pickedFile != null) {
             //profileImage = File(pickedFile.path);
             images.add(profileImage.path);
+            imageList.add(Image.file(File(profileImage.path)));
           }
         },
       );
@@ -425,6 +432,32 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
 
                                 }
                               }
+                            })),
+                  ),
+                  Visibility(
+                    visible: imageList.length > 0 ? true : false,
+                    child: Container(
+                        height: 140,
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                            itemCount: imageList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
+                                  margin: const EdgeInsets.only(
+                                      left: 10.0, right: 10.0),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: imageList[index].image,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  height: 100,
+                                  width: 200,
+                                  child: null);
                             })),
                   ),
                   Visibility(
