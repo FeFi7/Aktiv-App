@@ -210,6 +210,19 @@ class _BodyState extends State<Body> {
             },
             child: Text("Info"),
           ),
+          TextButton(
+            onPressed: () async {
+              final url =
+                  "https://app.lebensqualitaet-burgrieden.de/Impressum.html";
+
+              await launch(
+                url,
+                forceSafariVC: false,
+                forceWebView: false,
+              );
+            },
+            child: Text("Impressum"),
+          ),
         ],
       );
     } else {

@@ -371,16 +371,27 @@ class UserProvider extends ChangeNotifier {
 
   Future getUngenehmigteVeranstaltungen() async {
     List _veranstaltungen = [];
-    List _genehmigerPLZs = await getGenehmigerPLZs(userId.toString());
-    if (_genehmigerPLZs != null) {
-      _genehmigerPLZs.forEach((element) async {
-        var veranstaltungen = await attemptGetAllVeranstaltungen(
-            "-1", "0", "25", "1", "-1", "-1", "-1", "-1", "-1", element);
+    if (rolle.toLowerCase() != "betreiber") {
+      List _genehmigerPLZs = await getGenehmigerPLZs(userId.toString());
 
-        if (veranstaltungen.statusCode == 200) {
-          _veranstaltungen.addAll(json.decode(veranstaltungen.body));
-        }
-      });
+      if (_genehmigerPLZs != null) {
+        _genehmigerPLZs.forEach((element) async {
+          var veranstaltungen = await attemptGetAllVeranstaltungen(
+              "-1", "0", "25", "1", "-1", "-1", "-1", "-1", "-1", element);
+
+          if (veranstaltungen.statusCode == 200) {
+            _veranstaltungen.addAll(json.decode(veranstaltungen.body));
+          }
+        });
+      }
+    } else {
+      var veranstaltungen = await attemptGetAllVeranstaltungen(
+          "-1", "0", "25", "1", "-1", "-1", "-1", "-1", "-1", "-1");
+
+      if (veranstaltungen.statusCode == 200) {
+        _veranstaltungen.addAll(json.decode(veranstaltungen.body));
+        return _veranstaltungen;
+      }
     }
     return _veranstaltungen;
   }
