@@ -26,7 +26,7 @@ class RoundedDatepickerButton extends StatelessWidget {
         // ignore: deprecated_member_use
         child: FlatButton(
           padding: EdgeInsets.symmetric(
-              vertical: 20, horizontal: 27.5), //max Höhe/Breite
+              vertical: 20, horizontal: 20), //max Höhe/Breite
           color: color,
           onPressed: press,
           child: Align(

@@ -462,20 +462,39 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   ),
                   Visibility(
                     visible: institutionVorhanden,
-                    child: new DropdownButton<dynamic>(
-                      hint: Text(selectedInstitutition),
-                      items: institutionen.keys.map((String value) {
-                        return new DropdownMenuItem<String>(
-                          value: value,
-                          child: new Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInstitutition = value;
-                          institutionsId = institutionen[value];
-                        });
-                      },
+                    child: Container(
+                      width: size.width * 0.8,
+                      height: 58,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 26),
+                      decoration: BoxDecoration(
+                          color: ColorPalette.malibu.rgb,
+                          borderRadius: BorderRadius.circular(29)),
+                      child: new DropdownButton<dynamic>(
+                        iconEnabledColor: ColorPalette.endeavour.rgb,
+                        style: TextStyle(color: ColorPalette.black.rgb),
+                        dropdownColor: ColorPalette.malibu.rgb,
+                        hint: Text(
+                          selectedInstitutition,
+                          style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        items: institutionen.keys.map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: Container(
+                                width: size.width * 0.6,
+                                child: new Text(value)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedInstitutition = value;
+                            institutionsId = institutionen[value];
+                          });
+                        },
+                      ),
                     ),
                   ),
                   Container(
