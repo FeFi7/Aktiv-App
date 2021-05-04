@@ -634,7 +634,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                                         ? NetworkImage(
                                             "https://app.lebensqualitaet-burgrieden.de/" +
                                                 snapShot.data[index]
-                                                    ['veranstaltungImage'])
+                                                    ['institutionsImage'])
                                         : Image.asset(
                                                 "assets/images/veranstaltungPic_default.png")
                                             .image,
