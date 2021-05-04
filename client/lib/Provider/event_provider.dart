@@ -708,8 +708,9 @@ class EventProvider extends ChangeNotifier {
 
     if (json['tags'] != null) {
       final List<dynamic> dynamicList =
-          json['tags'].map((item) => item).toList();
+          json['tags'].map((item) => item['name']).toList();
 
+      // log("tags" + json['tags'].toString());
       tagList = List<String>.from(dynamicList).toList();
 
       // log("tolle Liste: " + fileList.toString());
