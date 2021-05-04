@@ -1,4 +1,5 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:mime/mime.dart';
 import 'dart:io';
 import 'package:pdf_compressor/pdf_compressor.dart';
 import 'package:path/path.dart' as path;
@@ -8,6 +9,10 @@ Future<File> compressImage(File file) async {
 
   var dir = path.dirname(file.path);
   var newPath = path.join(dir, newFileName);
+
+  if (lookupMimeType(file.path) == 'image/png') {
+    return file;
+  }
 
   var result = await FlutterImageCompress.compressAndGetFile(file.path, newPath,
       quality: 50);

@@ -242,7 +242,6 @@ Future<http.Response> attemptCreateVeranstaltung(
     'plz': plz,
     'latitude': latitude,
     'longitude': longitude,
-    //'institutionId': institutionId,
     'userId': userId,
     'istGenehmigt': istGenehmigt
   };
