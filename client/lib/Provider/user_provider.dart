@@ -182,10 +182,15 @@ class UserProvider extends ChangeNotifier {
 
   changeProfileImage(File file) async {
     var jwt = await attemptNewProfilImage(file.path, file, userId.toString());
-    var parsedProfilBild = json.decode(jwt.body);
-    profilBild = parsedProfilBild['pfad'];
-    notifyListeners();
-    return jwt;
+    if (jwt.statusCode == 200) {
+      var parsedProfilBild = json.decode(jwt.body);
+      profilBild = parsedProfilBild['pfad'];
+      notifyListeners();
+      return jwt;
+    } else {
+      errorToast("falsches Bildformat\n(nur .jpg, .jpeg und .png unterstützt)");
+      return null;
+    }
   }
 
   loadProfileImage() async {
@@ -254,7 +259,6 @@ class UserProvider extends ChangeNotifier {
     var _accessToken = await getAccessToken();
     Response institutionen = await attemptGetVerwalteteInstitutionen(
         userId.toString(), _accessToken);
-
     if (institutionen.statusCode == 200) {
       _institutionen = json.decode(institutionen.body);
       return _institutionen;
@@ -298,10 +302,15 @@ class UserProvider extends ChangeNotifier {
   attemptImageForInstitution(File file, String institutionId) async {
     var jwt = await attemptNewImageForInstitution(
         file, institutionId, await getAccessToken());
-    var parsedInstitutionsBild = json.decode(jwt.body);
-    institutionBild = parsedInstitutionsBild['pfad'];
-    notifyListeners();
-    return jwt;
+
+    if (jwt.statusCode == 200) {
+      var parsedInstitutionsBild = json.decode(jwt.body);
+      institutionBild = parsedInstitutionsBild['pfad'];
+      notifyListeners();
+      return jwt;
+    } else {
+      errorToast("falsches Bildformat\n(nur .jpg, .jpeg und .png unterstützt)");
+    }
   }
 
   loadInstitutionImage() async {
