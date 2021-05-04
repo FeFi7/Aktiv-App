@@ -219,10 +219,11 @@ Future<http.Response> attemptCreateVeranstaltung(
     String endets,
     String ortBeschreibung,
     String plz,
-    String institutionId,
+    //String institutionId,
     String userId,
     String istGenehmigt,
-    [List<String> fileids = const ["-1"],
+    [String institutionId = "-1",
+    List<String> fileids = const ["-1"],
     List<String> tags = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
 
@@ -241,10 +242,14 @@ Future<http.Response> attemptCreateVeranstaltung(
     'plz': plz,
     'latitude': latitude,
     'longitude': longitude,
-    'institutionId': institutionId,
+    //'institutionId': institutionId,
     'userId': userId,
     'istGenehmigt': istGenehmigt
   };
+
+  if (institutionId != "-1") {
+    body.putIfAbsent('institutionId', () => institutionId);
+  }
 
   if (fileids.toString() != "[-1]") {
     body.putIfAbsent('fileIds', () => jsonEncode(fileids));
