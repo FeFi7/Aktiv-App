@@ -403,7 +403,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                 // toastmsg = error;
 
                               }
-                            })),
+                            }})),
                   ),
                   Visibility(
                     visible: institutionVorhanden,
