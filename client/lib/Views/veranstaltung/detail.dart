@@ -134,6 +134,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                             // A flexible child that will grow to fit the viewport but
                             // still be at least as big as necessary to fit its contents.
                             child: Container(
+                              margin: EdgeInsets.only(top: 15),
                               child: Column(
                                 children: [
                                   Container(

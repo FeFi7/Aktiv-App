@@ -752,7 +752,7 @@ class EventProvider extends ChangeNotifier {
   CircleAvatar getPreviewImage(int eventId) {
     if (previewImage[eventId] == null)
       return CircleAvatar(
-        backgroundImage: AssetImage("assets/images/wir_logo.png"),
+        backgroundImage: AssetImage("assets/images/wir_hier_logo_transparent.png"),
       );
     else
       return CircleAvatar(

@@ -184,11 +184,6 @@ class _CalendarViewState extends State<CalendarView> {
       disabledBuilder: (context, date, _) {
         return CalendarDay(date.day.toString(), ColorPalette.light_grey.rgb);
       },
-      // singleMarkerBuilder: (context, date, _) {
-      //   return SingleMarkerDay(
-      //       isSelected[1] ? ColorPalette.orange.rgb : ColorPalette.malibu.rgb);
-      // },
-
       markerBuilder: (context, date, events) {
         return events.length > 0
             ? (SingleMarkerDay(
@@ -215,13 +210,13 @@ class SingleMarkerDay extends StatelessWidget {
       right: 6,
       bottom: 3,
       child: Container(
-        height: 14,
-        width: 14,
+        height: 15,
+        width: 15,
         margin: const EdgeInsets.all(2),
         child: Center(
           child: Text(amount.toString(),
               style: TextStyle(
-                  color: ColorPalette.white.rgb, fontWeight: FontWeight.bold, fontSize: 11)),
+                  color: ColorPalette.white.rgb, fontWeight: FontWeight.bold, fontSize: 10)),
         ),
         decoration: new BoxDecoration(
             color: backgroundColor,
