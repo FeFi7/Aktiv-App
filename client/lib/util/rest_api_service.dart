@@ -6,7 +6,6 @@ import 'package:mime/mime.dart';
 import 'compress_service.dart';
 import '../util/geo_service.dart';
 
-//const SERVER_IP = "85.214.166.230";
 const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
 
 // [POST] Login User
@@ -176,8 +175,6 @@ Future<http.Response> attemptGetAllVeranstaltungen(
       // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
       List<String> coordinates = await getActualCoordinates();
       if (coordinates != null) {
-        // qParams.putIfAbsent('latitude', () => coordinates.first);
-        // qParams.putIfAbsent('longitude', () => coordinates.last);
         latitude = coordinates.first;
         longitude = coordinates.last;
         print('new lat: ' +
@@ -219,7 +216,6 @@ Future<http.Response> attemptCreateVeranstaltung(
     String endets,
     String ortBeschreibung,
     String plz,
-    //String institutionId,
     String userId,
     String istGenehmigt,
     [String institutionId = "-1",
@@ -286,6 +282,7 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
     return http.Response("File types allowed .jpeg, .jpg .png and .pdf!", 500);
   }
 
+  // Komprimiere Bild oder PDF Datei
   var compressedFile;
 
   if (mimetype == 'application/pdf') {
@@ -324,6 +321,7 @@ Future<http.Response> attemptNewProfilImage(
     return http.Response("File types allowed .jpeg, .jpg and png!", 500);
   }
 
+  // Komprimiere Bild
   var compressedFile = await compressImage(file);
 
   var _file = await http.MultipartFile.fromPath(
@@ -543,6 +541,7 @@ Future<http.Response> attemptNewImageForInstitution(
     return http.Response("File types allowed .jpeg, .jpg and png!", 500);
   }
 
+  // Komprimiere Bild
   var compressedFile = await compressImage(file);
 
   var _file = await http.MultipartFile.fromPath(
@@ -895,10 +894,6 @@ Future<http.Response> attemptGetUngenehmigteInstitutionen(
 
   return response;
 }
-
-// [DELETE] Lösche einzelnes File
-// ignore: missing_return
-Future<http.Response> attemptDeleteFile() async {}
 
 // [GET] TEST API
 Future<http.Response> testapi() async {
