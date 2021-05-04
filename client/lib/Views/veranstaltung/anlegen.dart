@@ -168,11 +168,13 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  
-                  RoundedInputField(
-                    hintText: "Titel",
-                    icon: Icons.title,
-                    controller: controllerTitel,
+                  Container(
+                    margin: EdgeInsets.only(top: size.width * 0.1),
+                    child: RoundedInputField(
+                      hintText: "Titel",
+                      icon: Icons.title,
+                      controller: controllerTitel,
+                    ),
                   ),
                   RoundedInputFieldBeschreibung(
                     hintText: 'Beschreibung der Veranstaltung',
@@ -264,9 +266,9 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     color: ColorPalette.malibu.rgb,
                     textColor: Colors.black54,
                     press: () async {
-                       currentDate = DateTime.now();
+                      currentDate = DateTime.now();
                       await _selectDate(context);
-
+                      DateTime checkEnde, checkStart;
                       setState(() {
                         String minute = currentTime.minute.toString();
                         String hour = currentTime.hour.toString();
@@ -303,6 +305,15 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             hour +
                             ":" +
                             minute;
+                        if (start.contains('Start') || ende.contains("Ende")) {
+                        } else {
+                          checkStart = DateTime.parse(start);
+                          checkEnde = DateTime.parse(ende);
+                          if (checkEnde.isBefore(checkStart)) {
+                            errorToast(
+                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                          }
+                        }
                       });
                     },
                   ),
@@ -313,6 +324,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     press: () async {
                       currentDate = DateTime.now().add(Duration(days: 1));
                       await _selectDate(context);
+                      DateTime checkEnde, checkStart;
 
                       setState(() {
                         String minute = currentTime.minute.toString();
@@ -350,6 +362,15 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             hour +
                             ":" +
                             minute;
+                        if (start.contains('Start') || ende.contains("Ende")) {
+                        } else {
+                          checkStart = DateTime.parse(start);
+                          checkEnde = DateTime.parse(ende);
+                          if (checkEnde.isBefore(checkStart)) {
+                            errorToast(
+                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                          }
+                        }
                       });
                     },
                   ),
@@ -365,6 +386,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             textColor: Colors.black54,
                             press: () async {
                               await getImage();
+
                               if(profileImage != null){
                               Response resp = await attemptFileUpload(
                                   'Bild1', profileImage);
@@ -379,8 +401,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                 // var parsedJson = json.decode(resp.body);
                                 // var error = parsedJson['error'];
                                 // toastmsg = error;
+
                               }
-                              setState(() {});}
                             })),
                   ),
                   Visibility(
@@ -402,7 +424,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, size.width * 0.1, 15),
+                    margin: EdgeInsets.fromLTRB(
+                        size.width * 0.1, 10, size.width * 0.1, 15),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: RoundedButtonDynamic(
