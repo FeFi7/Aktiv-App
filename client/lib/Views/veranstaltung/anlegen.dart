@@ -328,6 +328,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     color: ColorPalette.malibu.rgb,
                     textColor: Colors.black54,
                     press: () async {
+                      currentDate = DateTime.now().add(Duration(days: 1));
                       await _selectDate(context);
 
                       setState(() {
