@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex =
       0; // Index des ausgewählten Item's der BottomNavigationBar
 
-  // static const TextStyle optionStyle 
+  // static const TextStyle optionStyle
   //     TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static final List<Widget> _widgetOptions = <Widget>[
     DiscoverView(),
@@ -87,22 +87,19 @@ class _HomePageState extends State<HomePage> {
         title: Consumer<AppBarTitleProvider>(builder: (context, value, child) {
           return Text(value.title, style: TextStyle(fontSize: 25));
         }),
-        leading: /*(!UserProvider.istEingeloggt ||
-                Provider.of<BodyProvider>(context, listen: false)
-                        .previous
-                        .length >
-                    0)*/ true
-            ? IconButton(
-                icon: Icon(Icons.chevron_left_rounded,
-                    color: Colors.white, size: 48),
-                onPressed: () {
-                  Provider.of<BodyProvider>(context, listen: false)
-                      .previousBody(context);
-                  Provider.of<AppBarTitleProvider>(context, listen: false)
-                      .previousTitle(context);
-                },
-              )
-            : Container(),
+        leading: Visibility(
+          visible: Provider.of<BodyProvider>(context, listen: false).previous.length >
+                    0 || !UserProvider.istEingeloggt,
+                  child: IconButton(
+            icon: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 48),
+            onPressed: () {
+              Provider.of<BodyProvider>(context, listen: false)
+                  .previousBody(context);
+              Provider.of<AppBarTitleProvider>(context, listen: false)
+                  .previousTitle(context);
+            },
+          ),
+        ),
       ),
       body: Center(
         child: body,
