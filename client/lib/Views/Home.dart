@@ -87,19 +87,9 @@ class _HomePageState extends State<HomePage> {
         title: Consumer<AppBarTitleProvider>(builder: (context, value, child) {
           return Text(value.title, style: TextStyle(fontSize: 25));
         }),
-        leading: Visibility(
-          visible: Provider.of<BodyProvider>(context, listen: false).previous.length >
-                    0 || !UserProvider.istEingeloggt,
-                  child: IconButton(
-            icon: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 48),
-            onPressed: () {
-              Provider.of<BodyProvider>(context, listen: false)
-                  .previousBody(context);
-              Provider.of<AppBarTitleProvider>(context, listen: false)
-                  .previousTitle(context);
-            },
-          ),
-        ),
+        leading: Consumer<AppBarTitleProvider>(builder: (context, value, child) {
+          return value.getBackButton(context);
+        }),
       ),
       body: Center(
         child: body,
@@ -139,6 +129,22 @@ class _HomePageState extends State<HomePage> {
 
 class AppBarTitleProvider extends ChangeNotifier {
   String _title = 'wir:hier';
+
+  Widget getBackButton(BuildContext context) {
+    return Visibility(
+          visible: Provider.of<BodyProvider>(context, listen: false).previous.length >
+                    0 || !UserProvider.istEingeloggt,
+                  child: IconButton(
+            icon: Icon(Icons.chevron_left_rounded, color: Colors.white, size: 48),
+            onPressed: () {
+              Provider.of<BodyProvider>(context, listen: false)
+                  .previousBody(context);
+              Provider.of<AppBarTitleProvider>(context, listen: false)
+                  .previousTitle(context);
+            },
+          ),
+        );
+  }
 
   ListQueue previous = ListQueue<String>();
 
