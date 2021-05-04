@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
@@ -63,7 +62,11 @@ class EventProvider extends ChangeNotifier {
 
   /// Löscht ein Event, falls es geladen ist
   void removeEventIfLoaded(int id) {
-    if (loaded.containsKey(id)) loaded.remove(id);
+    if (loaded.containsKey(id)) {
+      dated[loaded[id].beginnTs].remove(id);
+      loaded.remove(id);
+    }
+
     if (favorites.contains(id)) favorites.remove(id);
     if (upComing.contains(id)) upComing.remove(id);
     if (nearby.contains(id)) nearby.remove(id);
@@ -265,7 +268,6 @@ class EventProvider extends ChangeNotifier {
   /// Lädt Events aus Datenbank, die vor dem übergebenen Datum stattfinden
   Future<List<Veranstaltung>> loadEventsUntil(
       int startPage, int maxPages, EventListType type, DateTime until) async {
-
     String entfernung =
         EventListType.NEAR_BY == type ? UserProvider.naehe.toString() : "-1";
     String sorting = EventListType.NEAR_BY == type
@@ -426,7 +428,7 @@ class EventProvider extends ChangeNotifier {
       //   for (int i = 0; i < allowedToApprove.length; i++) {
       //     Veranstaltung event = loaded[allowedToApprove[i]];
       //     // if(event.)
-      //     
+      //
       //   }
 
       //   return allowedToApprove.map((id) => getLoadedEventById(id)).toList();
@@ -545,7 +547,6 @@ class EventProvider extends ChangeNotifier {
       List<String> imageIds,
       List<String> selectedTags) async {
     int userId = UserProvider.userId;
-
 
     Response resp = await attemptCreateVeranstaltung(
         titel,
@@ -745,7 +746,8 @@ class EventProvider extends ChangeNotifier {
   CircleAvatar getPreviewImage(int eventId) {
     if (previewImage[eventId] == null)
       return CircleAvatar(
-        backgroundImage: AssetImage("assets/images/wir_hier_logo_transparent.png"),
+        backgroundImage:
+            AssetImage("assets/images/wir_hier_logo_transparent.png"),
       );
     else
       return CircleAvatar(

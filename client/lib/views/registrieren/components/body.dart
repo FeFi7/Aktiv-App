@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/components/rounded_button.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
@@ -9,6 +10,7 @@ import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Body extends StatefulWidget {
@@ -136,6 +138,7 @@ class _BodyState extends State<Body> {
                         errorToast(
                             "Bitte AGBs und Datenschutzerklärung akzeptieren");
                       } else {
+                        Provider.of<EventProvider>(context, listen: false).resetEventListType(EventListType.FAVORITES);
                         var jwt = await attemptSignUp(mail, password);
 
                         if (jwt.statusCode == 502) {

@@ -150,11 +150,6 @@ class _CalendarViewState extends State<CalendarView> {
                       : "Für eine generauer Übersicht Tag auswählen"));
             }
 
-            for(int i = 0; i < value.length; i++)
-              if(value[i] == null)
-                value.removeAt(i--);
-
-
             return ListView.builder(
               itemCount: value.length,
               itemBuilder: (context, index) {
