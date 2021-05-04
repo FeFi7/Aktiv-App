@@ -1,4 +1,3 @@
-
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
@@ -52,6 +51,12 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                           .rolle
                           .toLowerCase() ==
                       "betreiber";
+
+          String tags = "";
+          for (int i = 0; i < veranstaltung.selectedTags.length; i++) {
+            tags += veranstaltung.selectedTags[i] +
+                (i < (veranstaltung.selectedTags.length - 1) ? ", " : "");
+          }
 
           return LayoutBuilder(
             builder:
@@ -287,6 +292,29 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                                     'dd.MM.yyyy – kk:mm')
                                                 .format(veranstaltung.endeTs) +
                                             " Uhr")),
+                                  ],
+                                ),Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical:
+                                          5),
+                                  width: size.width * 0.9,
+                                  child: Divider(
+                                    color: ColorPalette.malibu.rgb,
+                                    thickness: 2,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                        width: size.width * 0.4,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text('Tags')),
+                                    Container(
+                                        width: size.width * 0.4,
+                                        alignment: Alignment.centerRight,
+                                        child: Text(tags)),
                                   ],
                                 ),
                                 Container(
