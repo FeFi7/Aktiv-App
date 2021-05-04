@@ -1,14 +1,14 @@
 import 'package:aktiv_app_flutter/Views/defaults/event_preview_box.dart';
+import 'package:flutter/material.dart';
 
 class Veranstaltung {
-
   int id, institutionsId;
   String titel, beschreibung, kontakt, plz, ortBeschr;
 
   DateTime beginnTs, endeTs, erstelltTs;
   double latitude, longitude;
   List<String> selectedTags = [];
-  List<String> imageIds = [];
+  List<String> images = [];
   //Bilder mit abspeichern
 
   Veranstaltung.create(
@@ -18,9 +18,8 @@ class Veranstaltung {
     this.ortBeschr,
     this.beginnTs,
     this.endeTs,
-
     this.institutionsId,
-    this.imageIds,
+    this.images,
     this.selectedTags,
   ) {
     // Muss noch code für id von database geschrieben werden
@@ -40,13 +39,23 @@ class Veranstaltung {
     this.beginnTs,
     this.endeTs,
     this.erstelltTs,
-  
     this.institutionsId,
-    this.imageIds,
+    this.images,
     this.selectedTags,
   );
 
   EventPreviewBox getPreviewBox() {
     return EventPreviewBox.load(this, AdditiveFormat.HOLE_DATETIME);
+  }
+
+  List<Widget> getImages() {
+    List<Widget> loadedImages = [];
+
+    for (String file in images) {
+      loadedImages.add(
+          Image(image: NetworkImage("https://app.lebensqualitaet-burgrieden.de/" + file)));
+    }
+
+    return loadedImages;
   }
 }

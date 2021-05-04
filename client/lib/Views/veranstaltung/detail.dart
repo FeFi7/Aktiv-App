@@ -30,13 +30,14 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
 
     return FutureBuilder<Veranstaltung>(
         future: Provider.of<EventProvider>(context, listen: false)
-            .getEventById(widget.id),
+            .loadEventById(widget.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(child: CircularProgressIndicator());
           }
 
           final veranstaltung = snapshot.data;
+
           return LayoutBuilder(
             builder:
                 (BuildContext context, BoxConstraints viewportConstraints) {
@@ -80,44 +81,43 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                             ),
                           ),
                         ),
-                        Expanded(
-                          // A flexible child that will grow to fit the viewport but
-                          // still be at least as big as necessary to fit its contents.
-                          child: Container(
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: size.width,
-                                  child: CarouselSlider(
-                                    options: CarouselOptions(
-                                      height: size.height * 0.3,
+                        Visibility(
+                          visible: veranstaltung.getImages().length > 0,
+                                                  child: Expanded(
+                            // A flexible child that will grow to fit the viewport but
+                            // still be at least as big as necessary to fit its contents.
+                            child: Container(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: size.width,
+                                    child: CarouselSlider(
+                                      options: CarouselOptions(
+                                        height: size.height * 0.3,
+                                      ),
+                                      items: veranstaltung.getImages().map((image) {
+                                        return Builder(
+                                          builder: (BuildContext context) {
+                                            return Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 5.0),
+                                                // decoration: BoxDecoration(
+                                                //     color:
+                                                //         ColorPalette.malibu.rgb),
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  child: image,
+                                                ));
+                                          },
+                                        );
+                                      }).toList(),
                                     ),
-                                    items: [1, 2, 3, 4, 5].map((i) {
-                                      return Builder(
-                                        builder: (BuildContext context) {
-                                          return Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 5.0),
-                                              decoration: BoxDecoration(
-                                                  color:
-                                                      ColorPalette.malibu.rgb),
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  'Bild $i',
-                                                  style:
-                                                      TextStyle(fontSize: 16.0),
-                                                ),
-                                              ));
-                                        },
-                                      );
-                                    }).toList(),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),

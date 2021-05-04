@@ -45,7 +45,7 @@ class EventProvider extends ChangeNotifier {
   static final List<int> favorites = [];
 
   /// Liste aller Event ID's die als genehmigt markiert sind.
-  static final List<int> pendingApproval = [];
+  // static final List<int> pendingApproval = [];
 
   /// Die Standard Menge an events, die von EINEM attempt Aufruf geladen werden sollen
   static final int pageSize = 25;
@@ -64,9 +64,9 @@ class EventProvider extends ChangeNotifier {
   }
 
   /// Gibt eine Liste aller Events mit ausstehender genehmigung zurück
-  List<Veranstaltung> getEventWithPendingApproval() {
-    return pendingApproval.map((id) => getLoadedEventById(id)).toList();
-  }
+  // List<Veranstaltung> getEventWithPendingApproval() {
+  //   return pendingApproval.map((id) => getLoadedEventById(id)).toList();
+  // }
 
   /// Gibt eine Liste aller Events zurück die als favorisiert markiert sind
   List<Veranstaltung> getLoadedFavoritesEvents() {
@@ -177,8 +177,9 @@ class EventProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 
-        final List<dynamic> dynamicList =
-            await parsedJson.map((item) => getEventFromJson(item)).toList();
+        final List<dynamic> dynamicList = await parsedJson
+            .map((item) => getEventFromJson(item, false))
+            .toList();
 
         final List<Veranstaltung> responseList =
             List<Veranstaltung>.from(dynamicList).toList();
@@ -222,8 +223,9 @@ class EventProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 
-        final List<dynamic> dynamicList =
-            await parsedJson.map((item) => getEventFromJson(item)).toList();
+        final List<dynamic> dynamicList = await parsedJson
+            .map((item) => getEventFromJson(item, false))
+            .toList();
 
         final List<Veranstaltung> responseList =
             List<Veranstaltung>.from(dynamicList).toList();
@@ -286,8 +288,9 @@ class EventProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 
-        final List<dynamic> dynamicList =
-            await parsedJson.map((item) => getEventFromJson(item)).toList();
+        final List<dynamic> dynamicList = await parsedJson
+            .map((item) => getEventFromJson(item, false))
+            .toList();
 
         final List<Veranstaltung> responseList =
             List<Veranstaltung>.from(dynamicList).toList();
@@ -388,8 +391,8 @@ class EventProvider extends ChangeNotifier {
         if (startPage == 1) nearby.clear();
 
         for (Veranstaltung event in loaded)
-          if (!pendingApproval.contains(event.id) && !nearby.contains(event.id))
-            nearby.add(event.id);
+          if (/*!pendingApproval.contains(event.id) && */ !nearby
+              .contains(event.id)) nearby.add(event.id);
 
         /// TODO: Wenn nearby dann nicht get all sondern dafpr noch austehende api route aufrufen
 
@@ -400,30 +403,30 @@ class EventProvider extends ChangeNotifier {
         if (startPage == 1) upComing.clear();
 
         for (Veranstaltung event in loaded)
-          if (!pendingApproval.contains(event.id) &&
+          if (/*!pendingApproval.contains(event.id) &&*/
               !upComing.contains(event.id)) upComing.add(event.id);
 
         return upComing.map((id) => getLoadedEventById(id)).toList();
-      case EventListType.APPROVE:
-        // if (startPage == 1) pendingApproval.clear();
+      // case EventListType.APPROVE:
+      //   // if (startPage == 1) pendingApproval.clear();
 
-        var response = await attemptGetPLZs(UserProvider.userId.toString());
+      //   var response = await attemptGetPLZs(UserProvider.userId.toString());
 
-        if (response.statusCode == 200) {
-          log("plzs: " + response.body);
-          // TODO: Zugewiese Posteiltzahlen einfügen
-          //
-        }
+      //   if (response.statusCode == 200) {
+      //     log("plzs: " + response.body);
+      //     // TODO: Zugewiese Posteiltzahlen einfügen
+      //     //
+      //   }
 
-        List<int> allowedToApprove = pendingApproval.toList();
+      //   List<int> allowedToApprove = pendingApproval.toList();
 
-        for (int i = 0; i < allowedToApprove.length; i++) {
-          Veranstaltung event = loaded[allowedToApprove[i]];
-          // if(event.)
-          // TODO: Veranstaltungen removen die man nicht verwaten darf
-        }
+      //   for (int i = 0; i < allowedToApprove.length; i++) {
+      //     Veranstaltung event = loaded[allowedToApprove[i]];
+      //     // if(event.)
+      //     // TODO: Veranstaltungen removen die man nicht verwaten darf
+      //   }
 
-        return allowedToApprove.map((id) => getLoadedEventById(id)).toList();
+      //   return allowedToApprove.map((id) => getLoadedEventById(id)).toList();
       default:
         return [];
     }
@@ -510,26 +513,49 @@ class EventProvider extends ChangeNotifier {
     return null;
   }
 
-  Future<Veranstaltung> getEventById(int id) async {
-    if (isEventLoaded(id)) return loaded[id];
+  Future<Veranstaltung> loadEventById(int id) async {
+    // if (isEventLoaded(id)) return loaded[id];
     var response = await attemptGetVeranstaltungByID(id);
-    if (response.statusCode == 200) {
-      var parsedJson = json.decode(response.body);
+    // if (response.statusCode == 200) {
+    var parsedJson = json.decode(response.body);
+    log("parsedJson.toString(): " + parsedJson.toString());
+    Veranstaltung event = getEventFromJson(parsedJson, true);
 
-      Veranstaltung event = await getEventFromJson(parsedJson);
-
-      return event;
-    }
-    return null;
+    return event;
+    // }
+    // log('message');
+    // return null;
+    // return Veranstaltung.;
   }
 
-  Future<Veranstaltung> createEvent(String titel, String beschreibung,
-      String email, String start, String ende, String adresse,String plz,int institutionsid,int istGehnemigt,List<String>imageIds,List<String>selectedTags) async {
+  Future<Veranstaltung> createEvent(
+      String titel,
+      String beschreibung,
+      String email,
+      String start,
+      String ende,
+      String adresse,
+      String plz,
+      int institutionsid,
+      int istGehnemigt,
+      List<String> imageIds,
+      List<String> selectedTags) async {
     int userId = UserProvider.userId;
-    // 
+    //
     /// TODO: ACHTUNG NOCH KONSTANTE PARAM ÜBERGABE
-    Response resp = await attemptCreateVeranstaltung(titel, beschreibung, email,
-        start, ende, adresse, plz,  institutionsid.toString(), userId.toString(),istGehnemigt.toString(),imageIds,selectedTags);
+    Response resp = await attemptCreateVeranstaltung(
+        titel,
+        beschreibung,
+        email,
+        start,
+        ende,
+        adresse,
+        plz,
+        institutionsid.toString(),
+        userId.toString(),
+        istGehnemigt.toString(),
+        imageIds,
+        selectedTags);
 
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
@@ -540,7 +566,7 @@ class EventProvider extends ChangeNotifier {
       DateTime erstelltTs = DateTime.now();
 
       Veranstaltung veranstaltung = Veranstaltung.load(eventId, titel,
-          beschreibung, email, adresse, startTs, endeTs, erstelltTs,1,[],[]);
+          beschreibung, email, adresse, startTs, endeTs, erstelltTs, 1, [], []);
 
       loadEvent(veranstaltung);
 
@@ -566,8 +592,6 @@ class EventProvider extends ChangeNotifier {
       dated[event.beginnTs].add(event.id);
     else
       dated[event.beginnTs] = [event.id];
-
-    if (!upComing.contains(event.id)) upComing.add(event.id);
 
     notifyListeners();
   }
@@ -607,7 +631,9 @@ class EventProvider extends ChangeNotifier {
     return isEventFavorite(eventId);
   }
 
-  Veranstaltung getEventFromJson(Map<String, dynamic> json) {
+  Veranstaltung getEventFromJson(Map<String, dynamic> json, bool forceNew) {
+    log('json:' + json.toString());
+
     int id = json['id'];
 
     if (json['favorit'].toString() == "1" && !favorites.contains(id)) {
@@ -616,15 +642,20 @@ class EventProvider extends ChangeNotifier {
     } else if (json['favorit'].toString() == "0" && favorites.contains(id))
       favorites.remove(id);
 
-    if (json['istGenehmigt'].toString() == "0" && !pendingApproval.contains(id))
-      pendingApproval.add(id);
-    else if (json['istGenehmigt'].toString() == "1" &&
-        pendingApproval.contains(id)) pendingApproval.remove(id);
+    // if (json['istGenehmigt'].toString() == "0" && !pendingApproval.contains(id))
+    //   pendingApproval.add(id);
+    // else if (json['istGenehmigt'].toString() == "1" &&
+    //     pendingApproval.contains(id)) pendingApproval.remove(id);
+
+    if (json['istGenehmigt'].toString() != "1")
+      log("Nicht genehmigte Veranstaltung geladen. (id: " +
+          id.toString() +
+          ")");
 
     if (json['entfernung'] != null)
       distance[id] = double.parse(json['entfernung'].toString());
 
-    if (isEventLoaded(id)) return loaded[id];
+    if (isEventLoaded(id) && !forceNew) return loaded[id];
 
     String titel = json['titel'];
     String description = json['beschreibung'];
@@ -635,13 +666,35 @@ class EventProvider extends ChangeNotifier {
 
     var institutionImage = json['institutionImage'];
 
-    if (institutionImage != null) previewImage[id] = institutionImage;;
+    if (institutionImage != null) previewImage[id] = institutionImage;
+    
+    List<String> fileList = null;
+
+    if (json['files'] != null) {
+      final List<dynamic> dynamicList =
+          json['files'].map((item) => item['pfad']).toList();
+
+      fileList = List<String>.from(dynamicList).toList();
+
+      log("tolle Liste: " + fileList.toString());
+    }
+
+        List<String> tagList = null;
+
+    if (json['tags'] != null) {
+      final List<dynamic> dynamicList =
+          json['tags'].map((item) => item).toList();
+
+      tagList = List<String>.from(dynamicList).toList();
+
+      log("tolle Liste: " + fileList.toString());
+    }
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 
     // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(
-        id, titel, description, contact, place, start, end, created, 1,[],[]);
+        id, titel, description, contact, place, start, end, created, 1, fileList ?? [], tagList ?? []);
 
     loadEvent(event);
 

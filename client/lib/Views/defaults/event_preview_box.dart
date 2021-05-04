@@ -60,7 +60,9 @@ class EventPreviewBox extends StatefulWidget {
                             " Minuten"))));
       case AdditiveFormat.DISTANCE:
         double distance = EventProvider.getDistanceToEvent(id);
-        return distance.toString() + " km weit entfernt";
+        if (distance > 0) return distance.toString() + " km weit entfernt";
+
+        return "In unmittelbarer Nähe";
       default:
         return "null";
     }
@@ -92,7 +94,7 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
     //                 backgroundImage: AssetImage("assets/images/lq_logo_klein.png"),
     //               );
     CircleAvatar image = Provider.of<EventProvider>(context, listen: false)
-          .getPreviewImage(widget.id);
+        .getPreviewImage(widget.id);
 
     return FractionallySizedBox(
       widthFactor: 1,
@@ -180,7 +182,8 @@ class _EventPreviewBoxState extends State<EventPreviewBox> {
                                 widget.liked = !widget.liked;
                               });
                               Provider.of<EventProvider>(context, listen: false)
-                                  .toggleEventsFavoriteState(context, widget.id);
+                                  .toggleEventsFavoriteState(
+                                      context, widget.id);
                             })
                         : Container()),
                     IconButton(
