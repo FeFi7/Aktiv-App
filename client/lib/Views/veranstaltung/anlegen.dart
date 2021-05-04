@@ -59,6 +59,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   //
   List<String> images = [];
   List<Image> imageList = [];
+  List<String> pdfPathList = [];
   String starttext = "Beginn";
   String endtext = "Ende";
   String titel,
@@ -154,6 +155,11 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             if (['.jpg', '.jpeg', '.png'].contains(profileImage.path
                 .substring(profileImage.path.lastIndexOf(".")))) {
               imageList.add(Image.file(File(profileImage.path)));
+            } else if (profileImage.path
+                    .substring(profileImage.path.lastIndexOf(".")) ==
+                ".pdf") {
+              pdfPathList.add(profileImage.path
+                  .substring(profileImage.path.lastIndexOf("/") + 1));
             }
           }
         },
@@ -464,46 +470,64 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             })),
                   ),
                   Visibility(
+                    visible: pdfPathList.length > 0 ? true : false,
+                    child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 0, 0, 25),
+                        child: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+                            itemCount: pdfPathList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
+                                  height: 30,
+                                  width: 200,
+                                  child: ListTile(
+                                      leading: Icon(
+                                        Icons.picture_as_pdf,
+                                        color: Color.fromRGBO(244, 15, 2, 1),
+                                      ),
+                                      title: Text(pdfPathList[index])));
+                            })),
+                  ),
+                  Visibility(
                     visible: institutionVorhanden,
                     child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(29),
-                        color: ColorPalette.malibu.rgb,
-                      ),
-                      height: 58,
                       width: size.width * 0.8,
-                      padding: const EdgeInsets.fromLTRB(25, 5, 20, 0),
-                      child: new Theme(
-                        data: Theme.of(context).copyWith(
-                          canvasColor: Colors.blue.shade200,
-                        ),
-                        child: new DropdownButton<dynamic>(
+                      height: 58,
+                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 26),
+                      decoration: BoxDecoration(
+                          color: ColorPalette.malibu.rgb,
+                          borderRadius: BorderRadius.circular(29)),
+                      child: new DropdownButton<dynamic>(
+                        iconEnabledColor: ColorPalette.endeavour.rgb,
+                        style: TextStyle(color: ColorPalette.black.rgb),
+                        dropdownColor: ColorPalette.malibu.rgb,
+                        hint: Text(
+                          selectedInstitutition,
                           style: TextStyle(
-                            color: ColorPalette.torea_bay.rgb,
-                          ),
-                          iconEnabledColor: ColorPalette.torea_bay.rgb,
-                          hint: Text(
-                            selectedInstitutition,
-                            style: TextStyle(
-                              color: ColorPalette.torea_bay.rgb,
-                            ),
-                          ),
-                          items: institutionen.keys.map((String value) {
-                            return new DropdownMenuItem<String>(
-                              value: value,
-                              child: Container(
-                                child: new Text(value),
-                                width: size.width * 0.6,
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedInstitutition = value;
-                              institutionsId = institutionen[value];
-                            });
-                          },
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold),
                         ),
+                        items: institutionen.keys.map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: Container(
+                                width: size.width * 0.6,
+                                child: new Text(value)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedInstitutition = value;
+                            institutionsId = institutionen[value];
+                          });
+                        },
                       ),
                     ),
                   ),
