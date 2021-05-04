@@ -472,7 +472,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   Visibility(
                     visible: pdfPathList.length > 0 ? true : false,
                     child: Container(
-                        padding: EdgeInsets.fromLTRB(20, 0, 0, 25),
+                        padding: EdgeInsets.fromLTRB(20, 0, 0, 15),
                         child: ListView.builder(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
