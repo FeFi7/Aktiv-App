@@ -657,6 +657,43 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         snapShot.data[index]['beschreibung'],
                         style: TextStyle(color: ColorPalette.black.rgb),
                       ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                              width: 50,
+                              alignment: Alignment.centerLeft,
+                              child: Text('Kontakt')),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              snapShot.data[index]['kontakt'],
+                              style: TextStyle(color: ColorPalette.black.rgb),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
+                      ),
                       SizedBox(height: 40.0),
                       RoundedButton(
                         text: "Veranstaltung genehmigen",
