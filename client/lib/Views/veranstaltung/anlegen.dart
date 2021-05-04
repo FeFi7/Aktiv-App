@@ -54,7 +54,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   final controllerAdresse = TextEditingController();
 
 
-  int institutionsId = 0;
+  int institutionsId = -1;
   //
   List<String> images = [];
   String starttext = "Beginn";
@@ -441,8 +441,9 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                         ende,
                                         controllerAdresse.text,
                                         controllerPlz.text,
-                                        institutionsId,
+                                        
                                         istGenehmigt,
+                                        institutionsId,
                                         imageIds,
                                         selectedTags)
                                     .then((event) => {

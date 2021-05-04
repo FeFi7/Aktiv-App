@@ -16,7 +16,7 @@ class EnvironmentPlaceholder extends StatefulWidget {
 
 class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
   final TextStyle headingStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: ColorPalette.endeavour.rgb);
 
   Future<List<List<Veranstaltung>>> loadEventsFromProvider() async {
     List<List<Veranstaltung>> lists = [];

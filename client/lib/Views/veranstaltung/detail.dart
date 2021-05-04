@@ -4,6 +4,7 @@ import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
+import 'package:aktiv_app_flutter/Views/defaults/error_preview_box.dart';
 import 'package:aktiv_app_flutter/components/rounded_button_dynamic.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
 import 'package:carousel_slider/carousel_options.dart';
@@ -38,6 +39,11 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
 
           final veranstaltung = snapshot.data;
 
+          if (veranstaltung == null)
+            return Center(
+                child: ErrorPreviewBox(
+                    "Fehler 404", "Fehler beim Laden aufgetreten"));
+
           return LayoutBuilder(
             builder:
                 (BuildContext context, BoxConstraints viewportConstraints) {
@@ -49,41 +55,67 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                   child: IntrinsicHeight(
                     child: Column(
                       children: <Widget>[
-                        Container(
+                        Visibility(
+                          visible: veranstaltung.institutBeschreibung != null &&
+                              veranstaltung.institutionName != null,
                           child: Container(
-                            height: size.height * 0.3,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  child: ClipOval(
-                                    child: Container(
-                                      width: size.width * 0.35,
-                                      height: size.width * 0.35,
-                                      child: Provider.of<EventProvider>(context,
-                                              listen: false)
-                                          .getPreviewImage(veranstaltung.id),
+                            child: Container(
+                              padding: EdgeInsets.all(20),
+                              height: size.height * 0.3,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Container(
+                                    child: ClipOval(
+                                      child: Container(
+                                        width: size.width * 0.35,
+                                        height: size.width * 0.35,
+                                        child: Provider.of<EventProvider>(
+                                                context,
+                                                listen: false)
+                                            .getPreviewImage(veranstaltung.id),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                    width: size.width * 0.40,
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text:
-                                            'Name Veranstalter, + kurze Beschreibung',
-                                        style:
-                                            DefaultTextStyle.of(context).style,
-                                      ),
-                                      softWrap: true,
-                                    ))
-                              ],
+                                  Container(
+                                      width: size.width * 0.60,
+                                      child: Column(
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              text:
+                                                  veranstaltung.institutionName,
+                                                  
+                                              style: TextStyle(
+                                                color: ColorPalette.black.rgb,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                              
+                                              ),
+                                            ),
+                                            softWrap: true,
+                                          ),
+                                          RichText(
+                                            text: TextSpan(
+                                              text: veranstaltung
+                                                  .institutBeschreibung,
+                                              style:
+                                                  DefaultTextStyle.of(context)
+                                                      .style,
+                                            ),
+                                            softWrap: true,
+                                          )
+                                        ],
+                                      ))
+                                ],
+                              ),
                             ),
                           ),
                         ),
                         Visibility(
                           visible: veranstaltung.getImages().length > 0,
-                                                  child: Expanded(
+                          child: Expanded(
                             // A flexible child that will grow to fit the viewport but
                             // still be at least as big as necessary to fit its contents.
                             child: Container(
@@ -95,7 +127,9 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                       options: CarouselOptions(
                                         height: size.height * 0.3,
                                       ),
-                                      items: veranstaltung.getImages().map((image) {
+                                      items: veranstaltung
+                                          .getImages()
+                                          .map((image) {
                                         return Builder(
                                           builder: (BuildContext context) {
                                             return Container(
@@ -214,8 +248,11 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     Container(
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
-                                        child: Text(
-                                            DateFormat('dd.MM.yyyy – kk:mm').format(veranstaltung.beginnTs) + " Uhr")),
+                                        child: Text(DateFormat(
+                                                    'dd.MM.yyyy – kk:mm')
+                                                .format(
+                                                    veranstaltung.beginnTs) +
+                                            " Uhr")),
                                   ],
                                 ),
                                 Container(
@@ -239,8 +276,10 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     Container(
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
-                                        child: Text(
-                                            DateFormat('dd.MM.yyyy – kk:mm').format(veranstaltung.endeTs) + " Uhr")),
+                                        child: Text(DateFormat(
+                                                    'dd.MM.yyyy – kk:mm')
+                                                .format(veranstaltung.endeTs) +
+                                            " Uhr")),
                                   ],
                                 ),
                                 Container(

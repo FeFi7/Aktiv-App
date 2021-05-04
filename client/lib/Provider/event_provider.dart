@@ -515,16 +515,19 @@ class EventProvider extends ChangeNotifier {
 
   Future<Veranstaltung> loadEventById(int id) async {
     // if (isEventLoaded(id)) return loaded[id];
+    log("versuche veranstaltung zu laden: " + id.toString());
     var response = await attemptGetVeranstaltungByID(id);
-    // if (response.statusCode == 200) {
-    var parsedJson = json.decode(response.body);
-    log("parsedJson.toString(): " + parsedJson.toString());
-    Veranstaltung event = getEventFromJson(parsedJson, true);
+    log("response.body.toString(): " + response.body.toString());
+    if (response.statusCode == 200) {
+      var parsedJson = json.decode(response.body);
+      log("parsedJson.toString(): " + parsedJson.toString());
+      Veranstaltung event = getEventFromJson(parsedJson, true);
 
-    return event;
-    // }
-    // log('message');
-    // return null;
+      return event;
+    }
+    log('response.statusCode != 200 und zwar ' +
+        response.statusCode.toString());
+    return null;
     // return Veranstaltung.;
   }
 
@@ -551,22 +554,37 @@ class EventProvider extends ChangeNotifier {
         ende,
         adresse,
         plz,
-        institutionsid.toString(),
         userId.toString(),
         istGehnemigt.toString(),
+        institutionsid.toString(),
         imageIds,
         selectedTags);
 
     if (resp.statusCode == 200) {
       var parsedJson = json.decode(resp.body);
+
+      log('parsedJson attemptCreateVeranstaltung:' + json.toString());
+
       int eventId = parsedJson['insertId'];
 
       DateTime startTs = DateTime.parse(start);
       DateTime endeTs = DateTime.parse(ende);
       DateTime erstelltTs = DateTime.now();
 
-      Veranstaltung veranstaltung = Veranstaltung.load(eventId, titel,
-          beschreibung, email, adresse, startTs, endeTs, erstelltTs, 1, [], []);
+      Veranstaltung veranstaltung = Veranstaltung.load(
+          eventId,
+          titel,
+          beschreibung,
+          email,
+          adresse,
+          startTs,
+          endeTs,
+          erstelltTs,
+          1,
+          [],
+          [],
+          null,
+          null); //TODO: null weg machen
 
       loadEvent(veranstaltung);
 
@@ -632,6 +650,7 @@ class EventProvider extends ChangeNotifier {
   }
 
   Veranstaltung getEventFromJson(Map<String, dynamic> json, bool forceNew) {
+    // if(forceNew)
     log('json:' + json.toString());
 
     int id = json['id'];
@@ -667,7 +686,7 @@ class EventProvider extends ChangeNotifier {
     var institutionImage = json['institutionImage'];
 
     if (institutionImage != null) previewImage[id] = institutionImage;
-    
+
     List<String> fileList = null;
 
     if (json['files'] != null) {
@@ -676,10 +695,10 @@ class EventProvider extends ChangeNotifier {
 
       fileList = List<String>.from(dynamicList).toList();
 
-      log("tolle Liste: " + fileList.toString());
+      // log("tolle Liste: " + fileList.toString());
     }
 
-        List<String> tagList = null;
+    List<String> tagList = null;
 
     if (json['tags'] != null) {
       final List<dynamic> dynamicList =
@@ -687,14 +706,29 @@ class EventProvider extends ChangeNotifier {
 
       tagList = List<String>.from(dynamicList).toList();
 
-      log("tolle Liste: " + fileList.toString());
+      // log("tolle Liste: " + fileList.toString());
     }
 
     DateTime created = DateTime.parse(json['erstellt_ts']);
 
+    String institutionName = json['institutionName'];
+    String institutBeschreibung = json['institutBeschreibung'];
+
     // TODO: latitude, longitude noch anpassen...
     Veranstaltung event = Veranstaltung.load(
-        id, titel, description, contact, place, start, end, created, 1, fileList ?? [], tagList ?? []);
+        id,
+        titel,
+        description,
+        contact,
+        place,
+        start,
+        end,
+        created,
+        1,
+        fileList ?? [],
+        tagList ?? [],
+        institutionName,
+        institutBeschreibung);
 
     loadEvent(event);
 
