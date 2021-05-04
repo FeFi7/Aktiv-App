@@ -17,6 +17,7 @@ import 'package:aktiv_app_flutter/components/rounded_input_field_beschreibung.da
 import 'package:aktiv_app_flutter/components/rounded_input_field_numeric.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_field_suggestions.dart';
 import 'package:aktiv_app_flutter/util/rest_api_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
@@ -40,6 +41,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   var tcVisibility = true;
   File profileImage;
   final picker = ImagePicker();
+
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
   bool institutionVorhanden = false;
@@ -108,16 +110,22 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   }
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(
-      () {
-        if (pickedFile != null) {
-          profileImage = File(pickedFile.path);
-          images.add(pickedFile.path);
-        }
-      },
-    );
+    //final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf']);
+    if (pickedFile != null) {
+      profileImage = File(pickedFile.files.single.path);
+      print(profileImage);
+      setState(
+        () {
+          if (pickedFile != null) {
+            //profileImage = File(pickedFile.path);
+            images.add(profileImage.path);
+          }
+        },
+      );
+    }
   }
 
   Future<Map<String, int>> awaitUserData() async {
@@ -274,6 +282,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     color: ColorPalette.malibu.rgb,
                     textColor: Colors.black54,
                     press: () async {
+                       currentDate = DateTime.now();
                       await _selectDate(context);
 
                       setState(() {
@@ -320,6 +329,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     color: ColorPalette.malibu.rgb,
                     textColor: Colors.black54,
                     press: () async {
+                      currentDate = DateTime.now().add(Duration(days: 1));
                       await _selectDate(context);
 
                       setState(() {
@@ -373,6 +383,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             textColor: Colors.black54,
                             press: () async {
                               await getImage();
+                              if(profileImage != null){
                               Response resp = await attemptFileUpload(
                                   'Bild1', profileImage);
                               print(resp.body);
@@ -387,7 +398,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                 var error = parsedJson['error'];
                                 // toastmsg = error;
                               }
-                              setState(() {});
+                              setState(() {});}
                             })),
                   ),
                   Container(

@@ -2,7 +2,7 @@
 
 Teamorientiertes Projekt der Hochschule Ulm in Zusammenarbeit mit Lebensqualtität Burgrieden e.V.
 
-![alt text](http://app.lebensqualitaet-burgrieden.de/wir_logo.jpg)
+<img src="https://app.lebensqualitaet-burgrieden.de/wir_hier_app_icon.png" width="420" height="420" />
 
 ## Veranstaltungs App mit Flutter
 
