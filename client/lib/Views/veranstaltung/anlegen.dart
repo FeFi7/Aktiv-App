@@ -77,6 +77,12 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
 
   String checkData(String titel, String beschreibung, String email,
       String start, String ende, String adresse, String plz) {
+    Provider.of<UserProvider>(context, listen: false).checkDataCompletion();
+    if (Provider.of<UserProvider>(context, listen: false)
+        .getDatenVollstaendig) {
+      return "Benutzerdaten unvollständig";
+    }
+
     if (titel.length == 0) {
       return "Titel fehlt";
     }
@@ -465,6 +471,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                   ),
                   Visibility(
                     visible: institutionVorhanden,
+
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(29),
@@ -505,6 +512,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                           },
                         ),
                       ),
+
                     ),
                   ),
                   Container(
@@ -531,36 +539,28 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                   controllerAdresse.text,
                                   controllerPlz.text);
                               if (dataCheck.contains("OK")) {
-                                Provider.of<UserProvider>(context,
+                                await Provider.of<EventProvider>(context,
                                         listen: false)
-                                    .checkDataCompletion();
-                                if (Provider.of<UserProvider>(context,
-                                        listen: false)
-                                    .getDatenVollstaendig) {
-                                  await Provider.of<EventProvider>(context,
-                                          listen: false)
-                                      .createEvent(
-                                          controllerTitel.text,
-                                          controllerBeschreibung.text,
-                                          controlleremail.text,
-                                          start,
-                                          ende,
-                                          controllerAdresse.text,
-                                          controllerPlz.text,
-                                          institutionsId,
-                                          istGenehmigt,
-                                          imageIds,
-                                          selectedTags)
-                                      .then((event) => {
-                                            Provider.of<BodyProvider>(context,
-                                                    listen: false)
-                                                .setBody(
-                                                    VeranstaltungDetailView(
-                                                        event.id))
-                                            // Provider.of<AppBarTitleProvider>(context, listen: false)
-                                            //     .setTitle('Übersicht');
-                                          });
-                                }
+                                    .createEvent(
+                                        controllerTitel.text,
+                                        controllerBeschreibung.text,
+                                        controlleremail.text,
+                                        start,
+                                        ende,
+                                        controllerAdresse.text,
+                                        controllerPlz.text,
+                                        institutionsId,
+                                        istGenehmigt,
+                                        imageIds,
+                                        selectedTags)
+                                    .then((event) => {
+                                          Provider.of<BodyProvider>(context,
+                                                  listen: false)
+                                              .setBody(VeranstaltungDetailView(
+                                                  event.id))
+                                          // Provider.of<AppBarTitleProvider>(context, listen: false)
+                                          //     .setTitle('Übersicht');
+                                        });
                               } else {
                                 errorToast(dataCheck);
                               }
