@@ -110,7 +110,7 @@ class _CalendarViewState extends State<CalendarView> {
                               child: Text('Persönlich')),
                         ],
                         isSelected: isSelected,
-                        onPressed: (int index) async {
+                        onPressed: (int index) {
                           setState(() {
                             for (int buttonIndex = 0;
                                 buttonIndex < isSelected.length;
@@ -143,7 +143,7 @@ class _CalendarViewState extends State<CalendarView> {
             child: ValueListenableBuilder<List<Veranstaltung>>(
           valueListenable: _selectedEvents,
           builder: (context, value, _) {
-            if (value == null && value.length == 0) {
+            if (value == null || value.length == 0) {
               return Container(
                   child: Text(_selectedDay != null
                       ? "Keine Veranstaltungen eingetragen"

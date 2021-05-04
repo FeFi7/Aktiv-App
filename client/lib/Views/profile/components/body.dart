@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/institution/institution_view.dart';
@@ -177,6 +178,8 @@ class _BodyState extends State<Body> {
                     style: TextStyle(color: ColorPalette.endeavour.rgb),
                   ),
                 )) {
+                  Provider.of<EventProvider>(context, listen: false).resetEventListType(EventListType.FAVORITES);
+                            
                   await Provider.of<UserProvider>(context, listen: false)
                       .signOff();
 
