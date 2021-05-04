@@ -3,7 +3,7 @@ let conn = require("../db").getConnection();
 
 async function getVeranstaltungById(veranstaltungId) {
   const query = `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, i.name AS institutionName, i.beschreibung AS institutBeschreibung  FROM Veranstaltung v
-    INNER JOIN Institution i ON v.institutionId = i.id
+    LEFT JOIN Institution i ON v.institutionId = i.id
     WHERE v.id = ?
     LIMIT 10`;
 
