@@ -51,6 +51,8 @@ dependencies:
   flutter_vant_kit: ^0.2.7
 
   flutter_launcher_icons: ^0.9.0
+
+  file_picker: ^3.0.1
  
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
