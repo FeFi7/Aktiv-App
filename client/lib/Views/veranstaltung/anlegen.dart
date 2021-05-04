@@ -60,19 +60,43 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   List<String> images = [];
   String starttext = "Beginn";
   String endtext = "Ende";
-  String titel = "Titel",
-      beschreibung = "Beschreibung der Veranstaltung",
-      email = "test@testmail.de",
-      plz = "00000",
-      adresse = "Adresse",
-      start = "Start",
-      ende = "Ende";
+  String titel, beschreibung, email, plz, adresse, start = "Beginn", ende = "Ende";
   Locale de = Locale('de', 'DE');
 
   List<DropdownMenuItem<String>> items = [];
 
   List<String> tags = ['Musik', 'Sport', 'Freizeit'];
   List<String> selectedTags = [];
+
+  String checkData(String titel, String beschreibung, String email,
+      String start, String ende, String adresse, String plz) {
+    if (titel.length == 0) {
+      return "Titel fehlt";
+    }
+    if (beschreibung.length == 0) {
+      return "Beschreibung fehlt";
+    }
+    if (email.length == 0) {
+      return "Kontakt ( Email Adresse ) fehlt";
+    }
+    if (start.contains('Beginn')) {
+      return "Startzeitpunkt fehlt";
+    }
+    if (ende.contains('Ende')) {
+      return "Endzeitpunkt fehlt";
+    }
+    if (adresse.length == 0) {
+      return "Adresse fehlt";
+    }
+    if (plz.length != 5) {
+      return "PLZ Eingabe ungültig";
+    }
+    if (institutionen.keys.length > 1 && institutionsId == 0){
+      return "Bitte Institution auswählen";
+
+    }
+    return 'OK';
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime pickedDate = await showDatePicker(
@@ -197,8 +221,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                         _controller.clear();
                         setState(() {});
                       }
-
-                      
                     },
                     onSubmitted: (value) {
                       selectedTags.add(value);
@@ -206,7 +228,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                       if (selectedTags.length != 0) {
                         setState(() {});
                       }
-                      
                     },
                   ),
                   Container(
@@ -387,23 +408,24 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             press: () async {
                               await getImage();
 
-                              if(profileImage != null){
-                              Response resp = await attemptFileUpload(
-                                  'Bild1', profileImage);
-                              // print(resp.body);
-                              // int id = 0;
-                              if (resp.statusCode == 200) {
-                                var parsedJson = json.decode(resp.body);
-                                imageId = parsedJson['id'];
-                                imageIds.add(imageId.toString());
-                                // toastmsg = "Neue Veranstaltung angelegt";
-                              } else {
-                                // var parsedJson = json.decode(resp.body);
-                                // var error = parsedJson['error'];
-                                // toastmsg = error;
+                              if (profileImage != null) {
+                                Response resp = await attemptFileUpload(
+                                    'Bild1', profileImage);
+                                // print(resp.body);
+                                // int id = 0;
+                                if (resp.statusCode == 200) {
+                                  var parsedJson = json.decode(resp.body);
+                                  imageId = parsedJson['id'];
+                                  imageIds.add(imageId.toString());
+                                  // toastmsg = "Neue Veranstaltung angelegt";
+                                } else {
+                                  // var parsedJson = json.decode(resp.body);
+                                  // var error = parsedJson['error'];
+                                  // toastmsg = error;
 
+                                }
                               }
-                            }})),
+                            })),
                   ),
                   Visibility(
                     visible: institutionVorhanden,
@@ -438,34 +460,47 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                               if (institutionsId > 0) {
                                 istGenehmigt = 1;
                               }
-
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .checkDataCompletion();
-                              if (Provider.of<UserProvider>(context,
-                                      listen: false)
-                                  .getDatenVollstaendig) {
-                                await Provider.of<EventProvider>(context,
+                              String dataCheck = checkData(
+                                  controllerTitel.text,
+                                  controllerBeschreibung.text,
+                                  controlleremail.text,
+                                  start,
+                                  ende,
+                                  controllerAdresse.text,
+                                  controllerPlz.text);
+                              if (dataCheck.contains("OK")) {
+                                Provider.of<UserProvider>(context,
                                         listen: false)
-                                    .createEvent(
-                                        controllerTitel.text,
-                                        controllerBeschreibung.text,
-                                        controlleremail.text,
-                                        start,
-                                        ende,
-                                        controllerAdresse.text,
-                                        controllerPlz.text,
-                                        institutionsId,
-                                        istGenehmigt,
-                                        imageIds,
-                                        selectedTags)
-                                    .then((event) => {
-                                          Provider.of<BodyProvider>(context,
-                                                  listen: false)
-                                              .setBody(VeranstaltungDetailView(
-                                                  event.id))
-                                          // Provider.of<AppBarTitleProvider>(context, listen: false)
-                                          //     .setTitle('Übersicht');
-                                        });
+                                    .checkDataCompletion();
+                                if (Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .getDatenVollstaendig) {
+                                  await Provider.of<EventProvider>(context,
+                                          listen: false)
+                                      .createEvent(
+                                          controllerTitel.text,
+                                          controllerBeschreibung.text,
+                                          controlleremail.text,
+                                          start,
+                                          ende,
+                                          controllerAdresse.text,
+                                          controllerPlz.text,
+                                          institutionsId,
+                                          istGenehmigt,
+                                          imageIds,
+                                          selectedTags)
+                                      .then((event) => {
+                                            Provider.of<BodyProvider>(context,
+                                                    listen: false)
+                                                .setBody(
+                                                    VeranstaltungDetailView(
+                                                        event.id))
+                                            // Provider.of<AppBarTitleProvider>(context, listen: false)
+                                            //     .setTitle('Übersicht');
+                                          });
+                                }
+                              } else {
+                                errorToast(dataCheck);
                               }
                             })),
                   )
