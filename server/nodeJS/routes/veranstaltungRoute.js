@@ -41,12 +41,17 @@ router.get("/:veranstaltungId", async function (req, res) {
   const veranstaltungFiles = await veranstaltungService.getVeranstaltungFilesById(
     req.params.veranstaltungId
   );
-
   if (veranstaltungFiles.error) {
     return res.status(400).json(veranstaltungFiles);
   }
 
+  const veranstaltungTags = await veranstaltungService.getTagsToVeranstaltung(req.params.veranstaltungId)
+  if (veranstaltungTags.error) {
+    return res.status(400).json(veranstaltungTags);
+  }
+
   veranstaltung.files = veranstaltungFiles;
+  veranstaltung.tags = veranstaltungTags;
   return res.status(200).json(veranstaltung);
 });
 

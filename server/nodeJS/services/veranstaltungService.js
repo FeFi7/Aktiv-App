@@ -345,6 +345,23 @@ async function addTagsToVeranstaltung(veranstaltungId, tags) {
   return true;
 }
 
+async function getTagsToVeranstaltung(veranstaltungId) {
+  const queryErstellungTag = `SELECT t.name, t.id FROM TagZuweisung tz 
+  INNER JOIN Tag t ON tz.tagId = t.id
+  WHERE tz.veranstaltungId = ?`;
+
+  const result = await conn.query(queryErstellungTag, veranstaltungId).catch((error) => {
+    console.log(error);
+    return { error: "Fehler bei Db" };
+  });
+
+  if (result) {
+    return result[0];
+  } else {
+    return { error: "Fehler bei Db" };
+  }
+}
+
 async function getTagsFiltered(tag) {
   // für sql wildcard anpassen
   if (tag) {
@@ -407,4 +424,5 @@ module.exports = {
   getTagsFiltered: getTagsFiltered,
   getVeranstaltungFilesById: getVeranstaltungFilesById,
   getFavoritVeranstaltungenByUser: getFavoritVeranstaltungenByUser,
+  getTagsToVeranstaltung: getTagsToVeranstaltung
 };
