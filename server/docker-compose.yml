@@ -75,11 +75,6 @@ services:
     db: 
         image: mysql:8.0
         restart: unless-stopped
-        environment: 
-            MYSQL_DATABASE: 'db'
-            MYSQL_USER: 'user'
-            MYSQL_PASSWORD: 'user1'
-            MYSQL_ROOT_PASSWORD: 'root1'
         ports:
             - '3306:3306'
         expose:
