@@ -109,32 +109,12 @@ async function getVeranstaltungen(
   sorting,
   plz
 ) {
-  console.log("in der richtigen Funktion");
-  // Falls nichts angegeben bis 1 Monat in der Zukunft
-  if (!bis) {
-    const dt = new Date();
-    bis = `${dt.getFullYear().toString().padStart(4, "0")}-${(dt.getMonth() + 2)
-      .toString()
-      .padStart(2, "0")}-${dt
-      .getDate()
-      .toString()
-      .padStart(2, "0")} ${dt
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${dt
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}:${dt.getSeconds().toString().padStart(2, "0")}`;
-  }
-
   // für sql wildcard anpassen
   if (vollText) {
     vollText = "%" + vollText + "%";
   }
-  // if(plz){
-  //   plz = "%" + plz + "%";
-  // }
-  console.log("sortiert nach: " + sorting);
+
+  console.log("bis: " + bis);
   const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
   const query =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
@@ -173,6 +153,35 @@ async function getVeranstaltungen(
   let results = {};
   const datumParams = datum ? [datum, datum] : [bis];
   const plzParams = plz ? [plz] : [];
+  
+  const params = vollText
+  ? [
+      longitude,
+      latitude,
+      Number(istGenehmigt),
+      ...plzParams,
+      ...datumParams, //bis),
+      vollText,
+      vollText,
+      vollText,
+      longitude,
+      latitude,
+      entfernung,
+      Number(limit) * Number(page) - Number(limit),
+      Number(limit),
+    ]
+  : [
+      longitude,
+      latitude,
+      Number(istGenehmigt),
+      ...plzParams,
+      ...datumParams, //bis),
+      longitude,
+      latitude,
+      entfernung,
+      Number(limit) * Number(page) - Number(limit),
+      Number(limit),
+    ]
 
   if (userId !== 0) {
     results = await conn
