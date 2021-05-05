@@ -32,39 +32,39 @@ class _DiscoverViewState extends State<DiscoverView> {
   });
 
   static String tooSpecific =
-      "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden.";
+      "Es konnte keine passende Veranstaltung, zu der von Ihnen gewählten Sucheingabe, gefunden werden. Für eine allgemeinere Suche verwenden Sie Tags. Mögliche Tags währen z.B.: Musik, Sport oder Flohmarkt";
 
   @override
   void initState() {
     super.initState();
-    loadTags();
+    // loadTags();
   }
 
-  bool tagsAlreadyLoaded = false;
+  // bool tagsAlreadyLoaded = false;
 
-  void loadTags() async {
-    if (tagsAlreadyLoaded) return;
-    tagsAlreadyLoaded = true;
+  // void loadTags() async {
+  //   if (tagsAlreadyLoaded) return;
+  //   tagsAlreadyLoaded = true;
 
-    var response = await attemptGetTags();
+  //   var response = await attemptGetTags();
 
-    if (response.statusCode == 200) {
-      var parsedJson = json.decode(response.body);
-      final List<dynamic> dynamicList =
-          await parsedJson.map((item) => item['name']).toList();
+  //   if (response.statusCode == 200) {
+  //     var parsedJson = json.decode(response.body);
+  //     final List<dynamic> dynamicList =
+  //         await parsedJson.map((item) => item['name']).toList();
 
-      final List<String> responseList = List<String>.from(dynamicList).toList();
+  //     final List<String> responseList = List<String>.from(dynamicList).toList();
 
-      int max = responseList.length < 5 ? responseList.length : 5;
-      if (max > 0)
-        tooSpecific +=
-            " Für eine allgemeinere Suche verwenden Sie Tags. Mögliche Tags währen z.B.: ";
+  //     int max = responseList.length < 5 ? responseList.length : 5;
+  //     if (max > 0)
+  //       tooSpecific +=
+  //           " Für eine allgemeinere Suche verwenden Sie Tags. Mögliche Tags währen z.B.: ";
 
-      for (int i = 0; i < max; i++) {
-        tooSpecific += responseList[i] + (i < (max - 1) ? ", " : ".");
-      }
-    }
-  }
+  //     for (int i = 0; i < max; i++) {
+  //       tooSpecific += responseList[i] + (i < (max - 1) ? ", " : ".");
+  //     }
+  //   }
+  // }
 
   //TODO: tooglen wenn Searchbar fokus wechselt
   bool _showSearchBehaviorProviderButtons = true;
