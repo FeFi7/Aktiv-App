@@ -93,7 +93,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                     ),
                                   ),
                                   Container(
-                                      // width: size.width * 0.60,
+                                      width: size.width * 0.50,
                                       alignment: Alignment.centerLeft,
                                       child: Column(
                                         children: [
