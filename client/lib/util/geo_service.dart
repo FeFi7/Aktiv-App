@@ -41,9 +41,15 @@ Future<List<String>> getActualCoordinates() async {
 // Breiten- und Längengrad von einer Adresse holen
 Future<List<String>> getCoordinatesFromAddress(String plz) async {
   final query = plz;
-  List<Location> address = await locationFromAddress(query);
-
+  List<Location> address;
   List<String> ret = [];
+
+  try {
+    address = await locationFromAddress(query);
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
 
   ret.add(address.first.latitude.toString());
   ret.add(address.first.longitude.toString());

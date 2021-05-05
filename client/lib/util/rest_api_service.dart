@@ -209,13 +209,11 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
 // Prüfe ob PLZ valide ist
 Future<bool> attemptProovePlz(String plz) async {
-  try {
-    await getCoordinatesFromAddress(plz);
-    return true;
-  } catch (e) {
-    e.toString();
+  var ret = await getCoordinatesFromAddress(plz);
+  if (ret == null) {
     return false;
   }
+  return true;
 }
 
 // [POST] Erstelle neue Veranstaltung
@@ -246,18 +244,18 @@ Future<http.Response> attemptCreateVeranstaltung(
     'istGenehmigt': istGenehmigt
   };
 
-  try {
-    // Hole Breiten- und Laengengrad fuer Veranstaltung
-    var coordinateList = await getCoordinatesFromAddress(plz);
-    var latitude = coordinateList.first;
-    var longitude = coordinateList.last;
+  // Hole User Koordinaten
+  var coordinateList = await getCoordinatesFromAddress(plz);
 
-    body.putIfAbsent('latitude', () => latitude);
-    body.putIfAbsent('longitude', () => longitude);
-  } catch (e) {
-    print(e.toString());
+  if (coordinateList == null) {
     return http.Response("PLZ nicht gefunden", 400);
   }
+
+  var latitude = coordinateList.first;
+  var longitude = coordinateList.last;
+
+  body.putIfAbsent('latitude', () => latitude);
+  body.putIfAbsent('longitude', () => longitude);
 
   if (institutionId != "-1") {
     body.putIfAbsent('institutionId', () => institutionId);
