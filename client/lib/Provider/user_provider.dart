@@ -322,6 +322,11 @@ class UserProvider extends ChangeNotifier {
   setGenehmiger(String mail, List<String> plz) async {
     var _betreiber = await attemptGetUser(mail);
     var parsedgenehmiger = json.decode(_betreiber.body);
+
+    var _map = parsedgenehmiger.values.toList();
+    if (_map[0] == false) {
+      return null;
+    }
     var genehmigerRolle = parsedgenehmiger.values.toList();
     var _genehmigerRolle = genehmigerRolle[1]['rolleId'].toString();
 
