@@ -66,7 +66,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.maxHeight,
                   ),
-                  child: IntrinsicHeight(
+                  child: Container(
                     child: Column(
                       children: <Widget>[
                         Visibility(
@@ -131,7 +131,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                         ),
                         Visibility(
                           visible: veranstaltung.getImages().length > 0,
-                          child: Expanded(
+                          child: Container(
                             // A flexible child that will grow to fit the viewport but
                             // still be at least as big as necessary to fit its contents.
                             child: Container(
@@ -173,7 +173,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                           ),
                         ),
                         Container(
-                          child: Expanded(
+                          child: Container(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -211,7 +211,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                             ),
                           ),
                         ),
-                        Expanded(
+                        Container(
                           child: Container(
                             margin: EdgeInsets.only(bottom: 10),
                             alignment: Alignment.center,
