@@ -136,9 +136,10 @@ class _BodyState extends State<Body> {
                         errorToast("Passwörter stimmen nicht überein");
                       } else if (!agbsGelesen) {
                         errorToast(
-                            "Bitte AGBs und Datenschutzerklärung akzeptieren");
+                            "Bitte Datenschutz- und\nVerpflichtungserklärung akzeptieren");
                       } else {
-                        Provider.of<EventProvider>(context, listen: false).resetEventListType(EventListType.FAVORITES);
+                        Provider.of<EventProvider>(context, listen: false)
+                            .resetEventListType(EventListType.FAVORITES);
                         var jwt = await attemptSignUp(mail, password);
 
                         if (jwt.statusCode == 502) {
