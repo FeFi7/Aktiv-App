@@ -152,7 +152,7 @@ class _BodyState extends State<Body> {
             color: Colors.grey[400],
             press: () async {
               final url =
-                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
+                  "https://app.lebensqualitaet-burgrieden.de/Benutzerhandbuch.pdf"; //Dokumentation/Anleitung der App
               await launch(
                 url,
                 forceSafariVC: false,
