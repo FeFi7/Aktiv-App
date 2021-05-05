@@ -209,6 +209,7 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
 // Prüfe ob PLZ valide ist
 Future<bool> attemptProovePlz(String plz) async {
+  print('RestAPI Service : ' + plz);
   var ret = await getCoordinatesFromAddress(plz);
   if (ret == null) {
     return false;

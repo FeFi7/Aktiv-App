@@ -41,6 +41,7 @@ Future<List<String>> getActualCoordinates() async {
 // Breiten- und Längengrad von einer Adresse holen
 Future<List<String>> getCoordinatesFromAddress(String plz) async {
   final query = plz;
+  print('Geo Service : ' + plz);
   List<Location> address;
   List<String> ret = [];
 

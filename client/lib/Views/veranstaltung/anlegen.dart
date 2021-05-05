@@ -40,7 +40,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   var tcVisibility = true;
   File profileImage;
   final picker = ImagePicker();
-
+  bool plzCheck = false;
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
   bool institutionVorhanden = false;
@@ -76,8 +76,10 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   List<String> tags = ['Musik', 'Sport', 'Freizeit'];
   List<String> selectedTags = [];
 
-  String checkData(String titel, String beschreibung, String email,
-      String start, String ende, String adresse, String plz) {
+  Future<String>checkData(String titel, String beschreibung, String email,
+      String start, String ende, String adresse, String plz)async  {
+
+         bool plzcheck = await attemptProovePlz(plz);
     if (titel.length == 0) {
       return "Titel fehlt";
     }
@@ -99,6 +101,11 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
     if (plz.length != 5) {
       return "PLZ Eingabe ungültig";
     }
+    if (plzcheck == false ) {
+      return "PLZ Eingabe ungültig";
+    }
+
+    
     if (institutionen.keys.length > 1 && institutionsId == 0) {
       return "Bitte Institution auswählen";
     }
@@ -292,6 +299,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     hintText: "Postleitzahl",
                     controller: controllerPlz,
                     icon: Icons.home,
+                    
                   ),
                   RoundedInputField(
                     hintText: "Adresse",
@@ -546,7 +554,8 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                               if (institutionsId > 0) {
                                 istGenehmigt = 1;
                               }
-                              String dataCheck = checkData(
+
+                              String dataCheck = await checkData(
                                   controllerTitel.text,
                                   controllerBeschreibung.text,
                                   controlleremail.text,
