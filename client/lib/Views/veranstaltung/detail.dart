@@ -66,7 +66,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                   constraints: BoxConstraints(
                     minHeight: viewportConstraints.maxHeight,
                   ),
-                  child: IntrinsicHeight(
+                  child: Container(
                     child: Column(
                       children: <Widget>[
                         Visibility(
@@ -131,7 +131,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                         ),
                         Visibility(
                           visible: veranstaltung.getImages().length > 0,
-                          child: Expanded(
+                          child: Container(
                             // A flexible child that will grow to fit the viewport but
                             // still be at least as big as necessary to fit its contents.
                             child: Container(
@@ -173,7 +173,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                           ),
                         ),
                         Container(
-                          child: Expanded(
+                          child: Container(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -211,7 +211,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                             ),
                           ),
                         ),
-                        Expanded(
+                        Container(
                           child: Container(
                             margin: EdgeInsets.only(bottom: 10),
                             alignment: Alignment.center,
@@ -261,7 +261,7 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
                                         child: Text(DateFormat(
-                                                    'dd.MM.yyyy – kk:mm')
+                                                    'dd.MM.yyyy – HH:mm')
                                                 .format(
                                                     veranstaltung.beginnTs) +
                                             " Uhr")),
@@ -289,33 +289,41 @@ class _VeranstaltungDetailViewState extends State<VeranstaltungDetailView> {
                                         width: size.width * 0.4,
                                         alignment: Alignment.centerRight,
                                         child: Text(DateFormat(
-                                                    'dd.MM.yyyy – kk:mm')
+                                                    'dd.MM.yyyy – HH:mm')
                                                 .format(veranstaltung.endeTs) +
                                             " Uhr")),
                                   ],
-                                ),Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical:
-                                          5),
-                                  width: size.width * 0.9,
-                                  child: Divider(
-                                    color: ColorPalette.malibu.rgb,
-                                    thickness: 2,
-                                  ),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Tags')),
-                                    Container(
-                                        width: size.width * 0.4,
-                                        alignment: Alignment.centerRight,
-                                        child: Text(tags)),
-                                  ],
+                                Visibility(
+                                  visible:
+                                      veranstaltung.selectedTags.length > 0,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 5),
+                                        width: size.width * 0.9,
+                                        child: Divider(
+                                          color: ColorPalette.malibu.rgb,
+                                          thickness: 2,
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Container(
+                                              width: size.width * 0.4,
+                                              alignment: Alignment.centerLeft,
+                                              child: Text('Tags')),
+                                          Container(
+                                              width: size.width * 0.4,
+                                              alignment: Alignment.centerRight,
+                                              child: Text(tags)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.symmetric(

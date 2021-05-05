@@ -14,8 +14,10 @@ class EnvironmentPlaceholder extends StatefulWidget {
 }
 
 class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
-  final TextStyle headingStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: ColorPalette.endeavour.rgb);
+  final TextStyle headingStyle = TextStyle(
+      fontSize: 30,
+      fontWeight: FontWeight.bold,
+      color: ColorPalette.endeavour.rgb);
 
   Future<List<List<Veranstaltung>>> loadEventsFromProvider() async {
     List<List<Veranstaltung>> lists = [];
@@ -108,9 +110,9 @@ class _PreviewDotsState extends State<PreviewDots> {
       margin: EdgeInsets.only(bottom: 45),
       child: IconButton(
           icon: Icon(
-            Icons.more_horiz,
+            Icons.keyboard_arrow_down_rounded,
             color: ColorPalette.congress_blue.rgb,
-            size: 64,
+            size: 40,
           ),
           onPressed: () {
             Provider.of<BodyProvider>(context, listen: false)

@@ -8,8 +8,6 @@ class BodyProvider extends ChangeNotifier {
 
   ListQueue previous = ListQueue<Widget>();
 
-  /// Wenn der Getter mit "Widget get body => this._body;"
-  /// erstellt wird, kommt ein Stack Overflow ¯\_(ツ)_/¯
   Widget getBody() {
     return this._body;
   }

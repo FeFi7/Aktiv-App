@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aktiv_app_flutter/Provider/body_provider.dart';
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/defaults/color_palette.dart';
 import 'package:aktiv_app_flutter/Views/institution/institution_view.dart';
@@ -151,7 +152,7 @@ class _BodyState extends State<Body> {
             color: Colors.grey[400],
             press: () async {
               final url =
-                  "http://lebensqualitaet-burgrieden.de/lq/kontaktimpressum/"; //Dokumentation/Anleitung der App
+                  "https://app.lebensqualitaet-burgrieden.de/Benutzerhandbuch.pdf"; //Dokumentation/Anleitung der App
               await launch(
                 url,
                 forceSafariVC: false,
@@ -177,6 +178,9 @@ class _BodyState extends State<Body> {
                     style: TextStyle(color: ColorPalette.endeavour.rgb),
                   ),
                 )) {
+                  Provider.of<EventProvider>(context, listen: false)
+                      .resetEventListType(EventListType.FAVORITES);
+
                   await Provider.of<UserProvider>(context, listen: false)
                       .signOff();
 
@@ -267,6 +271,19 @@ class _BodyState extends State<Body> {
                   .setTitle('');
             },
             child: Text("Info"),
+          ),
+          TextButton(
+            onPressed: () async {
+              final url =
+                  "https://app.lebensqualitaet-burgrieden.de/Impressum.html";
+
+              await launch(
+                url,
+                forceSafariVC: false,
+                forceWebView: false,
+              );
+            },
+            child: Text("Impressum"),
           ),
         ],
       );

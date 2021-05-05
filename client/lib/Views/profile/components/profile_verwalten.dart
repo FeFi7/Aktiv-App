@@ -35,6 +35,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
   final plzController = TextEditingController();
   final veranstaltungController = TextEditingController();
   final _scrollController = ScrollController();
+
   String institutionValue =
       "Institution wählen"; //erstes Item aus Insitutionen Liste
 
@@ -634,7 +635,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                                         ? NetworkImage(
                                             "https://app.lebensqualitaet-burgrieden.de/" +
                                                 snapShot.data[index]
-                                                    ['veranstaltungImage'])
+                                                    ['institutionsImage'])
                                         : Image.asset(
                                                 "assets/images/veranstaltungPic_default.png")
                                             .image,
@@ -655,6 +656,43 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                       Text(
                         snapShot.data[index]['beschreibung'],
                         style: TextStyle(color: ColorPalette.black.rgb),
+                      ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                              width: 50,
+                              alignment: Alignment.centerLeft,
+                              child: Text('Kontakt')),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              snapShot.data[index]['kontakt'],
+                              style: TextStyle(color: ColorPalette.black.rgb),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical:
+                                5), //Abstand um den Button herum (oben/unten)
+                        width: 250,
+                        child: Divider(
+                          color: ColorPalette.malibu.rgb,
+                          thickness: 2,
+                        ),
                       ),
                       SizedBox(height: 40.0),
                       RoundedButton(
@@ -747,6 +785,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             return Container();
           }
           return ListView.builder(
+              addAutomaticKeepAlives: true,
               controller: _scrollController,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,

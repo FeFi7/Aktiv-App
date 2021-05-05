@@ -1,5 +1,3 @@
-
-
 import 'package:aktiv_app_flutter/Models/veranstaltung.dart';
 import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
@@ -112,7 +110,7 @@ class _CalendarViewState extends State<CalendarView> {
                               child: Text('Persönlich')),
                         ],
                         isSelected: isSelected,
-                        onPressed: (int index) async {
+                        onPressed: (int index) {
                           setState(() {
                             for (int buttonIndex = 0;
                                 buttonIndex < isSelected.length;
@@ -145,18 +143,20 @@ class _CalendarViewState extends State<CalendarView> {
             child: ValueListenableBuilder<List<Veranstaltung>>(
           valueListenable: _selectedEvents,
           builder: (context, value, _) {
-            return value != null && value.length > 0
-                ? ListView.builder(
-                    itemCount: value.length,
-                    itemBuilder: (context, index) {
-                      return EventPreviewBox.load(
-                          value[index], AdditiveFormat.HOLE_DATETIME);
-                    },
-                  )
-                : Container(
-                    child: Text(_selectedDay != null
-                        ? "Keine Veranstaltungen eingetragen"
-                        : "Für eine generauer Übersicht Tag auswählen"));
+            if (value == null || value.length == 0) {
+              return Container(
+                  child: Text(_selectedDay != null
+                      ? "Keine Veranstaltungen eingetragen"
+                      : "Für eine generauer Übersicht Tag auswählen"));
+            }
+
+            return ListView.builder(
+              itemCount: value.length,
+              itemBuilder: (context, index) {
+                return EventPreviewBox.load(
+                    value[index], AdditiveFormat.HOLE_DATETIME);
+              },
+            );
           },
         ))
       ],
@@ -215,7 +215,9 @@ class SingleMarkerDay extends StatelessWidget {
         child: Center(
           child: Text(amount.toString(),
               style: TextStyle(
-                  color: ColorPalette.white.rgb, fontWeight: FontWeight.bold, fontSize: 10)),
+                  color: ColorPalette.white.rgb,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10)),
         ),
         decoration: new BoxDecoration(
             color: backgroundColor,

@@ -1,3 +1,4 @@
+import 'package:aktiv_app_flutter/Provider/event_provider.dart';
 import 'package:aktiv_app_flutter/Provider/user_provider.dart';
 import 'package:aktiv_app_flutter/Views/Login/components/background.dart';
 import 'package:aktiv_app_flutter/components/rounded_input_email_field.dart';
@@ -75,6 +76,7 @@ class _BodyState extends State<Body> {
                       }
 
                       if (EmailValidator.validate(mail)) {
+                        Provider.of<EventProvider>(context, listen: false).resetEventListType(EventListType.FAVORITES);
                         var jwt = await Provider.of<UserProvider>(context,
                                 listen: false)
                             .login(mail, password);

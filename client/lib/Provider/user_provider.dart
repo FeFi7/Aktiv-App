@@ -182,10 +182,15 @@ class UserProvider extends ChangeNotifier {
 
   changeProfileImage(File file) async {
     var jwt = await attemptNewProfilImage(file.path, file, userId.toString());
-    var parsedProfilBild = json.decode(jwt.body);
-    profilBild = parsedProfilBild['pfad'];
-    notifyListeners();
-    return jwt;
+    if (jwt.statusCode == 200) {
+      var parsedProfilBild = json.decode(jwt.body);
+      profilBild = parsedProfilBild['pfad'];
+      notifyListeners();
+      return jwt;
+    } else {
+      errorToast("falsches Bildformat\n(nur .jpg, .jpeg und .png unterstützt)");
+      return null;
+    }
   }
 
   loadProfileImage() async {
@@ -254,7 +259,6 @@ class UserProvider extends ChangeNotifier {
     var _accessToken = await getAccessToken();
     Response institutionen = await attemptGetVerwalteteInstitutionen(
         userId.toString(), _accessToken);
-
     if (institutionen.statusCode == 200) {
       _institutionen = json.decode(institutionen.body);
       return _institutionen;
@@ -298,10 +302,15 @@ class UserProvider extends ChangeNotifier {
   attemptImageForInstitution(File file, String institutionId) async {
     var jwt = await attemptNewImageForInstitution(
         file, institutionId, await getAccessToken());
-    var parsedInstitutionsBild = json.decode(jwt.body);
-    institutionBild = parsedInstitutionsBild['pfad'];
-    notifyListeners();
-    return jwt;
+
+    if (jwt.statusCode == 200) {
+      var parsedInstitutionsBild = json.decode(jwt.body);
+      institutionBild = parsedInstitutionsBild['pfad'];
+      notifyListeners();
+      return jwt;
+    } else {
+      errorToast("falsches Bildformat\n(nur .jpg, .jpeg und .png unterstützt)");
+    }
   }
 
   loadInstitutionImage() async {
@@ -313,13 +322,10 @@ class UserProvider extends ChangeNotifier {
   setGenehmiger(String mail, List<String> plz) async {
     var _betreiber = await attemptGetUser(mail);
     var parsedgenehmiger = json.decode(_betreiber.body);
-    var genehmigerId = parsedgenehmiger.values.toList();
-    var _genehmigerId = genehmigerId[1]['id'].toString();
+    var genehmigerRolle = parsedgenehmiger.values.toList();
+    var _genehmigerRolle = genehmigerRolle[1]['rolleId'].toString();
 
-    var betreiber =
-        await attemptGetUserInfo(_genehmigerId, await getAccessToken());
-    var parsedBetreiber = json.decode(betreiber.body);
-    if (parsedBetreiber['rolle'].toString().toLowerCase() != 'betreiber') {
+    if (_genehmigerRolle != '3') {
       if (await setRole(mail, "genehmiger") != null) {
         var genehmiger = await attemptGetUser(mail);
         var parsedgenehmiger = json.decode(genehmiger.body);

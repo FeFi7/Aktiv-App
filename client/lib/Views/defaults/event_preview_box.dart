@@ -35,7 +35,7 @@ class EventPreviewBox extends StatefulWidget {
   String _FormatAdditive(DateTime dateTime) {
     switch (additiveFormat) {
       case AdditiveFormat.HOLE_DATETIME:
-        return DateFormat('dd.MM.yyyy – kk:mm').format(dateTime) + " Uhr";
+        return DateFormat('dd.MM.yyyy – HH:mm').format(dateTime) + " Uhr";
       case AdditiveFormat.TIME_TILL_START:
         return "Beginnt in " +
             (dateTime.difference(DateTime.now()).inDays > 1

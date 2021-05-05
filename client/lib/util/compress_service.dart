@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:pdf_compressor/pdf_compressor.dart';
 import 'package:path/path.dart' as path;
 
+// Bilder komprimieren
 Future<File> compressImage(File file) async {
   var newFileName = "compressed_" + path.basename(file.path);
 
@@ -25,6 +26,7 @@ Future<File> compressImage(File file) async {
   return result;
 }
 
+// PDF komprimieren
 Future<File> compressPDF(File file) async {
   var newFileName = "compressed_" + path.basename(file.path);
 

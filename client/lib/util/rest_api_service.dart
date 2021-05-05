@@ -6,7 +6,6 @@ import 'package:mime/mime.dart';
 import 'compress_service.dart';
 import '../util/geo_service.dart';
 
-//const SERVER_IP = "85.214.166.230";
 const SERVER_IP = "app.lebensqualitaet-burgrieden.de";
 
 // [POST] Login User
@@ -176,8 +175,6 @@ Future<http.Response> attemptGetAllVeranstaltungen(
       // Frage Standortzugriff User ab und hole Breiten- und Laengengrad fuer Entfernungsberechnung
       List<String> coordinates = await getActualCoordinates();
       if (coordinates != null) {
-        // qParams.putIfAbsent('latitude', () => coordinates.first);
-        // qParams.putIfAbsent('longitude', () => coordinates.last);
         latitude = coordinates.first;
         longitude = coordinates.last;
         print('new lat: ' +
@@ -210,6 +207,16 @@ Future<http.Response> attemptGetAllVeranstaltungen(
   return response;
 }
 
+// Prüfe ob PLZ valide ist
+Future<bool> attemptProovePlz(String plz) async {
+  print('RestAPI Service : ' + plz);
+  var ret = await getCoordinatesFromAddress(plz);
+  if (ret == null) {
+    return false;
+  }
+  return true;
+}
+
 // [POST] Erstelle neue Veranstaltung
 Future<http.Response> attemptCreateVeranstaltung(
     String titel,
@@ -219,18 +226,12 @@ Future<http.Response> attemptCreateVeranstaltung(
     String endets,
     String ortBeschreibung,
     String plz,
-    //String institutionId,
     String userId,
     String istGenehmigt,
     [String institutionId = "-1",
     List<String> fileids = const ["-1"],
     List<String> tags = const ["-1"]]) async {
   String route = "api/veranstaltungen/";
-
-  // Hole Breiten- und Laengengrad fuer Veranstlatung
-  var coordinateList = await getCoordinatesFromAddress(plz);
-  var latitude = coordinateList.first;
-  var longitude = coordinateList.last;
 
   Map<String, dynamic> body = {
     'titel': titel,
@@ -240,11 +241,22 @@ Future<http.Response> attemptCreateVeranstaltung(
     'ende_ts': endets,
     'ortBeschreibung': ortBeschreibung,
     'plz': plz,
-    'latitude': latitude,
-    'longitude': longitude,
     'userId': userId,
     'istGenehmigt': istGenehmigt
   };
+
+  // Hole User Koordinaten
+  var coordinateList = await getCoordinatesFromAddress(plz);
+
+  if (coordinateList == null) {
+    return http.Response("PLZ nicht gefunden", 400);
+  }
+
+  var latitude = coordinateList.first;
+  var longitude = coordinateList.last;
+
+  body.putIfAbsent('latitude', () => latitude);
+  body.putIfAbsent('longitude', () => longitude);
 
   if (institutionId != "-1") {
     body.putIfAbsent('institutionId', () => institutionId);
@@ -286,6 +298,7 @@ Future<http.Response> attemptFileUpload(String filename, File file) async {
     return http.Response("File types allowed .jpeg, .jpg .png and .pdf!", 500);
   }
 
+  // Komprimiere Bild oder PDF Datei
   var compressedFile;
 
   if (mimetype == 'application/pdf') {
@@ -324,6 +337,7 @@ Future<http.Response> attemptNewProfilImage(
     return http.Response("File types allowed .jpeg, .jpg and png!", 500);
   }
 
+  // Komprimiere Bild
   var compressedFile = await compressImage(file);
 
   var _file = await http.MultipartFile.fromPath(
@@ -543,6 +557,7 @@ Future<http.Response> attemptNewImageForInstitution(
     return http.Response("File types allowed .jpeg, .jpg and png!", 500);
   }
 
+  // Komprimiere Bild
   var compressedFile = await compressImage(file);
 
   var _file = await http.MultipartFile.fromPath(
@@ -895,10 +910,6 @@ Future<http.Response> attemptGetUngenehmigteInstitutionen(
 
   return response;
 }
-
-// [DELETE] Lösche einzelnes File
-// ignore: missing_return
-Future<http.Response> attemptDeleteFile() async {}
 
 // [GET] TEST API
 Future<http.Response> testapi() async {

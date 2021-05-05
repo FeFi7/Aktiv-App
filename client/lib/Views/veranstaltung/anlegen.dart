@@ -40,7 +40,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   var tcVisibility = true;
   File profileImage;
   final picker = ImagePicker();
-
+  bool plzCheck = false;
   DateTime currentDate = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.now();
   bool institutionVorhanden = false;
@@ -58,14 +58,16 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   int institutionsId = 0;
   //
   List<String> images = [];
+  List<Image> imageList = [];
+  List<String> pdfPathList = [];
   String starttext = "Beginn";
   String endtext = "Ende";
-  String titel = "Titel",
-      beschreibung = "Beschreibung der Veranstaltung",
-      email = "test@testmail.de",
-      plz = "00000",
-      adresse = "Adresse",
-      start = "Start",
+  String titel,
+      beschreibung,
+      email,
+      plz,
+      adresse,
+      start = "Beginn",
       ende = "Ende";
   Locale de = Locale('de', 'DE');
 
@@ -73,6 +75,42 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
 
   List<String> tags = ['Musik', 'Sport', 'Freizeit'];
   List<String> selectedTags = [];
+
+  Future<String>checkData(String titel, String beschreibung, String email,
+      String start, String ende, String adresse, String plz)async  {
+
+         bool plzcheck = await attemptProovePlz(plz);
+    if (titel.length == 0) {
+      return "Titel fehlt";
+    }
+    if (beschreibung.length == 0) {
+      return "Beschreibung fehlt";
+    }
+    if (email.length == 0) {
+      return "Kontakt ( Email Adresse ) fehlt";
+    }
+    if (start.contains('Beginn')) {
+      return "Startzeitpunkt fehlt";
+    }
+    if (ende.contains('Ende')) {
+      return "Endzeitpunkt fehlt";
+    }
+    if (adresse.length == 0) {
+      return "Adresse fehlt";
+    }
+    if (plz.length != 5) {
+      return "PLZ Eingabe ungültig";
+    }
+    if (plzcheck == false ) {
+      return "PLZ Eingabe ungültig";
+    }
+
+    
+    if (institutionen.keys.length > 1 && institutionsId == 0) {
+      return "Bitte Institution auswählen";
+    }
+    return 'OK';
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime pickedDate = await showDatePicker(
@@ -121,6 +159,15 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
           if (pickedFile != null) {
             //profileImage = File(pickedFile.path);
             images.add(profileImage.path);
+            if (['.jpg', '.jpeg', '.png'].contains(profileImage.path
+                .substring(profileImage.path.lastIndexOf(".")))) {
+              imageList.add(Image.file(File(profileImage.path)));
+            } else if (profileImage.path
+                    .substring(profileImage.path.lastIndexOf(".")) ==
+                ".pdf") {
+              pdfPathList.add(profileImage.path
+                  .substring(profileImage.path.lastIndexOf("/") + 1));
+            }
           }
         },
       );
@@ -168,11 +215,13 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  
-                  RoundedInputField(
-                    hintText: "Titel",
-                    icon: Icons.title,
-                    controller: controllerTitel,
+                  Container(
+                    margin: EdgeInsets.only(top: size.width * 0.1),
+                    child: RoundedInputField(
+                      hintText: "Titel",
+                      icon: Icons.title,
+                      controller: controllerTitel,
+                    ),
                   ),
                   RoundedInputFieldBeschreibung(
                     hintText: 'Beschreibung der Veranstaltung',
@@ -195,8 +244,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                         _controller.clear();
                         setState(() {});
                       }
-
-                      
                     },
                     onSubmitted: (value) {
                       selectedTags.add(value);
@@ -204,7 +251,6 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                       if (selectedTags.length != 0) {
                         setState(() {});
                       }
-                      
                     },
                   ),
                   Container(
@@ -253,6 +299,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     hintText: "Postleitzahl",
                     controller: controllerPlz,
                     icon: Icons.home,
+                    
                   ),
                   RoundedInputField(
                     hintText: "Adresse",
@@ -264,9 +311,9 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     color: ColorPalette.malibu.rgb,
                     textColor: Colors.black54,
                     press: () async {
-                       currentDate = DateTime.now();
+                      currentDate = DateTime.now();
                       await _selectDate(context);
-
+                      DateTime checkEnde, checkStart;
                       setState(() {
                         String minute = currentTime.minute.toString();
                         String hour = currentTime.hour.toString();
@@ -303,6 +350,15 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             hour +
                             ":" +
                             minute;
+                        if (start.contains('Start') || ende.contains("Ende")) {
+                        } else {
+                          checkStart = DateTime.parse(start);
+                          checkEnde = DateTime.parse(ende);
+                          if (checkEnde.isBefore(checkStart)) {
+                            errorToast(
+                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                          }
+                        }
                       });
                     },
                   ),
@@ -313,6 +369,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                     press: () async {
                       currentDate = DateTime.now().add(Duration(days: 1));
                       await _selectDate(context);
+                      DateTime checkEnde, checkStart;
 
                       setState(() {
                         String minute = currentTime.minute.toString();
@@ -350,6 +407,15 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             hour +
                             ":" +
                             minute;
+                        if (start.contains('Start') || ende.contains("Ende")) {
+                        } else {
+                          checkStart = DateTime.parse(start);
+                          checkEnde = DateTime.parse(ende);
+                          if (checkEnde.isBefore(checkStart)) {
+                            errorToast(
+                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                          }
+                        }
                       });
                     },
                   ),
@@ -365,44 +431,117 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                             textColor: Colors.black54,
                             press: () async {
                               await getImage();
-                              if(profileImage != null){
-                              Response resp = await attemptFileUpload(
-                                  'Bild1', profileImage);
-                              // print(resp.body);
-                              // int id = 0;
-                              if (resp.statusCode == 200) {
-                                var parsedJson = json.decode(resp.body);
-                                imageId = parsedJson['id'];
-                                imageIds.add(imageId.toString());
-                                // toastmsg = "Neue Veranstaltung angelegt";
-                              } else {
-                                // var parsedJson = json.decode(resp.body);
-                                // var error = parsedJson['error'];
-                                // toastmsg = error;
+
+                              if (profileImage != null) {
+                                Response resp = await attemptFileUpload(
+                                    'Bild1', profileImage);
+                                // print(resp.body);
+                                // int id = 0;
+                                if (resp.statusCode == 200) {
+                                  var parsedJson = json.decode(resp.body);
+                                  imageId = parsedJson['id'];
+                                  imageIds.add(imageId.toString());
+                                  // toastmsg = "Neue Veranstaltung angelegt";
+                                } else {
+                                  // var parsedJson = json.decode(resp.body);
+                                  // var error = parsedJson['error'];
+                                  // toastmsg = error;
+
+                                }
                               }
-                              setState(() {});}
+                            })),
+                  ),
+                  Visibility(
+                    visible: imageList.length > 0 ? true : false,
+                    child: Container(
+                        height: 140,
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                            itemCount: imageList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
+                                  margin: const EdgeInsets.only(
+                                      left: 10.0, right: 10.0),
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: imageList[index].image,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  height: 100,
+                                  width: 200,
+                                  child: null);
+                            })),
+                  ),
+                  Visibility(
+                    visible: pdfPathList.length > 0 ? true : false,
+                    child: Container(
+                        padding: EdgeInsets.fromLTRB(20, 0, 0, 15),
+                        child: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+                            itemCount: pdfPathList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
+                                  height: 30,
+                                  width: 200,
+                                  child: ListTile(
+                                      leading: Icon(
+                                        Icons.picture_as_pdf,
+                                        color: Color.fromRGBO(244, 15, 2, 1),
+                                      ),
+                                      title: Text(pdfPathList[index])));
                             })),
                   ),
                   Visibility(
                     visible: institutionVorhanden,
-                    child: new DropdownButton<dynamic>(
-                      hint: Text(selectedInstitutition),
-                      items: institutionen.keys.map((String value) {
-                        return new DropdownMenuItem<String>(
-                          value: value,
-                          child: new Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInstitutition = value;
-                          institutionsId = institutionen[value];
-                        });
-                      },
+                    child: Container(
+                      width: size.width * 0.8,
+                      height: 58,
+                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 20, horizontal: 26),
+                      decoration: BoxDecoration(
+                          color: ColorPalette.malibu.rgb,
+                          borderRadius: BorderRadius.circular(29)),
+                      child: new DropdownButton<dynamic>(
+                        iconEnabledColor: ColorPalette.endeavour.rgb,
+                        style: TextStyle(color: ColorPalette.black.rgb),
+                        dropdownColor: ColorPalette.malibu.rgb,
+                        hint: Text(
+                          selectedInstitutition,
+                          style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        items: institutionen.keys.map((String value) {
+                          return new DropdownMenuItem<String>(
+                            value: value,
+                            child: Container(
+                                width: size.width * 0.6,
+                                child: new Text(value)),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedInstitutition = value;
+                            institutionsId = institutionen[value];
+                          });
+                        },
+                      ),
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, size.width * 0.1, 15),
+                    margin: EdgeInsets.fromLTRB(
+                        size.width * 0.1, 10, size.width * 0.1, 15),
                     child: Align(
                         alignment: Alignment.bottomRight,
                         child: RoundedButtonDynamic(
@@ -416,33 +555,50 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
                                 istGenehmigt = 1;
                               }
 
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .checkDataCompletion();
-                              if (Provider.of<UserProvider>(context,
-                                      listen: false)
-                                  .getDatenVollstaendig) {
-                                await Provider.of<EventProvider>(context,
+                              String dataCheck = await checkData(
+                                  controllerTitel.text,
+                                  controllerBeschreibung.text,
+                                  controlleremail.text,
+                                  start,
+                                  ende,
+                                  controllerAdresse.text,
+                                  controllerPlz.text);
+                              if (dataCheck.contains("OK")) {
+                                Provider.of<UserProvider>(context,
                                         listen: false)
-                                    .createEvent(
-                                        controllerTitel.text,
-                                        controllerBeschreibung.text,
-                                        controlleremail.text,
-                                        start,
-                                        ende,
-                                        controllerAdresse.text,
-                                        controllerPlz.text,
-                                        institutionsId,
-                                        istGenehmigt,
-                                        imageIds,
-                                        selectedTags)
-                                    .then((event) => {
-                                          Provider.of<BodyProvider>(context,
-                                                  listen: false)
-                                              .setBody(VeranstaltungDetailView(
-                                                  event.id))
-                                          // Provider.of<AppBarTitleProvider>(context, listen: false)
-                                          //     .setTitle('Übersicht');
-                                        });
+                                    .checkDataCompletion();
+                                if (Provider.of<UserProvider>(context,
+                                            listen: false)
+                                        .getDatenVollstaendig ==
+                                    false) {
+                                  errorToast("Benutzerdaten unvöllständig");
+                                } else {
+                                  await Provider.of<EventProvider>(context,
+                                          listen: false)
+                                      .createEvent(
+                                          controllerTitel.text,
+                                          controllerBeschreibung.text,
+                                          controlleremail.text,
+                                          start,
+                                          ende,
+                                          controllerAdresse.text,
+                                          controllerPlz.text,
+                                          institutionsId,
+                                          istGenehmigt,
+                                          imageIds,
+                                          selectedTags)
+                                      .then((event) => {
+                                            Provider.of<BodyProvider>(context,
+                                                    listen: false)
+                                                .setBody(
+                                                    VeranstaltungDetailView(
+                                                        event.id))
+                                            // Provider.of<AppBarTitleProvider>(context, listen: false)
+                                            //     .setTitle('Übersicht');
+                                          });
+                                }
+                              } else {
+                                errorToast(dataCheck);
                               }
                             })),
                   )
