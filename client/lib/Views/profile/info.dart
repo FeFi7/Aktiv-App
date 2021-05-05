@@ -33,7 +33,7 @@ class _InfoViewState extends State<InfoView> {
           padding: const EdgeInsets.all(20.0),
           child: Text("Lebensqualität Burgrieden e.V.unterstützt durch: Bürgerstiftung Burgrieden\n\nBesonderer Dank an " +
               "die Projektgruppe von LQ e.V.:\n\nHarald Dammann\nIngeborg Pfaff\nRobert Mages\nSilvia Beitner\n\n" +
-              "an Herrn Prof. Dr. Klaus Baer für die wissenschaftliche Unterstützung und vor allem an unsere Programmierer:\n\n" +
+              "an Herrn Prof. Dr. Klaus Baer der Technischen Hochschule Ulm für die wissenschaftliche Unterstützung und vor allem an unsere Programmierer:\n\n" +
               "Viktor Dötzel\nFelix Filser\nFabian Bösel\nNiko Burkert\nMoritz Nentwig\nFlorian Kovacsik"),
         ),
         TextButton(
