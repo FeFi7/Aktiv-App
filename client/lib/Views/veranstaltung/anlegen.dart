@@ -791,16 +791,20 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   getTop10Tags(String input) async {
     var jwt = await attemptGetTags(input);
 
-    if (jwt.statusCode != 200) {
-      return ['musik', 'sport', 'freizeit'];
-    } else {
-      var parsedTags = json.decode(jwt.body);
-      var _map = parsedTags.toList();
-      List<String> tagList = [];
-      for (var element in _map) {
-        tagList.add(element['name'].toString());
+    if (jwt != null) {
+      if (jwt.statusCode != 200) {
+        return _tags;
+      } else {
+        var parsedTags = json.decode(jwt.body);
+        var _map = parsedTags.toList();
+        List<String> tagList = [];
+        for (var element in _map) {
+          tagList.add(element['name'].toString());
+        }
+        _tags = tagList;
+        return _tags;
       }
-      _tags = tagList;
+    } else {
       return _tags;
     }
   }
