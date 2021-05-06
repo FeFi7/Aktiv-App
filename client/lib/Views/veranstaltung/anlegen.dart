@@ -49,6 +49,10 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
   int imageId;
   var _controller = TextEditingController();
 
+  int currentStep = 0; //startIndex für Stepper
+  bool complete = false; //Ausfüllen abgeschlossen
+  List<Step> steps;
+
   final controllerTitel = TextEditingController();
   final controllerBeschreibung = TextEditingController();
   final controlleremail = TextEditingController();
@@ -73,13 +77,14 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
 
   List<DropdownMenuItem<String>> items = [];
 
-  List<String> tags = ['Musik', 'Sport', 'Freizeit'];
+  List<String> _tags = [];
+
+  List<String> tags = ['musik', 'sport', 'freizeit'];
   List<String> selectedTags = [];
 
-  Future<String>checkData(String titel, String beschreibung, String email,
-      String start, String ende, String adresse, String plz)async  {
-
-         bool plzcheck = await attemptProovePlz(plz);
+  Future<String> checkData(String titel, String beschreibung, String email,
+      String start, String ende, String adresse, String plz) async {
+    bool plzcheck = await attemptProovePlz(plz);
     if (titel.length == 0) {
       return "Titel fehlt";
     }
@@ -101,11 +106,10 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
     if (plz.length != 5) {
       return "PLZ Eingabe ungültig";
     }
-    if (plzcheck == false ) {
+    if (plzcheck == false) {
       return "PLZ Eingabe ungültig";
     }
 
-    
     if (institutionen.keys.length > 1 && institutionsId == 0) {
       return "Bitte Institution auswählen";
     }
@@ -196,13 +200,13 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
       institutionVorhanden = true;
     }
 
+    _tags = getTop10Tags("");
     return institutionen;
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return FutureBuilder<Map<String, int>>(
         future: awaitUserData(),
         builder: (context, snapshot) {
@@ -215,339 +219,493 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             return SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(top: size.width * 0.1),
-                    child: RoundedInputField(
-                      hintText: "Titel",
-                      icon: Icons.title,
-                      controller: controllerTitel,
-                    ),
-                  ),
-                  RoundedInputFieldBeschreibung(
-                    hintText: 'Beschreibung der Veranstaltung',
-                    icon: Icons.edit,
-                    controller: controllerBeschreibung,
-                  ),
-                  RoundedInputFieldSuggestions(
-                    controller: _controller,
-                    hintText: 'Musik, Sport, Freizeit...',
-                    suggestions: tags,
-                    icon: Icons.tag,
-                    onChanged: (value) {
-                      if (value.endsWith(" ")) {
-                        selectedTags.add(value);
-                        _controller.clear();
-                        setState(() {});
-                      }
-                      if (value.endsWith(",")) {
-                        selectedTags.add(value);
-                        _controller.clear();
-                        setState(() {});
-                      }
-                    },
-                    onSubmitted: (value) {
-                      selectedTags.add(value);
-
-                      if (selectedTags.length != 0) {
-                        setState(() {});
-                      }
-                    },
-                  ),
-                  Container(
-                    width: size.width * 0.5,
-                    child: Visibility(
-                        child: Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      child: ListView.builder(
-                        itemCount: selectedTags.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                              decoration: BoxDecoration(
-                                color: ColorPalette.malibu.rgb,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(29.0)),
-                              ),
-                              padding: EdgeInsets.fromLTRB(25, 0, 10, 0),
-                              margin: EdgeInsets.all(5),
-                              height: 50,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('${selectedTags[index]}'),
-                                  IconButton(
-                                      icon: Icon(Icons.delete,
-                                          color: ColorPalette.torea_bay.rgb),
-                                      onPressed: () {
-                                        setState(() {
-                                          selectedTags.removeAt(index);
-                                        });
-                                      })
+                  complete
+                      ? Center(
+                          //Bestätigung der Angaben
+                          child: AlertDialog(
+                            title: Text("Veranstaltung angelegt"),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Text(
+                                      "Ihre Veranstaltung wurde erfolgreich angelegt."),
                                 ],
-                              ));
-                        },
-                        shrinkWrap: true,
-                      ),
-                    )),
-                  ),
-                  RoundedInputEmailField(
-                    hintText: "Kontakt",
-                    icon: Icons.email,
-                    controller: controlleremail,
-                  ),
-                  RoundedInputFieldNumeric(
-                    hintText: "Postleitzahl",
-                    controller: controllerPlz,
-                    icon: Icons.home,
-                    
-                  ),
-                  RoundedInputField(
-                    hintText: "Adresse",
-                    icon: Icons.location_on_rounded,
-                    controller: controllerAdresse,
-                  ),
-                  RoundedDatepickerButton(
-                    text: starttext,
-                    color: ColorPalette.malibu.rgb,
-                    textColor: Colors.black54,
-                    press: () async {
-                      currentDate = DateTime.now();
-                      await _selectDate(context);
-                      DateTime checkEnde, checkStart;
-                      setState(() {
-                        String minute = currentTime.minute.toString();
-                        String hour = currentTime.hour.toString();
-                        String month = currentDate.month.toString();
-                        String day = currentDate.day.toString();
-
-                        if (currentTime.minute.toString().length == 1) {
-                          minute = '0' + currentTime.minute.toString();
-                        }
-                        if (currentTime.hour.toString().length == 1) {
-                          hour = '0' + currentTime.hour.toString();
-                        }
-                        if (currentDate.month.toString().length == 1) {
-                          month = '0' + currentDate.month.toString();
-                        }
-                        if (currentDate.day.toString().length == 1) {
-                          day = '0' + currentDate.day.toString();
-                        }
-                        starttext = day +
-                            "." +
-                            month +
-                            "." +
-                            currentDate.year.toString() +
-                            ", " +
-                            hour +
-                            ":" +
-                            minute;
-                        start = currentDate.year.toString() +
-                            "-" +
-                            month +
-                            "-" +
-                            day +
-                            " " +
-                            hour +
-                            ":" +
-                            minute;
-                        if (start.contains('Start') || ende.contains("Ende")) {
-                        } else {
-                          checkStart = DateTime.parse(start);
-                          checkEnde = DateTime.parse(ende);
-                          if (checkEnde.isBefore(checkStart)) {
-                            errorToast(
-                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
-                          }
-                        }
-                      });
-                    },
-                  ),
-                  RoundedDatepickerButton(
-                    text: endtext,
-                    color: ColorPalette.malibu.rgb,
-                    textColor: Colors.black54,
-                    press: () async {
-                      currentDate = DateTime.now().add(Duration(days: 1));
-                      await _selectDate(context);
-                      DateTime checkEnde, checkStart;
-
-                      setState(() {
-                        String minute = currentTime.minute.toString();
-                        String hour = currentTime.hour.toString();
-                        String month = currentDate.month.toString();
-                        String day = currentDate.day.toString();
-                        if (currentTime.minute.toString().length == 1) {
-                          minute = '0' + currentTime.minute.toString();
-                        }
-                        if (currentTime.hour.toString().length == 1) {
-                          hour = '0' + currentTime.hour.toString();
-                        }
-                        if (currentDate.month.toString().length == 1) {
-                          month = '0' + currentDate.month.toString();
-                        }
-                        if (currentDate.day.toString().length == 1) {
-                          day = '0' + currentDate.day.toString();
-                        }
-
-                        endtext = day +
-                            "." +
-                            month +
-                            "." +
-                            currentDate.year.toString() +
-                            ", " +
-                            hour +
-                            ":" +
-                            minute;
-                        ende = currentDate.year.toString() +
-                            "-" +
-                            month +
-                            "-" +
-                            day +
-                            " " +
-                            hour +
-                            ":" +
-                            minute;
-                        if (start.contains('Start') || ende.contains("Ende")) {
-                        } else {
-                          checkStart = DateTime.parse(start);
-                          checkEnde = DateTime.parse(ende);
-                          if (checkEnde.isBefore(checkStart)) {
-                            errorToast(
-                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
-                          }
-                        }
-                      });
-                    },
-                  ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(size.width * 0.1, 10, 0, 15),
-                    child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: RoundedButtonDynamic(
-                            width: size.width * 0.8,
-                            text: 'Bilder',
-                            icon: Icons.camera_alt,
-                            color: ColorPalette.malibu.rgb,
-                            textColor: Colors.black54,
-                            press: () async {
-                              await getImage();
-
-                              if (profileImage != null) {
-                                Response resp = await attemptFileUpload(
-                                    'Bild1', profileImage);
-                                // print(resp.body);
-                                // int id = 0;
-                                if (resp.statusCode == 200) {
-                                  var parsedJson = json.decode(resp.body);
-                                  imageId = parsedJson['id'];
-                                  imageIds.add(imageId.toString());
-                                  // toastmsg = "Neue Veranstaltung angelegt";
-                                } else {
-                                  // var parsedJson = json.decode(resp.body);
-                                  // var error = parsedJson['error'];
-                                  // toastmsg = error;
-
-                                }
-                              }
-                            })),
-                  ),
-                  Visibility(
-                    visible: imageList.length > 0 ? true : false,
-                    child: Container(
-                        height: 140,
-                        child: ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                            itemCount: imageList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
-                                  margin: const EdgeInsets.only(
-                                      left: 10.0, right: 10.0),
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: imageList[index].image,
-                                      fit: BoxFit.cover,
+                              ),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                  onPressed: () {
+                                    setState(
+                                      () {
+                                        complete = false;
+                                      },
+                                    );
+                                  },
+                                  child: Text("Bestätigen"))
+                            ],
+                          ),
+                        )
+                      : Stepper(
+                          physics: ClampingScrollPhysics(),
+                          controlsBuilder: (BuildContext context,
+                              {VoidCallback onStepContinue,
+                              VoidCallback onStepCancel}) {
+                            return Row(
+                              children: <Widget>[
+                                currentStep + 1 !=
+                                        steps
+                                            .length //wenn letzter Schritt, "Daten senden", anstatt "weiter" anzeigen
+                                    ? TextButton(
+                                        onPressed: onStepContinue,
+                                        child: const Text(
+                                          'Weiter',
+                                          style: TextStyle(
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                //zurück-TextButton
+                                TextButton(
+                                  onPressed: onStepCancel,
+                                  child: const Text(
+                                    'Zurück',
+                                    style: TextStyle(
+                                      color: Colors.black54,
                                     ),
                                   ),
-                                  height: 100,
-                                  width: 200,
-                                  child: null);
-                            })),
-                  ),
-                  Visibility(
-                    visible: pdfPathList.length > 0 ? true : false,
-                    child: Container(
-                        padding: EdgeInsets.fromLTRB(20, 0, 0, 15),
-                        child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
-                            itemCount: pdfPathList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 1, 20, 0),
-                                  height: 30,
-                                  width: 200,
-                                  child: ListTile(
-                                      leading: Icon(
-                                        Icons.picture_as_pdf,
-                                        color: Color.fromRGBO(244, 15, 2, 1),
+                                ),
+                              ],
+                            );
+                          },
+                          steps: steps = [
+                            Step(
+                              title: Text("Titel und Beschreibung"),
+                              content: Column(
+                                children: <Widget>[
+                                  Container(
+                                    // margin:
+                                    //     EdgeInsets.only(top: size.height * 0.1),
+                                    child: RoundedInputField(
+                                      hintText: "Titel",
+                                      icon: Icons.title,
+                                      controller: controllerTitel,
+                                    ),
+                                  ),
+                                  RoundedInputFieldBeschreibung(
+                                    hintText: 'Beschreibung der Veranstaltung',
+                                    icon: Icons.edit,
+                                    controller: controllerBeschreibung,
+                                  ),
+                                  RoundedInputFieldSuggestions(
+                                    controller: _controller,
+                                    hintText: 'musik, sport, freizeit...',
+                                    suggestions: _tags,
+                                    icon: Icons.tag,
+                                    onChanged: (value) {
+                                      if (value.endsWith(" ")) {
+                                        selectedTags.add(value);
+                                        _controller.clear();
+                                        setState(() {});
+                                      }
+                                      if (value.endsWith(",")) {
+                                        selectedTags.add(value);
+                                        _controller.clear();
+                                        setState(() {});
+                                      }
+
+                                      //getTop10Tags(_controller.text.toString());
+                                    },
+                                    onSubmitted: (value) {
+                                      selectedTags.add(value);
+
+                                      if (selectedTags.length != 0) {
+                                        setState(() {});
+                                      }
+                                    },
+                                  ),
+                                  Container(
+                                    width: size.width * 0.5,
+                                    child: Visibility(
+                                        child: Container(
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      child: ListView.builder(
+                                        itemCount: selectedTags.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return Container(
+                                              decoration: BoxDecoration(
+                                                color: ColorPalette.malibu.rgb,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(29.0)),
+                                              ),
+                                              padding: EdgeInsets.fromLTRB(
+                                                  25, 0, 10, 0),
+                                              margin: EdgeInsets.all(5),
+                                              height: 50,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                      '${selectedTags[index]}'),
+                                                  IconButton(
+                                                      icon: Icon(Icons.delete,
+                                                          color: ColorPalette
+                                                              .torea_bay.rgb),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          selectedTags
+                                                              .removeAt(index);
+                                                        });
+                                                      })
+                                                ],
+                                              ));
+                                        },
+                                        shrinkWrap: true,
                                       ),
-                                      title: Text(pdfPathList[index])));
-                            })),
-                  ),
-                  Visibility(
-                    visible: institutionVorhanden,
-                    child: Container(
-                      width: size.width * 0.8,
-                      height: 58,
-                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 20, horizontal: 26),
-                      decoration: BoxDecoration(
-                          color: ColorPalette.malibu.rgb,
-                          borderRadius: BorderRadius.circular(29)),
-                      child: new DropdownButton<dynamic>(
-                        iconEnabledColor: ColorPalette.endeavour.rgb,
-                        style: TextStyle(color: ColorPalette.black.rgb),
-                        dropdownColor: ColorPalette.malibu.rgb,
-                        hint: Text(
-                          selectedInstitutition,
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold),
+                                    )),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //"Anschrift-Schritt" im Stepper
+                            Step(
+                              title: Text("Kontakt und Datum"),
+                              content: Column(
+                                children: <Widget>[
+                                  RoundedInputEmailField(
+                                    hintText: "Kontakt",
+                                    icon: Icons.email,
+                                    controller: controlleremail,
+                                  ),
+                                  RoundedInputFieldNumeric(
+                                    hintText: "Postleitzahl",
+                                    controller: controllerPlz,
+                                    icon: Icons.home,
+                                  ),
+                                  RoundedInputField(
+                                    hintText: "Adresse",
+                                    icon: Icons.location_on_rounded,
+                                    controller: controllerAdresse,
+                                  ),
+                                  RoundedDatepickerButton(
+                                    text: starttext,
+                                    color: ColorPalette.malibu.rgb,
+                                    textColor: Colors.black54,
+                                    press: () async {
+                                      currentDate = DateTime.now();
+                                      await _selectDate(context);
+                                      DateTime checkEnde, checkStart;
+                                      setState(() {
+                                        String minute =
+                                            currentTime.minute.toString();
+                                        String hour =
+                                            currentTime.hour.toString();
+                                        String month =
+                                            currentDate.month.toString();
+                                        String day = currentDate.day.toString();
+
+                                        if (currentTime.minute
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          minute = '0' +
+                                              currentTime.minute.toString();
+                                        }
+                                        if (currentTime.hour
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          hour =
+                                              '0' + currentTime.hour.toString();
+                                        }
+                                        if (currentDate.month
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          month = '0' +
+                                              currentDate.month.toString();
+                                        }
+                                        if (currentDate.day.toString().length ==
+                                            1) {
+                                          day =
+                                              '0' + currentDate.day.toString();
+                                        }
+                                        starttext = day +
+                                            "." +
+                                            month +
+                                            "." +
+                                            currentDate.year.toString() +
+                                            ", " +
+                                            hour +
+                                            ":" +
+                                            minute;
+                                        start = currentDate.year.toString() +
+                                            "-" +
+                                            month +
+                                            "-" +
+                                            day +
+                                            " " +
+                                            hour +
+                                            ":" +
+                                            minute;
+                                        if (start.contains('Start') ||
+                                            ende.contains("Ende")) {
+                                        } else {
+                                          checkStart = DateTime.parse(start);
+                                          checkEnde = DateTime.parse(ende);
+                                          if (checkEnde.isBefore(checkStart)) {
+                                            errorToast(
+                                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                                          }
+                                        }
+                                      });
+                                    },
+                                  ),
+                                  RoundedDatepickerButton(
+                                    text: endtext,
+                                    color: ColorPalette.malibu.rgb,
+                                    textColor: Colors.black54,
+                                    press: () async {
+                                      currentDate =
+                                          DateTime.now().add(Duration(days: 1));
+                                      await _selectDate(context);
+                                      DateTime checkEnde, checkStart;
+
+                                      setState(() {
+                                        String minute =
+                                            currentTime.minute.toString();
+                                        String hour =
+                                            currentTime.hour.toString();
+                                        String month =
+                                            currentDate.month.toString();
+                                        String day = currentDate.day.toString();
+                                        if (currentTime.minute
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          minute = '0' +
+                                              currentTime.minute.toString();
+                                        }
+                                        if (currentTime.hour
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          hour =
+                                              '0' + currentTime.hour.toString();
+                                        }
+                                        if (currentDate.month
+                                                .toString()
+                                                .length ==
+                                            1) {
+                                          month = '0' +
+                                              currentDate.month.toString();
+                                        }
+                                        if (currentDate.day.toString().length ==
+                                            1) {
+                                          day =
+                                              '0' + currentDate.day.toString();
+                                        }
+
+                                        endtext = day +
+                                            "." +
+                                            month +
+                                            "." +
+                                            currentDate.year.toString() +
+                                            ", " +
+                                            hour +
+                                            ":" +
+                                            minute;
+                                        ende = currentDate.year.toString() +
+                                            "-" +
+                                            month +
+                                            "-" +
+                                            day +
+                                            " " +
+                                            hour +
+                                            ":" +
+                                            minute;
+                                        if (start.contains('Start') ||
+                                            ende.contains("Ende")) {
+                                        } else {
+                                          checkStart = DateTime.parse(start);
+                                          checkEnde = DateTime.parse(ende);
+                                          if (checkEnde.isBefore(checkStart)) {
+                                            errorToast(
+                                                'Veranstaltungs Ende vor Veranstaltungs Beginn');
+                                          }
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Step(
+                              title: Text("Anhänge und Institution"),
+                              content: Column(children: <Widget>[
+                                Container(
+                                  // margin: EdgeInsets.fromLTRB(
+                                  //     size.width * 0.1, 10, 0, 15),
+                                  child: Align(
+                                      alignment: Alignment.bottomLeft,
+                                      child: RoundedButtonDynamic(
+                                          width: size.width * 0.8,
+                                          text: 'Anhänge',
+                                          icon: Icons.add_to_photos_outlined,
+                                          color: ColorPalette.malibu.rgb,
+                                          textColor: Colors.black54,
+                                          press: () async {
+                                            await getImage();
+
+                                            if (profileImage != null) {
+                                              Response resp =
+                                                  await attemptFileUpload(
+                                                      'Bild1', profileImage);
+                                              // print(resp.body);
+                                              // int id = 0;
+                                              if (resp.statusCode == 200) {
+                                                var parsedJson =
+                                                    json.decode(resp.body);
+                                                imageId = parsedJson['id'];
+                                                imageIds
+                                                    .add(imageId.toString());
+                                                // toastmsg = "Neue Veranstaltung angelegt";
+                                              } else {
+                                                // var parsedJson = json.decode(resp.body);
+                                                // var error = parsedJson['error'];
+                                                // toastmsg = error;
+
+                                              }
+                                            }
+                                          })),
+                                ),
+                                SizedBox(height: 16.0),
+                                Visibility(
+                                  visible: imageList.length > 0 ? true : false,
+                                  child: Container(
+                                      height: 140,
+                                      child: ListView.builder(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 10),
+                                          itemCount: imageList.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Container(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        20, 1, 20, 0),
+                                                margin: const EdgeInsets.only(
+                                                    left: 10.0, right: 10.0),
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image:
+                                                        imageList[index].image,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                                height: 100,
+                                                width: 200,
+                                                child: null);
+                                          })),
+                                ),
+                                Visibility(
+                                  visible:
+                                      pdfPathList.length > 0 ? true : false,
+                                  child: Container(
+                                      padding:
+                                          EdgeInsets.fromLTRB(20, 0, 0, 15),
+                                      child: ListView.builder(
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.vertical,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 12),
+                                          itemCount: pdfPathList.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Container(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        20, 1, 20, 0),
+                                                height: 30,
+                                                width: 200,
+                                                child: ListTile(
+                                                    leading: Icon(
+                                                      Icons.picture_as_pdf,
+                                                      color: Color.fromRGBO(
+                                                          244, 15, 2, 1),
+                                                    ),
+                                                    title: Text(
+                                                        pdfPathList[index])));
+                                          })),
+                                ),
+                                Visibility(
+                                  visible: institutionVorhanden,
+                                  child: Container(
+                                    width: size.width * 0.8,
+                                    height: 58,
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 5, 0, 10),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 20, horizontal: 26),
+                                    decoration: BoxDecoration(
+                                        color: ColorPalette.malibu.rgb,
+                                        borderRadius:
+                                            BorderRadius.circular(29)),
+                                    child: new DropdownButton<dynamic>(
+                                      iconEnabledColor:
+                                          ColorPalette.endeavour.rgb,
+                                      style: TextStyle(
+                                          color: ColorPalette.black.rgb),
+                                      dropdownColor: ColorPalette.malibu.rgb,
+                                      hint: Text(
+                                        selectedInstitutition,
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      items: institutionen.keys
+                                          .map((String value) {
+                                        return new DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Container(
+                                              width: size.width * 0.6,
+                                              child: new Text(value)),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedInstitutition = value;
+                                          institutionsId = institutionen[value];
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ],
+                          currentStep: currentStep,
+                          onStepContinue: nextStep,
+                          onStepCancel: cancelStep,
+                          onStepTapped: (step) => goToStep(step),
                         ),
-                        items: institutionen.keys.map((String value) {
-                          return new DropdownMenuItem<String>(
-                            value: value,
-                            child: Container(
-                                width: size.width * 0.6,
-                                child: new Text(value)),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedInstitutition = value;
-                            institutionsId = institutionen[value];
-                          });
-                        },
-                      ),
-                    ),
-                  ),
                   Container(
-                    margin: EdgeInsets.fromLTRB(
-                        size.width * 0.1, 10, size.width * 0.1, 15),
+                    // margin: EdgeInsets.fromLTRB(size.width * 0.1,
+                    //     10, size.width * 0.1, 15),
+                    margin: EdgeInsets.fromLTRB(38, 0.0, 0.0, 0.0),
                     child: Align(
-                        alignment: Alignment.bottomRight,
+                        alignment: Alignment.center,
                         child: RoundedButtonDynamic(
-                            width: size.width * 0.5,
+                            width: size.width * 0.8,
                             icon: Icons.save,
-                            text: 'Speichern',
+                            text: 'Veranstaltung Erstellen',
                             color: ColorPalette.orange.rgb,
                             textColor: Colors.white,
                             press: () async {
@@ -607,6 +765,43 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
             );
           }
         });
+  }
+
+  //nächster Schritt im Stepper
+  nextStep() async {
+    if (currentStep + 1 != steps.length) {
+      goToStep(currentStep + 1);
+    } else {
+      setState(() => complete = true);
+    }
+  }
+
+  //"zurück" Schritt im Stepper
+  cancelStep() {
+    if (currentStep > 0) {
+      goToStep(currentStep - 1);
+    }
+  }
+
+  //freie Auswahl des Schrittes im Stepper
+  goToStep(int step) {
+    setState(() => currentStep = step);
+  }
+
+  getTop10Tags(String input) async {
+    var jwt = await attemptGetTags(input);
+
+    if (jwt.statusCode != 200) {
+      return ['musik', 'sport', 'freizeit'];
+    } else {
+      var parsedTags = json.decode(jwt.body);
+      var _map = parsedTags.toList();
+      List<String> tagList = [];
+      for (var element in _map) {
+        tagList.add(element['name'].toString());
+      }
+      _tags = tagList;
+    }
   }
 
   errorToast(String errorMessage) {

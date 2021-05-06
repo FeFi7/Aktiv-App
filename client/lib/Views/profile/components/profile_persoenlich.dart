@@ -73,6 +73,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                     ),
                   )
                 : Stepper(
+                    physics: ClampingScrollPhysics(),
                     controlsBuilder: (BuildContext context,
                         {VoidCallback onStepContinue,
                         VoidCallback onStepCancel}) {

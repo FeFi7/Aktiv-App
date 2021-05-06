@@ -209,12 +209,15 @@ Future<http.Response> attemptGetAllVeranstaltungen(
 
 // Prüfe ob PLZ valide ist
 Future<bool> attemptProovePlz(String plz) async {
-  print('RestAPI Service : ' + plz);
-  var ret = await getCoordinatesFromAddress(plz);
-  if (ret == null) {
-    return false;
+  if (plz.isNotEmpty) {
+    print('RestAPI Service : ' + plz);
+    var ret = await getCoordinatesFromAddress(plz);
+    if (ret == null) {
+      return false;
+    }
+    return true;
   }
-  return true;
+  return false;
 }
 
 // [POST] Erstelle neue Veranstaltung
@@ -737,10 +740,12 @@ Future<http.Response> attemptDeleteVeranstaltung(
 // [GET] Bekomme tags (optional gefiltert)
 Future<http.Response> attemptGetTags([String tag = "[-1]"]) async {
   String route = "api/veranstaltungen/tags";
-  Map<String, dynamic> qParams;
+  Map<String, dynamic> qParams = {};
 
   if (tag != "[-1]") {
-    qParams.putIfAbsent('tag', () => tag);
+    if (tag.isNotEmpty) {
+      qParams.putIfAbsent('tag', () => tag);
+    }
   }
 
   final response = await http.get(Uri.https(SERVER_IP, route, qParams));
