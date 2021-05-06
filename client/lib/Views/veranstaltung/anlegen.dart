@@ -200,7 +200,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
       institutionVorhanden = true;
     }
 
-    _tags = getTop10Tags("");
+    _tags = await getTop10Tags("");
     return institutionen;
   }
 
@@ -801,6 +801,7 @@ class _VeranstaltungAnlegenViewState extends State<VeranstaltungAnlegenView> {
         tagList.add(element['name'].toString());
       }
       _tags = tagList;
+      return _tags;
     }
   }
 
