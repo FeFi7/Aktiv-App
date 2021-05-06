@@ -37,38 +37,12 @@ class _DiscoverViewState extends State<DiscoverView> {
   @override
   void initState() {
     super.initState();
-    // loadTags();
   }
 
-  // bool tagsAlreadyLoaded = false;
 
-  // void loadTags() async {
-  //   if (tagsAlreadyLoaded) return;
-  //   tagsAlreadyLoaded = true;
-
-  //   var response = await attemptGetTags();
-
-  //   if (response.statusCode == 200) {
-  //     var parsedJson = json.decode(response.body);
-  //     final List<dynamic> dynamicList =
-  //         await parsedJson.map((item) => item['name']).toList();
-
-  //     final List<String> responseList = List<String>.from(dynamicList).toList();
-
-  //     int max = responseList.length < 5 ? responseList.length : 5;
-  //     if (max > 0)
-  //       tooSpecific +=
-  //           " Für eine allgemeinere Suche verwenden Sie Tags. Mögliche Tags währen z.B.: ";
-
-  //     for (int i = 0; i < max; i++) {
-  //       tooSpecific += responseList[i] + (i < (max - 1) ? ", " : ".");
-  //     }
-  //   }
-  // }
-
-  //TODO: tooglen wenn Searchbar fokus wechselt
   bool _showSearchBehaviorProviderButtons = true;
 
+  // Entdecken View mit Suchfeld 
   @override
   Widget build(BuildContext context) {
     final SearchBarController<Widget> _searchBarController =

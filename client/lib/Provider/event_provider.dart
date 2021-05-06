@@ -259,9 +259,9 @@ class EventProvider extends ChangeNotifier {
 
   /// Lädt alle Events von neu bis zu einem gewissen Datum
   Future<List<Veranstaltung>> loadAllEventsUntil(DateTime until) {
-    /// 16 pages begrenzt das Laden der Events auf max 400 Events
     until = DateTime.utc(until.year, until.month, until.day + 1);
 
+    /// 16 pages begrenzt das Laden der Events auf max 400 Events
     return loadEventsUntil(1, 16, null, until);
   }
 
@@ -292,6 +292,7 @@ class EventProvider extends ChangeNotifier {
           "-1", // weil keine volltext Suche
           entfernung,
           sorting);
+          
       if (response.statusCode == 200) {
         var parsedJson = json.decode(response.body);
 

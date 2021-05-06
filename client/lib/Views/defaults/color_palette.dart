@@ -14,6 +14,7 @@ enum ColorPalette {
   orange
 }
 
+// Farbpalette für Einheitliches Farbschema
 extension ColorPaletteExtension on ColorPalette {
   Color get rgb {
     switch (this) {

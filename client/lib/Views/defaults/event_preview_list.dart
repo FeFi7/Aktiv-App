@@ -10,6 +10,7 @@ import 'color_palette.dart';
 import 'event_preview_box.dart';
 import 'package:flutter/material.dart';
 
+// Dynamische Liste für Event Preview Boxen
 // ignore: must_be_immutable
 class EventPreviewList extends StatefulWidget {
   // EventPreviewList(this.widgetList, this.bottomReached);

@@ -13,6 +13,8 @@ class EnvironmentPlaceholder extends StatefulWidget {
   _EnvironmentPlaceholderState createState() => _EnvironmentPlaceholderState();
 }
 
+// Wenn keine Suche getätig wird, wird diese View angezeigt,
+// Sie beinhaltet die Vorschau Listen für "Bald" und "In der Nähe"
 class _EnvironmentPlaceholderState extends State<EnvironmentPlaceholder> {
   final TextStyle headingStyle = TextStyle(
       fontSize: 30,

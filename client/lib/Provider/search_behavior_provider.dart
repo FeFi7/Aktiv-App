@@ -9,6 +9,7 @@ class SearchBehaviorProvider extends ChangeNotifier {
   static SearchStyle _style = SearchStyle.FULLTEXT;
   static SearchStyle get style => _style;
 
+  // Buttons für die Entdecken View, die darüber entscheiden wie (Volltext/Datum/Zeitraum) gesucht wird
   Widget getToggleButtons() {
     return Container(
       margin: const EdgeInsets.all(2.0),

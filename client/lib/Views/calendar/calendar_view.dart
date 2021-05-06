@@ -19,12 +19,19 @@ class CalendarView extends StatefulWidget {
 class _CalendarViewState extends State<CalendarView> {
   ValueNotifier<List<Veranstaltung>> _selectedEvents;
 
+  // Sorgt dafür, dass pro Seite der ganze Monat angezeigt wird
   CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  // Heutiger Tag als wird daruch dezent hervorgehoben
   DateTime _focusedDay = DateTime.now();
+
+  // Variable für den ausgewählten Tag 
   DateTime _selectedDay;
 
+  // Gibts Auskunft über die Auswahlstatus der ToggleButtons (Allgemein/Persönlich) 
   final List<bool> isSelected = [true, false];
 
+  // Speichert wie viele Monate bereits geladen sind
   int futureMonthsLoaded = 1;
 
   @override
@@ -60,6 +67,7 @@ class _CalendarViewState extends State<CalendarView> {
                     return isSameDay(_selectedDay, day);
                   },
                   eventLoader: (day) {
+                    // Gibt die Events zurück, die der event provider dem entsprechenden tag zuordnet
                     return isSelected[0]
                         ? Provider.of<EventProvider>(context, listen: false)
                             .getLoadedEventsOfDay(day)
@@ -68,6 +76,7 @@ class _CalendarViewState extends State<CalendarView> {
                   },
                   onDaySelected: (selectedDay, focusedDay) {
                     if (!isSameDay(_selectedDay, selectedDay)) {
+                      // Vorgang für die Auswahl eines tages
                       setState(() {
                         _selectedDay = selectedDay;
                         _focusedDay = focusedDay;
@@ -81,6 +90,8 @@ class _CalendarViewState extends State<CalendarView> {
                     }
                   },
                   onPageChanged: (focusedDay) {
+                    // Vorgang bei wechseln des Monats
+
                     _focusedDay = focusedDay;
 
                     Provider.of<EventProvider>(context, listen: false)
@@ -100,6 +111,8 @@ class _CalendarViewState extends State<CalendarView> {
                   ? (Container(
                       height: 40,
                       margin: const EdgeInsets.all(10.0),
+
+                      // Asuwahl Button zum wechseln zwischen Persönlichem und Allgemeinem Kaledner
                       child: ToggleButtons(
                         children: [
                           Container(
@@ -112,6 +125,7 @@ class _CalendarViewState extends State<CalendarView> {
                         isSelected: isSelected,
                         onPressed: (int index) {
                           setState(() {
+                            // Sorgt dafür dass nur ein Button gleichzeitig ausgewählt ist
                             for (int buttonIndex = 0;
                                 buttonIndex < isSelected.length;
                                 buttonIndex++) {
@@ -142,6 +156,7 @@ class _CalendarViewState extends State<CalendarView> {
         Expanded(
             child: ValueListenableBuilder<List<Veranstaltung>>(
           valueListenable: _selectedEvents,
+          // Vorschau Liste der Veranstaltung am ausgewählten Tag
           builder: (context, value, _) {
             if (value == null || value.length == 0) {
               return Container(
@@ -196,6 +211,7 @@ class _CalendarViewState extends State<CalendarView> {
   }
 }
 
+// Widget für die anzeige wie viele Veranstaltungen an einem Tag hinterlegt sind
 // ignore: must_be_immutable
 class SingleMarkerDay extends StatelessWidget {
   Color backgroundColor;
@@ -227,6 +243,7 @@ class SingleMarkerDay extends StatelessWidget {
   }
 }
 
+// Widget für die Tage 
 // ignore: must_be_immutable
 class CalendarDay extends StatelessWidget {
   String content;

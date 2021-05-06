@@ -10,6 +10,8 @@ class FavoritesView extends StatefulWidget {
   _FavoritesViewState createState() => _FavoritesViewState();
 }
 
+// Liste aller vom Nutzer favorisierten Veranstaltungen. Falls er nicht
+// eingeloggt ist, wird ihm eine ErrorBox angezeigt
 class _FavoritesViewState extends State<FavoritesView> {
   @override
   Widget build(BuildContext context) {

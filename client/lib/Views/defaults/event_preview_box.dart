@@ -13,6 +13,7 @@ import '../Home.dart';
 
 enum AdditiveFormat { HOLE_DATETIME, TIME_TILL_START, DISTANCE }
 
+// Blaue Box die eine Vorschau für Veranstaltungen visualisren soll
 // ignore: must_be_immutable
 class EventPreviewBox extends StatefulWidget {
   int id;

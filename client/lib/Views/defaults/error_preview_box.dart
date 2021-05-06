@@ -13,6 +13,7 @@ class ErrorPreviewBox extends StatefulWidget {
   _ErrorPreviewBoxState createState() => _ErrorPreviewBoxState();
 }
 
+// Organge Box, die einen Keine gefundenenden Events oder einen Fehler visualisren soll
 class _ErrorPreviewBoxState extends State<ErrorPreviewBox> {
   @override
   Widget build(BuildContext context) {
