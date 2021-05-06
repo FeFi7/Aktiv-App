@@ -44,6 +44,7 @@ class _BodyState extends State<Body> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(height: size.height * 0.03), //Abstand über dem Bild
+                //Logo
                 CircleAvatar(
                   radius: 120,
                   backgroundImage:
@@ -51,18 +52,21 @@ class _BodyState extends State<Body> {
                   backgroundColor: Color.fromARGB(0, 0, 0, 0),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
+                //InputField für Email
                 RoundedInputEmailField(
                   hintText: "Email Adresse",
                   onChanged: (value) {
                     mail = value;
                   },
                 ),
+                //InputField für Passwort
                 RoundedPasswordField(
                   hintText: "Passwort",
                   onChanged: (value) {
                     password = value;
                   },
                 ),
+                //Login-Button
                 RoundedButton(
                   text: "LOGIN",
                   color: ColorPalette.endeavour.rgb,
@@ -76,7 +80,8 @@ class _BodyState extends State<Body> {
                       }
 
                       if (EmailValidator.validate(mail)) {
-                        Provider.of<EventProvider>(context, listen: false).resetEventListType(EventListType.FAVORITES);
+                        Provider.of<EventProvider>(context, listen: false)
+                            .resetEventListType(EventListType.FAVORITES);
                         var jwt = await Provider.of<UserProvider>(context,
                                 listen: false)
                             .login(mail, password);
@@ -103,54 +108,9 @@ class _BodyState extends State<Body> {
                     }
                   },
                 ),
-
-                // Container(
-                //   child: Row(
-                //     children: <Widget>[
-                //       SizedBox(
-                //           width:
-                //               size.width * 0.48), //Abstand links von der Kante
-                //       FlatButton(
-                //         onPressed: () => print("Passwort vergessen gedrückt"),
-                //         child: Text(
-                //           "Passwort vergessen?",
-                //           style: TextStyle(color: ColorPalette.white.rgb),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                // Container(
-                //   child: Row(
-                //     children: <Widget>[
-                //       SizedBox(
-                //           width:
-                //               size.width * 0.1), //Abstand links von der Kante
-                //       Theme(
-                //         data: ThemeData(
-                //             unselectedWidgetColor: ColorPalette.white.rgb),
-                //         child: Checkbox(
-                //           value: rememberMe,
-                //           checkColor: ColorPalette.orange.rgb,
-                //           activeColor: ColorPalette.white.rgb,
-                //           onChanged: (value) {
-                //             setState(
-                //               () {
-                //                 rememberMe = value;
-                //               },
-                //             );
-                //           },
-                //         ),
-                //       ),
-                //       Text(
-                //         "Eingeloggt bleiben?",
-                //         style: TextStyle(color: ColorPalette.malibu.rgb),
-                //       ),
-                //     ],
-                //   ),
-                // ),
                 SizedBox(
                     height: size.height * 0.02), //Abstand nach der Checkbox
+                //Wechsel zur Registrieren-View
                 AccountBereitsVorhandenCheck(
                   press: () {
                     Navigator.push(
@@ -174,6 +134,7 @@ class _BodyState extends State<Body> {
     );
   }
 
+  //Toast mit "errorMessage" anzeigen
   errorToast(String errorMessage) {
     Fluttertoast.showToast(
       msg: errorMessage,

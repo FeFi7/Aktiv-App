@@ -11,6 +11,6 @@ class InstitutionView extends StatefulWidget {
 class _InstitutionViewState extends State<InstitutionView> {
   @override
   Widget build(BuildContext context) {
-    return Body();
+    return Body(); //build Body aus components
   }
 }

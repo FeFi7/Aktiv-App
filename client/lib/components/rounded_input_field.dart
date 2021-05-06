@@ -17,6 +17,7 @@ class RoundedInputField extends StatelessWidget {
     this.controller,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
@@ -25,6 +26,7 @@ class RoundedInputField extends StatelessWidget {
         onSubmitted: onSubmitted,
         controller: controller,
         decoration: InputDecoration(
+          //Icon des InputFields
           icon: Icon(
             icon,
             color: ColorPalette.torea_bay.rgb,

@@ -13,6 +13,7 @@ class RoundedDatepickerButton extends StatelessWidget {
     this.textColor,
   }) : super(key: key);
 
+  //Abgerundeter DatePicker-Button mit vordefiniertem Design
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -33,10 +34,12 @@ class RoundedDatepickerButton extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
+                //Icon des Buttons
                 Icon(
                   Icons.calendar_today,
                   color: ColorPalette.torea_bay.rgb,
                 ),
+                //Textinhalt des Buttons
                 Container(
                   margin: EdgeInsets.symmetric(
                       vertical: 0, horizontal: 17), //max Höhe/Breite

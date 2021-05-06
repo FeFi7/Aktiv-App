@@ -10,6 +10,8 @@ class AccountBereitsVorhandenCheck extends StatelessWidget {
     this.press,
   }) : super(key: key);
 
+  //Text im Login/Registrieren Fenster wird entsprechend der aktuellen Ansicht
+  //angezeigt und wechselt zwischen den Beiden Views
   @override
   Widget build(BuildContext context) {
     return Row(

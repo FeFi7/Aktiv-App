@@ -11,20 +11,22 @@ class RoundedInputFieldBeschreibung extends StatelessWidget {
     Key key,
     this.hintText,
     this.icon = Icons.person,
-    this.onChanged, 
+    this.onChanged,
     this.controller,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem Design und begrenzter Eingabe mit 420 Zeichen
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextField(
-        controller:controller,
+        controller: controller,
         decoration: InputDecoration(
           icon: Padding(
-            padding: const EdgeInsets.only(left: 0 , top: 8 , right: 0, bottom: 100),
+            //Icon des InputFields
+            padding:
+                const EdgeInsets.only(left: 0, top: 8, right: 0, bottom: 100),
             child: Icon(
-              
               icon,
               color: ColorPalette.torea_bay.rgb,
             ),
@@ -32,7 +34,6 @@ class RoundedInputFieldBeschreibung extends StatelessWidget {
           hintText: hintText,
           border: InputBorder.none,
         ),
-        
         maxLines: 6,
         maxLength: 420,
       ),

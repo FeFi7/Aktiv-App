@@ -19,6 +19,7 @@ class RoundedInputFieldNumericKomma extends StatelessWidget {
     this.enabled,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem Design Keyboard-Type (numerisch), ohne Einschränkung
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
@@ -26,8 +27,9 @@ class RoundedInputFieldNumericKomma extends StatelessWidget {
         enabled: enabled,
         onChanged: onChanged,
         controller: controller,
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.number, //nur Eingabe von Zahlen möglich
         decoration: InputDecoration(
+          //Icon des InputFields
           icon: Icon(
             icon,
             color: ColorPalette.torea_bay.rgb,

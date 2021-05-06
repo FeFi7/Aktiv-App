@@ -45,8 +45,10 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
+            //wenn Angaben komplett, BestätigungsFenster anzeigen, sonst Stepper
             complete
                 ? Center(
+                    //Bestätigung der Angaben
                     child: AlertDialog(
                       title: Text("Angaben vollständig"),
                       content: SingleChildScrollView(
@@ -76,7 +78,9 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         VoidCallback onStepCancel}) {
                       return Row(
                         children: <Widget>[
-                          currentStep + 1 != steps.length
+                          currentStep + 1 !=
+                                  steps
+                                      .length //wenn letzter Schritt, "Daten senden", anstatt "weiter" anzeigen
                               ? TextButton(
                                   onPressed: onStepContinue,
                                   child: const Text(
@@ -95,6 +99,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                     ),
                                   ),
                                 ),
+                          //zurück-TextButton
                           TextButton(
                             onPressed: onStepCancel,
                             child: const Text(
@@ -112,6 +117,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                         title: Text("Person"),
                         content: Column(
                           children: <Widget>[
+                            //InputField für Vorname
                             RoundedInputField(
                               controller: vornameController,
                               hintText: hintVorname(Provider.of<UserProvider>(
@@ -128,6 +134,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                 }
                               },
                             ),
+                            //InputField für Nachname
                             RoundedInputField(
                                 controller: nachnameController,
                                 hintText: hintNachname(
@@ -143,6 +150,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                     nachnameController.text = value;
                                   }
                                 }),
+                            //InputField für Telefonnummer
                             RoundedInputFieldNumeric(
                               controller: telController,
                               hintText: hintTel(Provider.of<UserProvider>(
@@ -163,10 +171,12 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                           ],
                         ),
                       ),
+                      //"Anschrift-Schritt" im Stepper
                       Step(
                         title: Text("Anschrift"),
                         content: Column(
                           children: <Widget>[
+                            //InputField für Straße
                             RoundedInputField(
                               controller: strasseController,
                               hintText: hintStrasse(Provider.of<UserProvider>(
@@ -184,6 +194,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                 }
                               },
                             ),
+                            //InputField für Hausnummer
                             RoundedInputFieldNumeric(
                               controller: hausnummerController,
                               hintText: hintHausnummer(
@@ -201,6 +212,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
                                 }
                               },
                             ),
+                            //InputField für PLZ
                             RoundedInputFieldNumeric(
                               controller: plzController,
                               hintText: hintPlz(Provider.of<UserProvider>(
@@ -233,6 +245,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
     );
   }
 
+  //nächster Schritt im Stepper
   nextStep() async {
     if (currentStep + 1 != steps.length) {
       goToStep(currentStep + 1);
@@ -247,16 +260,19 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
     }
   }
 
+  //"zurück" Schritt im Stepper
   cancelStep() {
     if (currentStep > 0) {
       goToStep(currentStep - 1);
     }
   }
 
+  //freie Auswahl des Schrittes im Stepper
   goToStep(int step) {
     setState(() => currentStep = step);
   }
 
+  //Prüft Angaben aus dem UserProvider und setzt den Inhalt der InputFields (falls angegeben)
   void checkValues() {
     (Provider.of<UserProvider>(context, listen: false).vorname.toString() !=
             "null")
@@ -304,6 +320,7 @@ class _ProfilePersoenlichState extends State<ProfilePersoenlich> {
   }
 }
 
+//Vordefinierte Angabe für Vorname
 hintVorname<String>(vorname) {
   if (vorname != null && vorname != "null") {
     return vorname;
@@ -312,6 +329,7 @@ hintVorname<String>(vorname) {
   }
 }
 
+//Vordefinierte Angabe für Nachname
 hintNachname<String>(nachname) {
   if (nachname != null && nachname != "null") {
     return nachname;
@@ -320,6 +338,7 @@ hintNachname<String>(nachname) {
   }
 }
 
+//Vordefinierte Angabe für Telefonnummer
 hintTel<String>(tel) {
   if (tel != null && tel != "null") {
     return tel;
@@ -328,6 +347,7 @@ hintTel<String>(tel) {
   }
 }
 
+//Vordefinierte Angabe für Straße
 hintStrasse<String>(strasse) {
   if (strasse != null && strasse != "null") {
     return strasse;
@@ -336,6 +356,7 @@ hintStrasse<String>(strasse) {
   }
 }
 
+//Vordefinierte Angabe für Hausnummer
 hintHausnummer<String>(hausnummer) {
   if (hausnummer != null && hausnummer != "null") {
     return hausnummer;
@@ -344,6 +365,7 @@ hintHausnummer<String>(hausnummer) {
   }
 }
 
+//Vordefinierte Angabe für PLZ
 hintPlz<String>(plz) {
   if (plz != null && plz != "null") {
     return plz;
@@ -352,6 +374,7 @@ hintPlz<String>(plz) {
   }
 }
 
+//Toast mit "errorMessage" anzeigen
 errorToast(String errorMessage) {
   Fluttertoast.showToast(
     msg: errorMessage,

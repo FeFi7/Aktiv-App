@@ -13,12 +13,14 @@ class RoundedInputFieldBeschreibungInstitution extends StatelessWidget {
     this.onChanged,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem Design und begrenzter Eingabe mit 255 Zeichen
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextField(
         onChanged: onChanged,
         decoration: InputDecoration(
+          //Icon des InputFields
           icon: Padding(
             padding:
                 const EdgeInsets.only(left: 0, top: 8, right: 0, bottom: 100),
@@ -30,6 +32,7 @@ class RoundedInputFieldBeschreibungInstitution extends StatelessWidget {
           hintText: hintText,
           border: InputBorder.none,
         ),
+        //Begrenzung der Eingabe(n)
         maxLines: 6,
         maxLength: 255,
       ),

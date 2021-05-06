@@ -71,8 +71,8 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
           ),
           body: TabBarView(
             children: [
-              firstTab(),
-              secondTab(),
+              firstTab(), //build ersten Tab
+              secondTab(), //build zweiten Tab
             ],
           ),
         ),
@@ -80,7 +80,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
-//Veranstaltungs-/Institutionsbezogener Tab
+  //Veranstaltungs-/Institutionsbezogener Tab
   SingleChildScrollView firstTab() {
     return SingleChildScrollView(
       child: Column(
@@ -98,7 +98,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
-//Benutzerbezogener Tab
+  //Benutzerbezogener Tab
   SingleChildScrollView secondTab() {
     return SingleChildScrollView(
       child: Column(
@@ -130,7 +130,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            institutionenVerwalten(),
+            institutionenVerwalten(), //verwaltete Institutionen anzeigen
           ],
         );
         break;
@@ -145,7 +145,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            institutionenVerwalten(),
+            institutionenVerwalten(), //verwaltete Institutionen anzeigen
           ],
         );
       case "betreiber":
@@ -160,7 +160,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            institutionenVerwalten(),
+            institutionenVerwalten(), //verwaltete Institutionen anzeigen
             SizedBox(height: 30.0),
             Text(
               "Zu genehmigende Institutionen",
@@ -170,7 +170,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            institutionenGenehmigen(),
+            institutionenGenehmigen(), //zu genehmigende Institutionen anzeigen
           ],
         );
       default:
@@ -180,7 +180,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     }
   }
 
-//Benutzerbezogener Tab
+  //Benutzerbezogener Tab
   Column buildSecondTab() {
     switch (_userGruppe.toLowerCase()) {
       case "user":
@@ -201,7 +201,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            zuGenehmigenVeranstaltungen(),
+            zuGenehmigenVeranstaltungen(), //zu genehmigende Veranstaltungen anzeigen
           ],
         );
       case "betreiber":
@@ -216,9 +216,9 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             ),
             SizedBox(height: 10.0),
             //verwalterVerwaltenCard(),
-            genehmigerVerwaltenCard(),
-            betreiberVerwaltenCard(),
-            benutzerLoschenCard(),
+            genehmigerVerwaltenCard(), //Genehmiger verwalten - anzeigen
+            betreiberVerwaltenCard(), //Betreiber verwalten - anzeigen
+            benutzerLoschenCard(), //Benutzer löschen - anzeigen
             SizedBox(height: 30.0),
             Text(
               "Veranstaltungen verwalten",
@@ -228,7 +228,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               ),
             ),
             SizedBox(height: 10.0),
-            zuGenehmigenVeranstaltungen(),
+            zuGenehmigenVeranstaltungen(), //zu genehmigende Veranstaltungen anzeigen
           ],
         );
       default:
@@ -238,6 +238,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     }
   }
 
+  //Verwalter verwalten Card
   verwalterVerwaltenCard() {
     Size size = MediaQuery.of(context).size;
     return CardDropDown(
@@ -251,6 +252,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       ],
       bodyChildren: [
         Text("Email-Adresse des neuen Verwalters eingeben"),
+        //Email Eingabe des Verwalters
         RoundedInputEmailField(
           hintText: "Email",
           controller: verwalterController,
@@ -259,6 +261,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         Container(
           width: size.width * 0.75,
           height: 60.0,
+          //Cards der Institutionen anzeigen
           child: DropdownButton<String>(
             value: institutionValue,
             // icon: const Icon(Icons.apartment_rounded),
@@ -288,14 +291,12 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
           ),
         ),
         SizedBox(height: 10.0),
+        //Verwalter hinzufügen Button
         RoundedButton(
           text: "Verwalter hinzufügen",
           color: ColorPalette.endeavour.rgb,
           press: () async {
             var institutionsId = "1";
-            // var verwalter =
-            //     await Provider.of<UserProvider>(context, listen: false)
-            //         .setRole(verwalterController.text, "verwalter");
             if (await confirm(
               context,
               title: Text("Bestätigung"),
@@ -323,14 +324,12 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             }
           },
         ),
+        //Verwalter entfernen Button
         RoundedButton(
           text: "Verwalter entfernen",
           color: ColorPalette.grey.rgb,
           press: () async {
             var institutionsId = "1";
-            // var verwalter =
-            //     await Provider.of<UserProvider>(context, listen: false)
-            //         .setRole(verwalterController.text, "verwalter");
             if (await confirm(
               context,
               title: Text("Bestätigung"),
@@ -361,6 +360,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
+  //Betreiber verwalten Card
   betreiberVerwaltenCard() {
     return CardDropDown(
       headerChildren: [
@@ -373,11 +373,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       ],
       bodyChildren: [
         Text("Email-Adresse des Betreibers eingeben"),
+        //Email Eingabe des Betreibers
         RoundedInputEmailField(
           hintText: "Email",
           controller: betreiberController,
         ),
         SizedBox(height: 10.0),
+        //Betreiber hinzufügen Button
         RoundedButton(
           text: "Betreiber hinzufügen",
           color: ColorPalette.endeavour.rgb,
@@ -408,6 +410,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
           },
         ),
         SizedBox(height: 10.0),
+        //Betreiber entfernen Button
         RoundedButton(
           text: "Betreiber entfernen",
           color: ColorPalette.grey.rgb,
@@ -441,6 +444,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
+  //Genehmiger verwalten Card
   genehmigerVerwaltenCard() {
     return CardDropDown(
       headerChildren: [
@@ -455,17 +459,20 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       ],
       bodyChildren: [
         Text("Email-Adresse des Genehmigers eingeben"),
+        //Email Eingabe des Genehmigers
         RoundedInputEmailField(
           hintText: "Email",
           controller: genehmigerController,
         ),
         SizedBox(height: 10.0),
         Text("Postleizahl(en) des Genehmigers eingeben"),
+        //InputField für PLZ bei Genehmiger
         RoundedInputFieldNumericKomma(
           hintText: "Bsp.: 12345, 67891",
           controller: plzController,
         ),
         SizedBox(height: 10.0),
+        //PLZ hinzufügen Button
         RoundedButton(
           text: "Postleizahl hinzufügen",
           color: ColorPalette.endeavour.rgb,
@@ -496,6 +503,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
             }
           },
         ),
+        //PLZ entfernen Button
         RoundedButton(
           text: "Postleizahl entfernen",
           color: ColorPalette.grey.rgb,
@@ -530,6 +538,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
+  //Genehmiger - keine Nutzerverwaltung - Card
   Card genehmigerCard() {
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -546,6 +555,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
+  //Benutzer löschen Card
   benutzerLoschenCard() {
     return CardDropDown(
       headerChildren: [
@@ -560,11 +570,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
       ],
       bodyChildren: [
         Text("Email-Adresse des Benutzers eingeben"),
+        //Email Eingabe des Benutzers
         RoundedInputEmailField(
           hintText: "Email",
           controller: benutzerController,
         ),
         SizedBox(height: 10.0),
+        //Benutzer löschen Button
         RoundedButton(
           text: "Benutzer löschen",
           color: ColorPalette.grey.rgb,
@@ -598,11 +610,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     );
   }
 
+  //zu genehmigende Veranstaltungen Card
   zuGenehmigenVeranstaltungen() {
     Size size = MediaQuery.of(context).size;
+    //Future Builder baut für jeden Eintrag in der Liste, eine Card
     return FutureBuilder(
         future: Provider.of<UserProvider>(context, listen: false)
-            .getUngenehmigteVeranstaltungen(),
+            .getUngenehmigteVeranstaltungen(), //Liste der ungenehmigten Veranstaltungen
         builder: (context, snapShot) {
           if (snapShot.connectionState == ConnectionState.none &&
               snapShot.hasData == null) {
@@ -615,6 +629,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
               itemBuilder: (context, index) {
                 return Container(
+                  //Card Dropdown mit Bild
                   child: CardDropDownImage(
                     decoration: [
                       Container(
@@ -626,6 +641,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                             fit: StackFit.expand,
                             children: [
                               Container(
+                                //Decoration Image
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                     fit: BoxFit.cover,
@@ -647,11 +663,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                     ],
+                    //Widgets die im zugeklappten Zustand angezeigt werden
                     headerChildren: [
                       Icon(Icons.calendar_today, size: 40.0),
                       SizedBox(width: 20.0),
                       Text(snapShot.data[index]['titel']),
                     ],
+                    //Widgets die im aufgeklappten Zustand angezeigt werden
                     bodyChildren: [
                       Text(
                         snapShot.data[index]['beschreibung'],
@@ -668,6 +686,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                           thickness: 2,
                         ),
                       ),
+                      //Kontaktangabe
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -695,6 +714,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                       SizedBox(height: 40.0),
+                      //Button zum Genehmigen von Veranstaltung
                       RoundedButton(
                         text: "Veranstaltung genehmigen",
                         color: ColorPalette.endeavour.rgb,
@@ -731,6 +751,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                           }
                         },
                       ),
+                      //Button zum Ablehnen von Veranstaltung
                       RoundedButton(
                         text: "Veranstaltung ablehnen",
                         color: ColorPalette.grey.rgb,
@@ -774,11 +795,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         });
   }
 
+  //Institution verwalten Card
   institutionenVerwalten() {
     Size size = MediaQuery.of(context).size;
+    //Future Builder baut für jeden Eintrag in der Liste, eine Card
     return FutureBuilder(
         future: Provider.of<UserProvider>(context, listen: false)
-            .getVerwalteteInstitutionen(),
+            .getVerwalteteInstitutionen(), //Liste der Institutionen
         builder: (context, snapShot) {
           if (snapShot.connectionState == ConnectionState.none &&
               snapShot.hasData == null) {
@@ -792,6 +815,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
               itemBuilder: (context, index) {
                 return Container(
+                  //Card Dropdown mit Bild
                   child: CardDropDownImage(
                     decoration: [
                       Container(
@@ -802,6 +826,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                             clipBehavior: Clip.none,
                             fit: StackFit.expand,
                             children: [
+                              //Decoration Image
                               Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
@@ -819,6 +844,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                                   ),
                                 ),
                               ),
+                              //Button für ImagePicker
                               Positioned(
                                 right: 5,
                                 bottom: 5,
@@ -852,11 +878,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                     ],
+                    //Widgets die im zugeklappten Zustand angezeigt werden
                     headerChildren: [
                       Icon(Icons.image_aspect_ratio_sharp, size: 40.0),
                       SizedBox(width: 20.0),
                       Text(snapShot.data[index]['name']),
                     ],
+                    //Widgets die im aufgeklappten Zustand angezeigt werden
                     bodyChildren: [
                       Text(
                         snapShot.data[index]['beschreibung'],
@@ -869,6 +897,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         controller: verwalterController,
                       ),
                       SizedBox(height: 20.0),
+                      //Button um Verwalter hinzuzufügen
                       RoundedButton(
                         text: "Verwalter hinzufügen",
                         color: ColorPalette.endeavour.rgb,
@@ -907,6 +936,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                           }
                         },
                       ),
+                      //Button für Verwalter entfernen
                       Visibility(
                         visible: (snapShot.data[index]['ersteller'] !=
                                 UserProvider.userId
@@ -949,6 +979,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                       SizedBox(height: 20.0),
+                      //Button für Institution entfernen
                       Visibility(
                         visible: (snapShot.data[index]['ersteller'] !=
                                 UserProvider.userId
@@ -997,11 +1028,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         });
   }
 
+  //Institution genehmigen Card
   institutionenGenehmigen() {
     Size size = MediaQuery.of(context).size;
+    //Future Builder baut für jeden Eintrag in der Liste, eine Card
     return FutureBuilder(
         future: Provider.of<UserProvider>(context, listen: false)
-            .getUngenehmigteInstitutionen(),
+            .getUngenehmigteInstitutionen(), //Liste der ungenehmigten Institutionen
         builder: (context, snapShot) {
           if (snapShot.connectionState == ConnectionState.none &&
               snapShot.hasData == null) {
@@ -1019,6 +1052,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
               itemCount: (snapShot.data != null) ? snapShot.data.length : 0,
               itemBuilder: (context, index) {
                 return Container(
+                  //Card Dropdown mit Bild
                   child: CardDropDownImage(
                     decoration: [
                       Container(
@@ -1029,6 +1063,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                             clipBehavior: Clip.none,
                             fit: StackFit.expand,
                             children: [
+                              //Decoration Image
                               Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
@@ -1051,11 +1086,13 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                     ],
+                    //Widgets die im zugeklappten Zustand angezeigt werden
                     headerChildren: [
                       Icon(Icons.image_aspect_ratio_sharp, size: 40.0),
                       SizedBox(width: 20.0),
                       Text(snapShot.data[index]['name']),
                     ],
+                    //Widgets die im aufgeklappten Zustand angezeigt werden
                     bodyChildren: [
                       Text(
                         snapShot.data[index]['beschreibung'],
@@ -1072,6 +1109,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                           thickness: 2,
                         ),
                       ),
+                      //Kontaktangabe in Card
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -1096,6 +1134,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                         ),
                       ),
                       SizedBox(height: 20.0),
+                      //Button zum genehmigen der Institution
                       RoundedButton(
                         text: "Institution genehmigen",
                         color: ColorPalette.endeavour.rgb,
@@ -1132,6 +1171,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
                           }
                         },
                       ),
+                      //Button zum Löschen einer Institution
                       RoundedButton(
                         text: "Institution löschen",
                         color: ColorPalette.grey.rgb,
@@ -1174,6 +1214,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
         });
   }
 
+  //Toast mit "errorMessage" anzeigen
   errorToast(String errorMessage) {
     Fluttertoast.showToast(
       msg: errorMessage,
@@ -1186,6 +1227,7 @@ class _ProfileVerwaltenState extends State<ProfileVerwalten> {
     FocusManager.instance.primaryFocus.unfocus();
   }
 
+  //Image Picker
   Future getImage(String institutionId) async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(

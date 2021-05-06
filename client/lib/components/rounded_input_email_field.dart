@@ -16,17 +16,20 @@ class RoundedInputEmailField extends StatelessWidget {
     this.controller,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem Design und Validierung für Email-Eingaben
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        //Validierung der Eingabe
         child: TextFormField(
           keyboardType: TextInputType.emailAddress,
           validator: (value) => EmailValidator.validate(value)
               ? null
               : "Bitte gültige Email eingeben",
           onChanged: onChanged,
+          //Icon des Buttons
           decoration: InputDecoration(
             icon: Icon(
               icon,

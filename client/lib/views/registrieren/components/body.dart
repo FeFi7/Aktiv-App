@@ -40,6 +40,7 @@ class _BodyState extends State<Body> {
                 style: TextStyle(color: ColorPalette.white.rgb, fontSize: 26.0),
               ),
               SizedBox(height: size.height * 0.03), //Abstand unter den Buttons
+              //InputField für Email
               RoundedInputEmailField(
                 hintText: "Email",
                 icon: Icons.mail,
@@ -49,6 +50,7 @@ class _BodyState extends State<Body> {
                   });
                 },
               ),
+              //InputField für Passwort
               RoundedPasswordField(
                 hintText: "Passwort",
                 onChanged: (value) {
@@ -57,6 +59,7 @@ class _BodyState extends State<Body> {
                   });
                 },
               ),
+              //InputField für Passwort wiederholen
               RoundedPasswordField(
                 hintText: "Passwort wiederholen",
                 onChanged: (value) {
@@ -65,6 +68,7 @@ class _BodyState extends State<Body> {
                   });
                 },
               ),
+              //Container für Datenschutz- und Verpflichtungserklärung
               Container(
                 child: Row(
                   children: <Widget>[
@@ -73,6 +77,7 @@ class _BodyState extends State<Body> {
                     Theme(
                       data: ThemeData(
                           unselectedWidgetColor: ColorPalette.white.rgb),
+                      //Checkbox für Datenschutz- und Verpflichtungserklärung
                       child: Checkbox(
                         value: agbsGelesen,
                         checkColor: ColorPalette.orange.rgb,
@@ -92,6 +97,7 @@ class _BodyState extends State<Body> {
                           text: "Ich habe die ",
                           style: TextStyle(color: ColorPalette.malibu.rgb),
                         ),
+                        //Link zur Datenschutz- und Verpflichtungserklärung
                         TextSpan(
                           text: "Datenschutz- und \nVerpflichtungserklärung ",
                           style: TextStyle(color: ColorPalette.white.rgb),
@@ -116,6 +122,7 @@ class _BodyState extends State<Body> {
                   ],
                 ),
               ),
+              //Button für Registrieren
               RoundedButton(
                 text: "Registrieren",
                 color: ColorPalette.endeavour.rgb,
@@ -186,6 +193,7 @@ class _BodyState extends State<Body> {
     );
   }
 
+  //Toast mit "errorMessage" anzeigen
   errorToast(String errorMessage) {
     Fluttertoast.showToast(
       msg: errorMessage,

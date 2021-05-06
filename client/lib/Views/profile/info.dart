@@ -13,6 +13,7 @@ class InfoView extends StatefulWidget {
   _InfoViewState createState() => _InfoViewState();
 }
 
+//View für Danksagungen und kurze Informationen
 class _InfoViewState extends State<InfoView> {
   @override
   Widget build(BuildContext context) {
@@ -36,6 +37,7 @@ class _InfoViewState extends State<InfoView> {
               "an Herrn Prof. Dr. Klaus Baer der Technischen Hochschule Ulm für die wissenschaftliche Unterstützung und vor allem an unsere Programmierer:\n\n" +
               "Viktor Dötzel\nFelix Filser\nFabian Bösel\nNiko Burkert\nMoritz Nentwig\nFlorian Kovacsik"),
         ),
+        //"zurück" Button
         TextButton(
           onPressed: () {
             Provider.of<BodyProvider>(context, listen: false)

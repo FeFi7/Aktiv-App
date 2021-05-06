@@ -22,14 +22,15 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
     Size size = MediaQuery.of(context).size;
     return Column(
       children: [
-        if (init) getSliderValues(),
+        if (init) getSliderValues(), //initiiert die Angaben der Slider
         SizedBox(height: 40),
-        baldSlider(size),
+        baldSlider(size), //build Slider für "Bald"
         SizedBox(height: 25),
-        naeheSlider(size),
+        naeheSlider(size), //build Slider für "In der Nähe"
         SizedBox(
           height: 25,
         ),
+        //Einstellungen übernehmen - Button
         RoundedButton(
           text: "Einstellungen übernehmen",
           color: ColorPalette.endeavour.rgb,
@@ -48,6 +49,7 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
     );
   }
 
+  //Slider für Angabe "In der Nähe"
   Container naeheSlider(Size size) {
     return Container(
       child: Align(
@@ -117,6 +119,7 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
     );
   }
 
+  //Slider für Angabe "Bald"
   Container baldSlider(Size size) {
     return Container(
       child: Align(
@@ -186,23 +189,19 @@ class _ProfileEinstellungenState extends State<ProfileEinstellungen> {
     );
   }
 
+  //holt "Bald" & "In der Nähe" Werte aus dem UserProvider
   getSliderValues() {
     init = false;
-    if (UserProvider.bald != null &&
-        UserProvider.bald.toString() !=
-            "null") {
-      sliderValueBald =
-          UserProvider.bald.toDouble();
+    if (UserProvider.bald != null && UserProvider.bald.toString() != "null") {
+      sliderValueBald = UserProvider.bald.toDouble();
     }
-    if (UserProvider.naehe != null &&
-        UserProvider.naehe.toString() !=
-            "null") {
-      sliderValueNaehe =
-          UserProvider.naehe.toDouble();
+    if (UserProvider.naehe != null && UserProvider.naehe.toString() != "null") {
+      sliderValueNaehe = UserProvider.naehe.toDouble();
     }
     return SizedBox(height: 2.0);
   }
 
+  //Toast mit "errorMessage" anzeigen
   errorToast(String errorMessage) {
     Fluttertoast.showToast(
       msg: errorMessage,

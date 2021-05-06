@@ -23,8 +23,6 @@ class _WelcomeScreen extends State<WelcomeScreen> {
     autoSignIn();
   }
 
-  // TODO: muss eigentlich standard mäßig auf true sein, wird aber wenn man sich
-  // nicht automatisc einloggt, nie false & idk why
   bool loadOverlay = false;
 
   @override
@@ -91,6 +89,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                   backgroundColor: Color.fromARGB(0, 0, 0, 0),
                 ),
                 SizedBox(height: size.height * 0.03), //Abstand unter dem Bild
+                //Button für Anmelden
                 RoundedButton(
                   text: "Anmelden",
                   color: ColorPalette.endeavour.rgb,
@@ -105,6 +104,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
                     );
                   },
                 ),
+                //Button für Ohne Anmeldung fortfahren
                 RoundedButton(
                   text: "Ohne Anmeldung fortfahren",
                   textColor: Colors.black87,
@@ -148,11 +148,13 @@ class _WelcomeScreen extends State<WelcomeScreen> {
     );
   }
 
+  //Start Timer für AutoLogin
   startTime() async {
     var duration = new Duration(seconds: 1);
     return new Timer(duration, route);
   }
 
+  //Route für AutoLogin
   route() async {
     await Provider.of<UserProvider>(context, listen: false).signInWithToken();
     if (Provider.of<UserProvider>(context, listen: false).isSignInWithToken) {
@@ -161,6 +163,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
     }
   }
 
+  //AutoLogin Prozess auslösen
   autoSignIn() async {
     if (await Provider.of<UserProvider>(context, listen: false)
             .getUserIdFromStorage() !=

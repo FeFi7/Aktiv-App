@@ -57,6 +57,7 @@ class _BodyState extends State<Body> {
     );
   }
 
+  //Anzeigen des Vor- & Nachnamen, sofern angegeben
   Text buildName() {
     if (Provider.of<UserProvider>(context, listen: false).vorname != null &&
         Provider.of<UserProvider>(context, listen: false).vorname != "null" &&
@@ -82,6 +83,7 @@ class _BodyState extends State<Body> {
     return Text("");
   }
 
+  //Anzeigen der Email
   Text buildMail() {
     if (Provider.of<UserProvider>(context, listen: false).mail != null &&
         Provider.of<UserProvider>(context, listen: false).mail != "null" &&
@@ -98,6 +100,7 @@ class _BodyState extends State<Body> {
     return Text("");
   }
 
+  //Anzeigen der PLZ & des Ortes, sofern angegeben
   Text buildPlzOrt() {
     if (Provider.of<UserProvider>(context, listen: false).plz != null &&
         Provider.of<UserProvider>(context, listen: false).ort != null &&
@@ -127,12 +130,15 @@ class _BodyState extends State<Body> {
     return Text("");
   }
 
+  //Aufbau der Buttons im Profil - abhängig von Nutzerrechten
   Column buttons(BuildContext context) {
+    //Buttons, die nur eingeloggte Nutzer sehen
     if (UserProvider.istEingeloggt) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(height: 10),
+          //Verwalten Button für Verwalter/Genehmiger/Betreiber
           Visibility(
             visible: Provider.of<UserProvider>(context, listen: false)
                     .hatVerwalteteInstitutionen ||
@@ -144,9 +150,12 @@ class _BodyState extends State<Body> {
               child: verwaltenButton(context),
             ),
           ),
-          persoenlichButton(context),
-          institutionenButton(context),
-          einstellungenButton(context),
+          persoenlichButton(context), //Button für Angabe der persönlichen Daten
+          institutionenButton(
+              context), //Button zum Beantragen einer Institution
+          einstellungenButton(
+              context), //Button zum Ändern der "Bald" & "In der Nähe" Einstellungen
+          //Hilfe Button
           RoundedButton(
             text: "Hilfe",
             color: Colors.grey[400],
@@ -160,6 +169,7 @@ class _BodyState extends State<Body> {
               );
             },
           ),
+          //Abmelden Button
           RoundedButton(
             text: "Abmelden",
             color: Colors.grey[400],
@@ -205,6 +215,7 @@ class _BodyState extends State<Body> {
               }
             },
           ),
+          //Info TextButton
           TextButton(
             onPressed: () {
               Provider.of<BodyProvider>(context, listen: false)
@@ -214,6 +225,7 @@ class _BodyState extends State<Body> {
             },
             child: Text("Info"),
           ),
+          //Impressum TextButton
           TextButton(
             onPressed: () async {
               final url =
@@ -230,10 +242,12 @@ class _BodyState extends State<Body> {
         ],
       );
     } else {
+      //Buttons, die alle Nutzer sehen
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(height: 10),
+          //Hilfe Button
           RoundedButton(
             text: "Hilfe",
             color: Colors.grey[400],
@@ -247,6 +261,7 @@ class _BodyState extends State<Body> {
               );
             },
           ),
+          //Abmelden Button
           RoundedButton(
             text: "Abmelden",
             color: Colors.grey[400],
@@ -263,6 +278,7 @@ class _BodyState extends State<Body> {
               );
             },
           ),
+          //Info-TextButton
           TextButton(
             onPressed: () {
               Provider.of<BodyProvider>(context, listen: false)
@@ -272,6 +288,7 @@ class _BodyState extends State<Body> {
             },
             child: Text("Info"),
           ),
+          //Impressum-TextButton
           TextButton(
             onPressed: () async {
               final url =

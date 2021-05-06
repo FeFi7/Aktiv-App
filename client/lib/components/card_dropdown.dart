@@ -7,6 +7,9 @@ class CardDropDown extends StatelessWidget {
   const CardDropDown({Key key, this.headerChildren, this.bodyChildren})
       : super(key: key);
 
+  //Drop-Down-Card Widget mit jeweils einer Liste für
+  //Header: Widgets, die im zugeklappten Zustand angezeigt werden
+  //Body: Widgets die nach dem Aufklappen der Card zu sehen sind
   @override
   Widget build(BuildContext context) {
     return Card(

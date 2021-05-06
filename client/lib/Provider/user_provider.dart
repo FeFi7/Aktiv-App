@@ -46,6 +46,8 @@ class UserProvider extends ChangeNotifier {
     _role = role;
   }
 
+  //Login Funktion - prüft Zugangsdaten - legt benötigte Daten im SecureStorage ab
+  //ruft bei erfolgreichem Login, collectUserInfo auf
   login<Response>(String mail, password) async {
     var jwt = await attemptLogIn(mail, password);
 
@@ -70,6 +72,7 @@ class UserProvider extends ChangeNotifier {
     return jwt;
   }
 
+  //Setzt Nutzerinformationen im UserProvider
   collectUserInfo(var id, var accessToken) async {
     var detailedUserInfo = await attemptGetUserInfo(id.toString(), accessToken);
     print("detailed User Info: " + detailedUserInfo.body);
@@ -95,6 +98,9 @@ class UserProvider extends ChangeNotifier {
     verwalteteInstitutionen = await getVerwalteteInstitutionen();
   }
 
+  //Liest SecureStorage und prüft, ob der accessToken bereits abgelaufen ist
+  //wenn abgelaufen: hole neuen accessToken mit Hilfe von refreshToken und schreibe neue Tokens
+  //mit TimeStamp in das Storage
   getAccessToken() async {
     var _accessToken = await storage.read('accessToken');
     if (_accessToken != null) {
@@ -126,6 +132,7 @@ class UserProvider extends ChangeNotifier {
     return await storage.read('accessToken');
   }
 
+  //holt UserId aus dem SecureStorage
   getUserIdFromStorage() async {
     var _userId = await storage.read('userId');
     if (_userId != null) {
@@ -136,6 +143,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //automatischer Login aus dem WelcomeScreen, sofern Token vorhanden
   signInWithToken() async {
     var userId = await storage.read("userId");
     var accessToken = await getAccessToken();
@@ -148,11 +156,13 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //log off
   signOff() async {
     istEingeloggt = false;
     await storage.deleteAll();
   }
 
+  //Nutzerinformationen aktualiseren
   updateUserInfo<Response>(String vorname, String nachname, String plz,
       String tel, String strasse, String hausnummer) async {
     var jwt = await attemptUpdateUserInfo(
@@ -167,11 +177,11 @@ class UserProvider extends ChangeNotifier {
         await getAccessToken());
     var accessToken = await storage.read('accessToken');
     await collectUserInfo(userId, accessToken);
-
     notifyListeners();
     return jwt;
   }
 
+  //Nutzersettings (Bald/In der Nähe) aktualisieren
   updateUserSettings(String naehe, String bald) async {
     var jwt = await attemptUpdateSettings(
         userId.toString(), await getAccessToken(), naehe, bald);
@@ -180,6 +190,7 @@ class UserProvider extends ChangeNotifier {
     return jwt;
   }
 
+  //Profilbild des Nutzers ändern
   changeProfileImage(File file) async {
     var jwt = await attemptNewProfilImage(file.path, file, userId.toString());
     if (jwt.statusCode == 200) {
@@ -193,12 +204,14 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Profilbild des Nutzers laden
   loadProfileImage() async {
     var jwt = await attemptGetFile(profilBild);
     notifyListeners();
     return jwt;
   }
 
+  //Rolle eines Benutzers setzen - durch angabe der Mail und Rolle ("user"/"genehmiger"/"betreiber")
   setRole(String mail, String rolle) async {
     switch (rolle.toLowerCase()) {
       case "user":
@@ -226,6 +239,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //Hinzufügen eines Verwalters zu einer Institution
   verwalterHinzufuegen(String mail, String institutionsId) async {
     var verwalter = await attemptGetUser(mail);
     var parsedVerwalter = json.decode(verwalter.body);
@@ -240,6 +254,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //Entfernen eines Verwalters von einer Institution
   verwalterLoeschen(String mail, String institutionsId) async {
     var verwalter = await attemptGetUser(mail);
     var parsedVerwalter = json.decode(verwalter.body);
@@ -254,6 +269,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //gibt Liste von verwalteten Institutionen zurück
   Future getVerwalteteInstitutionen() async {
     List _institutionen = [];
     var _accessToken = await getAccessToken();
@@ -266,6 +282,7 @@ class UserProvider extends ChangeNotifier {
     return _institutionen;
   }
 
+  //gibt Liste von ungenehmigten Institutionen zurück
   Future getUngenehmigteInstitutionen() async {
     List _institutionen = [];
     var _accessToken = await getAccessToken();
@@ -279,6 +296,7 @@ class UserProvider extends ChangeNotifier {
     return _institutionen;
   }
 
+  //Genehmigen einer Institution
   institutionGenehmigen(String id) async {
     var institutionGenehmigen =
         await attemptApproveInstitution(id, await getAccessToken());
@@ -289,6 +307,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Löschen einer Institution
   institutionLoeschen(String id) async {
     var institutionLoeschen =
         await attemptDeleteInstitution(id, await getAccessToken());
@@ -299,6 +318,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Bild einer Institution setzen (nur möglich nach der Genehmigung und nur als Verwalter)
   attemptImageForInstitution(File file, String institutionId) async {
     var jwt = await attemptNewImageForInstitution(
         file, institutionId, await getAccessToken());
@@ -313,12 +333,14 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Bild einer Institution laden
   loadInstitutionImage() async {
     var jwt = await attemptGetFile(institutionBild);
     notifyListeners();
     return jwt;
   }
 
+  //Hinzufügen von zu verwalteten PLZs zum User -> ernennung zum "Genehmiger" in einem PLZ-Bereich
   setGenehmiger(String mail, List<String> plz) async {
     var _betreiber = await attemptGetUser(mail);
     var parsedgenehmiger = json.decode(_betreiber.body);
@@ -350,6 +372,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //Entfernen von zu verwalteten PLZs eines Users
   removeGenehmiger(String mail, List<String> plz) async {
     if (await setRole(mail, "genehmiger") != null) {
       var genehmiger = await attemptGetUser(mail);
@@ -368,6 +391,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //Ausgeben aller PLZs, die vom Nutzer mit der angegebenen UserId verwaltet werden
   getGenehmigerPLZs(String userId) async {
     var jwt = await attemptGetPLZs(userId);
     if (jwt != null) {
@@ -378,9 +402,11 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Liste aller ungenehmigter Veranstaltungen
   Future getUngenehmigteVeranstaltungen() async {
     List _veranstaltungen = [];
     if (rolle.toLowerCase() != "betreiber") {
+      //Alle ungenehmigten Veranstaltungen für Genehmiger (innerhalb PLZs)
       List _genehmigerPLZs = await getGenehmigerPLZs(userId.toString());
 
       if (_genehmigerPLZs != null) {
@@ -394,6 +420,7 @@ class UserProvider extends ChangeNotifier {
         });
       }
     } else {
+      //Allge ungenehmigten Veranstaltungen - für Betreiber
       var veranstaltungen = await attemptGetAllVeranstaltungen(
           "-1", "0", "25", "1", "-1", "-1", "-1", "-1", "-1", "-1");
 
@@ -405,6 +432,7 @@ class UserProvider extends ChangeNotifier {
     return _veranstaltungen;
   }
 
+  //Genehmigen einer Veranstaltung
   veranstaltungGenehmigen(String id) async {
     var institutionGenehmigen =
         await attemptApproveVeranstaltung(id, await getAccessToken());
@@ -415,6 +443,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Löschen einer Veranstaltung
   veranstaltungLoeschen(String id) async {
     var institutionLoeschen =
         await attemptDeleteVeranstaltung(id, await getAccessToken());
@@ -425,6 +454,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  //Löschen eines Nutzers
   deleteUser(String mail) async {
     var userToDelete = await attemptGetUser(mail);
     var parsedUser = json.decode(userToDelete.body);
@@ -437,6 +467,7 @@ class UserProvider extends ChangeNotifier {
     return null;
   }
 
+  //Prüfen, ob Nutzerdaten komplett sind (zum Erstellen von Veranstaltungen)
   checkDataCompletion() {
     if (vorname != null &&
         vorname != "null" &&

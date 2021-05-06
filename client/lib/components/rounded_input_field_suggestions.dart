@@ -11,27 +11,28 @@ class RoundedInputFieldSuggestions extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onSubmitted;
 
- 
   const RoundedInputFieldSuggestions({
     Key key,
     this.hintText,
     this.icon = Icons.person,
     this.onChanged,
-    this.suggestions, this.controller, 
+    this.suggestions,
+    this.controller,
     this.onSubmitted,
-    
   }) : super(key: key);
 
+//Abgerundetes InputField mit vordefiniertem Design und Vorschlägen für Tags
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: SimpleAutoCompleteTextField(
         controller: controller,
         key: key,
-        suggestions: suggestions,
+        suggestions: suggestions, //Liste der Vorschläge
         textChanged: onChanged,
         textSubmitted: onSubmitted,
         decoration: InputDecoration(
+          //Icon des InputFields
           icon: Icon(
             icon,
             color: ColorPalette.torea_bay.rgb,

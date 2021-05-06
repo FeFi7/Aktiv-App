@@ -37,6 +37,7 @@ class _BodyState extends State<Body> {
               style: TextStyle(color: ColorPalette.black.rgb, fontSize: 26.0),
             ),
             SizedBox(height: size.height * 0.03), //Abstand unter den Buttons
+            //InputField für Titel
             RoundedInputField(
               hintText: "Titel",
               icon: Icons.title,
@@ -44,6 +45,7 @@ class _BodyState extends State<Body> {
                 titelController.text = value;
               },
             ),
+            //InputField für Beschreibung
             RoundedInputFieldBeschreibungInstitution(
               hintText: 'Beschreibung der Institution',
               icon: Icons.edit,
@@ -51,6 +53,7 @@ class _BodyState extends State<Body> {
                 beschreibungController.text = value;
               },
             ),
+            //Button zum Abschicken des Institutionsantrags
             RoundedButton(
               text: "Institutionsantrag abschicken",
               color: ColorPalette.endeavour.rgb,
@@ -89,6 +92,7 @@ class _BodyState extends State<Body> {
     );
   }
 
+  //Toast mit "errorMessage" anzeigen
   errorToast(String errorMessage) {
     Fluttertoast.showToast(
       msg: errorMessage,

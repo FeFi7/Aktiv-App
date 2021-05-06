@@ -16,6 +16,7 @@ class RoundedInputFieldNumeric extends StatelessWidget {
     this.controller,
   }) : super(key: key);
 
+  //Abgerundetes InputField mit vordefiniertem Design Keyboard-Type (numerisch), mit Einschränkungen
   @override
   Widget build(BuildContext context) {
     return TextFieldContainer(
@@ -24,9 +25,11 @@ class RoundedInputFieldNumeric extends StatelessWidget {
         controller: controller,
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+          FilteringTextInputFormatter.allow(
+              RegExp(r'[0-9]')), //Einschräkung der Eingabe (nur Zahlen)
         ],
         decoration: InputDecoration(
+          //Icon des InputFields
           icon: Icon(
             icon,
             color: ColorPalette.torea_bay.rgb,

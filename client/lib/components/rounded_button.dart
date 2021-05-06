@@ -12,6 +12,7 @@ class RoundedButton extends StatelessWidget {
     this.textColor = Colors.white,
   }) : super(key: key);
 
+  //Abgerundeter Button mit vordefiniertem Design
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -27,6 +28,7 @@ class RoundedButton extends StatelessWidget {
               vertical: 20, horizontal: 40), //max Höhe/Breite
           color: color,
           onPressed: press,
+          //Textinhalt des Buttons
           child: Text(
             text,
             style: TextStyle(

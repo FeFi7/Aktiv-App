@@ -14,20 +14,19 @@ class RoundedButtonDynamic extends StatelessWidget {
     this.text,
     this.press,
     this.color,
-    this.textColor = Colors.white, 
+    this.textColor = Colors.white,
     this.margin,
-    this.width, 
-    this.textSize, 
+    this.width,
+    this.textSize,
     this.icon,
-
-    
   }) : super(key: key);
 
+  //Abgerundeter Button mit vordefiniertem Design
   @override
   Widget build(BuildContext context) {
     // Size size = MediaQuery.of(context).size;
     return Container(
-     // margin:EdgeInsets.only(right:size.width*0.1),
+      // margin:EdgeInsets.only(right:size.width*0.1),
       width: width,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(29),
@@ -41,6 +40,7 @@ class RoundedButtonDynamic extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Row(
               children: [
+                //Icon im Button
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                   child: Icon(
@@ -48,8 +48,10 @@ class RoundedButtonDynamic extends StatelessWidget {
                     color: ColorPalette.torea_bay.rgb,
                   ),
                 ),
+                //Textinhalt des Buttons
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 0, horizontal: 5), //max Höhe/Breite
+                  margin: EdgeInsets.symmetric(
+                      vertical: 0, horizontal: 5), //max Höhe/Breite
                   child: Text(
                     text,
                     style: TextStyle(
