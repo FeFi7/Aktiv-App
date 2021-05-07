@@ -114,7 +114,7 @@ async function getVeranstaltungen(
     vollText = "%" + vollText + "%";
   }
 
-  const queryPartVollText = ` AND v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? `;
+  const queryPartVollText = ` AND ( v.titel LIKE ? OR v.beschreibung LIKE ? OR i.name LIKE ? )`;
   const query =
     `SELECT v.id, v.titel, v.beschreibung, v.kontakt, v.beginn_ts, v.ende_ts, v.ortBeschreibung, v.erstellt_ts, ROUND(st_distance_sphere( ST_SRID(POINT(?,?), 4326), v.koordinaten)/1000, 1) AS entfernung, 
     v.istGenehmigt, i.name AS institutionName, i.beschreibung AS institutBeschreibung, fi.pfad as institutionImage FROM Veranstaltung v
