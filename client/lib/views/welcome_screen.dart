@@ -150,7 +150,7 @@ class _WelcomeScreen extends State<WelcomeScreen> {
 
   //Start Timer für AutoLogin
   startTime() async {
-    var duration = new Duration(seconds: 1);
+    var duration = new Duration(seconds: 0);
     return new Timer(duration, route);
   }
 
